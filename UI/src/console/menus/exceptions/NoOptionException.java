@@ -1,11 +1,10 @@
-package Console.Menus.Exceptions;
+package console.menus.exceptions;
 
 public class NoOptionException extends Exception {
 
     private final String EXCEPTION_MESSAGE = "The option selected does not exist.";
 
     public NoOptionException() {
-
     }
 
     @Override
