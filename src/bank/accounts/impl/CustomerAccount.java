@@ -1,11 +1,11 @@
-package bank.account.impl;
+package bank.accounts.impl;
 
-import bank.account.Accounts;
-import bank.account.impl.exceptions.NegativeAmountException;
+import bank.accounts.Account;
+import bank.accounts.impl.exceptions.NonPositiveAmountException;
 
 import java.util.Objects;
 
-public class CustomerAccount implements Accounts {
+public class CustomerAccount implements Account {
     private static int idGenerator = 1;
     private int id;
     private String name;
@@ -44,17 +44,18 @@ public class CustomerAccount implements Accounts {
         return balance;
     }
 
-    public void deposit(float amount) throws NegativeAmountException {
-        if(amount <= 0) throw new NegativeAmountException();
+    @Override
+    public void deposit(float amount) throws NonPositiveAmountException {
+        if(amount <= 0) throw new NonPositiveAmountException();
 
         balance += amount;
         // TODO: CREATE TRANSACTION
     }
+    @Override
+    public void withdraw(float amount) throws NonPositiveAmountException {
+        if(amount <= 0) throw new NonPositiveAmountException();
 
-    public void withdraw(float amount) throws NegativeAmountException {
-        if(amount <= 0) throw new NegativeAmountException();
-
-        balance += amount;
+        balance -= amount;
         // TODO: CREATE TRANSACTION
     }
 }

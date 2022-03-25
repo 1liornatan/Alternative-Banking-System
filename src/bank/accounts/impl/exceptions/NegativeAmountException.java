@@ -1,4 +1,4 @@
-package bank.account.impl.exceptions;
+package bank.accounts.impl.exceptions;
 
 public class NegativeAmountException extends Exception {
     private static final String EXCEPTION_MESSAGE = "Negative amount was entered.";
