@@ -2,10 +2,11 @@ package bank.accounts.impl;
 
 import bank.accounts.Account;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
+import bank.data.Singular;
 
 import java.util.Objects;
 
-public class CustomerAccount implements Account {
+public class CustomerAccount implements Account, Singular {
     private static int idGenerator = 1;
     private int id;
     private String name;
@@ -24,7 +25,7 @@ public class CustomerAccount implements Account {
         return Objects.hash(id);
     }
 
-    CustomerAccount(String name, float balance) {
+    public CustomerAccount(String name, float balance) {
         id = idGenerator++;
         this.name = name;
         this.balance = balance;

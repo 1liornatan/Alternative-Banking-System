@@ -8,7 +8,5 @@ public interface Loan {
     float getInterest();
     float getBaseAmount();
     LoanStatus getStatus();
-    String getRequesterName();
-    int getRequesterId();
 
 }
