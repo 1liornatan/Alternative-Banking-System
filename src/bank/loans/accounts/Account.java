@@ -1,6 +1,6 @@
-package bank.accounts;
+package bank.loans.accounts;
 
-import bank.accounts.impl.exceptions.NonPositiveAmountException;
+import bank.loans.accounts.impl.exceptions.NonPositiveAmountException;
 
 /* An interface for all kind of accounts
    with the default actions required

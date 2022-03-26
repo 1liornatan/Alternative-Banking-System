@@ -1,7 +1,7 @@
-package bank.accounts.impl;
+package bank.loans.accounts.impl;
 
-import bank.accounts.Account;
-import bank.accounts.impl.exceptions.NonPositiveAmountException;
+import bank.loans.accounts.Account;
+import bank.loans.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.Singular;
 
 import java.util.Objects;
@@ -58,5 +58,14 @@ public class CustomerAccount implements Account, Singular {
 
         balance -= amount;
         // TODO: CREATE TRANSACTION
+    }
+
+    @Override
+    public String toString() {
+        return "CustomerAccount{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", balance=" + balance +
+                '}';
     }
 }

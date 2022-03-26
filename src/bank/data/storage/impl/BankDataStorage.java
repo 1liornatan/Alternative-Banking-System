@@ -47,4 +47,11 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E> {
             container.put(currAcc.getId(), currAcc);
         }
     }
+
+    @Override
+    public String toString() {
+        return "BankDataStorage{" +
+                "container=" + container +
+                '}';
+    }
 }
