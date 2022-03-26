@@ -4,7 +4,7 @@ import bank.loans.Loan;
 
 public class BasicLoan implements Loan {
     private static int idGenerator = 3000;
-    private int id, requesterId;
+    private int id;
     private String category;
     private float baseAmount;
     private Interest interest;
