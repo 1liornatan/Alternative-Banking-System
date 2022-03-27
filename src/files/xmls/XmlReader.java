@@ -6,7 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 
-import bank.loans.accounts.impl.CustomerAccount;
+import bank.accounts.impl.CustomerAccount;
 import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
 import files.schema.generated.*;

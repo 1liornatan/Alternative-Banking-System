@@ -16,7 +16,7 @@ public class BasicLoan implements Loan {
         this.status = status;
     }
 
-    public BasicLoan(String category, float baseAmount, float interestPercent) {
+    public BasicLoan(float baseAmount, float interestPercent, String category) {
         this.category = category;
         this.baseAmount = baseAmount;
         this.interest = new BasicInterest(interestPercent, baseAmount);

@@ -1,6 +1,8 @@
 package bank.loans;
 
-public interface Loan {
+import bank.data.Singular;
+
+public interface Loan extends Singular {
 
     int getId();
     String getCategory();

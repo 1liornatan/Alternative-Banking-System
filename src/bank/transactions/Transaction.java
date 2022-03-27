@@ -1,6 +1,8 @@
 package bank.transactions;
 
-public interface Transaction {
+import bank.data.Singular;
+
+public interface Transaction extends Singular {
 
     int getId();
     float getAmount();

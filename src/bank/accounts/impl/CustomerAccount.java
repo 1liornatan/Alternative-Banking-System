@@ -1,16 +1,25 @@
-package bank.loans.accounts.impl;
+package bank.accounts.impl;
 
-import bank.loans.accounts.Account;
-import bank.loans.accounts.impl.exceptions.NonPositiveAmountException;
+import bank.accounts.Account;
+import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.Singular;
+import bank.transactions.Transaction;
+import bank.transactions.impl.BasicTransaction;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class CustomerAccount implements Account, Singular {
     private static int idGenerator = 1;
     private int id;
     private String name;
     private float balance;
+    private Set<Integer> transactions;
+
+    public Set<Integer> getTransactions() {
+        return transactions;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -29,6 +38,7 @@ public class CustomerAccount implements Account, Singular {
         id = idGenerator++;
         this.name = name;
         this.balance = balance;
+        this.transactions = new HashSet<>();
     }
 
     @Override
@@ -46,18 +56,24 @@ public class CustomerAccount implements Account, Singular {
     }
 
     @Override
-    public void deposit(float amount) throws NonPositiveAmountException {
+    public Transaction deposit(float amount, String description) throws NonPositiveAmountException {
         if(amount <= 0) throw new NonPositiveAmountException();
 
+        Transaction transaction = new BasicTransaction(amount, description);
+        transactions.add(transaction.getId());
         balance += amount;
-        // TODO: CREATE TRANSACTION
+
+        return transaction;
     }
     @Override
-    public void withdraw(float amount) throws NonPositiveAmountException {
+    public Transaction withdraw(float amount, String description) throws NonPositiveAmountException {
         if(amount <= 0) throw new NonPositiveAmountException();
 
+        Transaction transaction = new BasicTransaction(amount, description);
+        transactions.add(transaction.getId());
         balance -= amount;
-        // TODO: CREATE TRANSACTION
+
+        return transaction;
     }
 
     @Override
