@@ -10,5 +10,5 @@ public interface Loan extends Singular {
     float getInterest();
     float getBaseAmount();
     LoanStatus getStatus();
-
+    float getMaxPortion();
 }
