@@ -67,7 +67,7 @@ public class CustomerAccount implements Account, Singular {
     }
     @Override
     public Transaction withdraw(float amount, String description) throws NonPositiveAmountException {
-        if(amount <= 0) throw new NonPositiveAmountException();
+        if(amount <= 0) throw new NonPositiveAmountException(); // TODO: Not enough money Exception.
 
         Transaction transaction = new BasicTransaction(amount, description);
         transactions.add(transaction.getId());

@@ -3,10 +3,7 @@ package bank.data.storage.impl;
 import bank.data.storage.DataStorage;
 import bank.data.Singular;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class BankDataStorage<E extends Singular> implements DataStorage<E> {
     private Map<Integer, E> container;
@@ -26,8 +23,12 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E> {
     }
 
     @Override
-    public Set<E> getDataByIds(Set<Integer> ids) {
-        Set<E> data = new HashSet<>();
+    public Collection<E> getAll() {
+        return container.values();
+    }
+    @Override
+    public Collection<E> getDataByIds(Collection<Integer> ids) {
+        Collection<E> data = new HashSet<>();
 
         for(Integer currId : ids) {
             data.add(container.get(currId));
@@ -42,7 +43,7 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E> {
     }
 
     @Override
-    public void addDataSet(Set<E> dataSet) {
+    public void addDataSet(Collection<E> dataSet) {
         for(E currAcc : dataSet) {
             container.put(currAcc.getId(), currAcc);
         }

@@ -10,4 +10,6 @@ public interface Investment {
     float getPayment();
 
     float getTotalPayment();
+
+    void payment();
 }

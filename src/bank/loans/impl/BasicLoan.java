@@ -12,13 +12,20 @@ import java.util.Set;
 
 public class BasicLoan implements Loan {
     private static int idGenerator = 40000;
-    private int id, duration;
-    private String category;
-    private float baseAmount;
-    private BasicInterest interest;
+    private final int id, ownerId;
+    private int duration;
+    private final String category;
+    private final float baseAmount;
+
+    @Override
+    public int getOwnerId() {
+        return ownerId;
+    }
+
+    private final BasicInterest interest;
     private LoanStatus status;
     private Set<Investment> investments;
-    private Account loanAccount;
+    private final Account loanAccount;
 
     public void setStatus(LoanStatus status) {
         this.status = status;
@@ -28,15 +35,21 @@ public class BasicLoan implements Loan {
         return duration;
     }
 
+    @Override
     public Set<Investment> getInvestments() {
         return investments;
     }
 
+    @Override
+    public void addInvestment(Investment investment) { investments.add(investment); }
+
+    @Override
     public Account getLoanAccount() {
         return loanAccount;
     }
 
-    public BasicLoan(float baseAmount, float interestPercent, String category) {
+    public BasicLoan(int ownerId, float baseAmount, float interestPercent, String category) {
+        this.ownerId = ownerId;
         this.category = category;
         this.baseAmount = baseAmount;
         this.interest = new BasicInterest(interestPercent, baseAmount);
@@ -69,6 +82,11 @@ public class BasicLoan implements Loan {
     }
 
     @Override
+    public float getCyclePayment() {
+        return getFinalAmount() / duration;
+    }
+
+    @Override
     public LoanStatus getStatus() {
         return status;
     }
@@ -76,9 +94,8 @@ public class BasicLoan implements Loan {
     @Override
     public float getMaxPortion() {
         float invested = loanAccount.getBalance();
-        float portion = (invested / baseAmount) * 100;
 
-        return portion;
+        return (invested / baseAmount) * 100;
     }
 
     @Override
