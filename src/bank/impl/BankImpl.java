@@ -4,6 +4,7 @@ import bank.Bank;
 import bank.accounts.Account;
 import bank.accounts.impl.CustomerAccount;
 import bank.accounts.impl.LoanAccount;
+import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.storage.impl.BankDataStorage;
 import bank.loans.Loan;
@@ -34,6 +35,8 @@ public class BankImpl implements Bank {
 
             return transaction.getId();
         } catch (NonPositiveAmountException e) {
+            e.printStackTrace();
+        } catch (NoMoneyException e) {
             e.printStackTrace();
         }
 

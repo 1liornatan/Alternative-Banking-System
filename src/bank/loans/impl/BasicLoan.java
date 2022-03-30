@@ -11,22 +11,24 @@ import java.util.Objects;
 import java.util.Set;
 
 public class BasicLoan implements Loan {
+
     private static int idGenerator = 40000;
     private final int id, ownerId;
     private int duration;
     private final String category;
     private final float baseAmount;
+    private final BasicInterest interest;
+    private LoanStatus status;
+    private Set<Investment> investments;
+    private final Account loanAccount;
+
 
     @Override
     public int getOwnerId() {
         return ownerId;
     }
 
-    private final BasicInterest interest;
-    private LoanStatus status;
-    private Set<Investment> investments;
-    private final Account loanAccount;
-
+    @Override
     public void setStatus(LoanStatus status) {
         this.status = status;
     }

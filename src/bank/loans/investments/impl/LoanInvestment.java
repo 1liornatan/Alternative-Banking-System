@@ -4,8 +4,9 @@ import bank.loans.interest.Interest;
 import bank.loans.investments.Investment;
 
 public class LoanInvestment implements Investment {
-    private int investorId, duration;
-    private Interest interest;
+    private final int investorId;
+    private final int duration;
+    private final Interest interest;
     private float amountPaid;
 
     public LoanInvestment(int investorId, Interest interest, int duration) {
@@ -44,6 +45,11 @@ public class LoanInvestment implements Investment {
     @Override
     public int getInvestorId() {
         return investorId;
+    }
+
+    @Override
+    public boolean isFullyPaid() {
+        return (amountPaid == getTotalPayment());
     }
 
 }

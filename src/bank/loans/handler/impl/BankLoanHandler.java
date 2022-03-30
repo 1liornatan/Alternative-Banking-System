@@ -1,6 +1,7 @@
 package bank.loans.handler.impl;
 
 import bank.accounts.Account;
+import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.storage.impl.BankDataStorage;
 import bank.loans.Loan;
@@ -32,13 +33,12 @@ public class BankLoanHandler implements LoanHandler {
 
     @Override
     public Loan createLoan(int ownerId, float baseAmount, float interestPercent, String category) {
-        Loan loan = new BasicLoan(ownerId, baseAmount, interestPercent, category);
 
-        return loan;
+        return new BasicLoan(ownerId, baseAmount, interestPercent, category);
     }
 
     @Override
-    public void addInvestment(Loan loan, Investment investment, Account srcAcc) throws NonPositiveAmountException {
+    public void addInvestment(Loan loan, Investment investment, Account srcAcc) throws NonPositiveAmountException, NoMoneyException {
         float amount = investment.getBaseAmount();
         loan.addInvestment(investment);
         transactions.addData(loan.getLoanAccount().deposit(amount, "Loan"));
@@ -46,14 +46,13 @@ public class BankLoanHandler implements LoanHandler {
     }
 
     public Investment createInvestment(int investorId, Interest interest, int duration) {
-        Investment loanInvestment = new LoanInvestment(investorId, interest, duration);
-        return loanInvestment;
+        return new LoanInvestment(investorId, interest, duration);
     }
 
     public void oneCycle() {
         Collection<Loan> loanCollection = loans.getAll();
         Collection<Loan> filteredLoans = loanCollection.stream()
-                .filter((loan -> loan.getStatus() != LoanStatus.FINISHED))
+                .filter((loan -> (loan.getStatus() != LoanStatus.FINISHED) && (loan.getStatus() != LoanStatus.PENDING)))
                 .collect(Collectors.toList());
 
         for(Loan loan : filteredLoans) {
@@ -69,13 +68,24 @@ public class BankLoanHandler implements LoanHandler {
             // TODO : add details
             transactions.addData(srcAcc.withdraw(payment, "Loan Cycle"));
             Collection<Investment> investments = loan.getInvestments();
+            boolean isFinished = true;
+
             for(Investment investment : investments) {
                 Account investor = customers.getDataById(investment.getInvestorId());
                 transactions.addData(investor.deposit(investment.getPayment(), "Loan Cycle"));
                 investment.payment();
+                if(!investment.isFullyPaid())
+                    isFinished = false;
             }
+
+            if(isFinished) {
+                loan.setStatus(LoanStatus.FINISHED);
+            }
+
         } catch (NonPositiveAmountException e) {
             e.printStackTrace();
+        } catch (NoMoneyException e) {
+            loan.setStatus(LoanStatus.RISK);
         }
     }
 

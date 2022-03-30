@@ -14,12 +14,11 @@ public interface Loan extends Singular {
     float getInterest();
     float getBaseAmount();
     LoanStatus getStatus();
+    void setStatus(LoanStatus status);
     float getMaxPortion();
-
     Set<Investment> getInvestments();
-
     void addInvestment(Investment investment);
-    public Account getLoanAccount();
+    Account getLoanAccount();
     float getCyclePayment();
     int getOwnerId();
 }

@@ -1,5 +1,6 @@
 package bank.accounts;
 
+import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.Singular;
 import bank.transactions.Transaction;
@@ -15,6 +16,6 @@ public interface Account extends Singular {
 
     Transaction deposit(float amount, String description) throws NonPositiveAmountException;
 
-    Transaction withdraw(float amount, String description) throws NonPositiveAmountException;
+    Transaction withdraw(float amount, String description) throws NonPositiveAmountException, NoMoneyException;
 
 }

@@ -1,6 +1,7 @@
 package bank.accounts.impl;
 
 import bank.accounts.Account;
+import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.Singular;
 import bank.transactions.Transaction;
@@ -12,7 +13,7 @@ import java.util.Set;
 
 public class LoanAccount implements Account, Singular {
     private static int idGenerator = 1;
-    private int id;
+    private final int id;
     private float balance;
     private Set<Integer> transactions;
 
@@ -60,8 +61,9 @@ public class LoanAccount implements Account, Singular {
         return transaction;
     }
     @Override
-    public Transaction withdraw(float amount, String description) throws NonPositiveAmountException {
+    public Transaction withdraw(float amount, String description) throws NonPositiveAmountException, NoMoneyException {
         if(amount <= 0) throw new NonPositiveAmountException();
+        if(amount > balance) throw new NoMoneyException();
 
         Transaction transaction = new BasicTransaction(amount, description);
         transactions.add(transaction.getId());
