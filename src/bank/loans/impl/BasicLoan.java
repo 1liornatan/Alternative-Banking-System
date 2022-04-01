@@ -4,6 +4,8 @@ import bank.accounts.Account;
 import bank.accounts.impl.LoanAccount;
 import bank.loans.Loan;
 import bank.loans.LoanStatus;
+import bank.loans.impl.builder.LoanBuilder;
+import bank.loans.interest.Interest;
 import bank.loans.interest.impl.BasicInterest;
 import bank.loans.investments.Investment;
 
@@ -13,11 +15,10 @@ import java.util.Set;
 public class BasicLoan implements Loan {
 
     private static int idGenerator = 40000;
-    private final int id, ownerId;
+    private final int id;
+    private final LoanBuilder loanDetails;
     private int duration;
-    private final String category, idName;
-    private final float baseAmount;
-    private final BasicInterest interest;
+    private final Interest interest;
     private LoanStatus status;
     private Set<Investment> investments;
     private final Account loanAccount;
@@ -25,7 +26,7 @@ public class BasicLoan implements Loan {
 
     @Override
     public int getOwnerId() {
-        return ownerId;
+        return loanDetails.getOwnerId();
     }
 
     @Override
@@ -50,12 +51,9 @@ public class BasicLoan implements Loan {
         return loanAccount;
     }
 
-    public BasicLoan(int ownerId, float baseAmount, float interestPercent, String category, String idName) {
-        this.ownerId = ownerId;
-        this.category = category;
-        this.baseAmount = baseAmount;
-        this.idName = idName;
-        this.interest = new BasicInterest(interestPercent, baseAmount);
+    public BasicLoan(LoanBuilder loanDetails, Interest interest) {
+        this.loanDetails = loanDetails;
+        this.interest = interest;
         this.status = LoanStatus.PENDING;
         loanAccount = new LoanAccount();
         id = idGenerator++;
@@ -63,7 +61,7 @@ public class BasicLoan implements Loan {
 
     @Override
     public String getIdName() {
-        return idName;
+        return loanDetails.getIdName();
     }
     @Override
     public int getId() {
@@ -71,7 +69,7 @@ public class BasicLoan implements Loan {
     }
     @Override
     public String getCategory() {
-        return category;
+        return loanDetails.getCategory();
     }
     @Override
     public float getFinalAmount() {
@@ -85,7 +83,7 @@ public class BasicLoan implements Loan {
 
     @Override
     public float getBaseAmount() {
-        return baseAmount;
+        return interest.getBaseAmount();
     }
 
     @Override
@@ -102,7 +100,7 @@ public class BasicLoan implements Loan {
     public float getMaxPortion() {
         float invested = loanAccount.getBalance();
 
-        return (invested / baseAmount) * 100;
+        return (invested / getBaseAmount()) * 100;
     }
 
     @Override
@@ -122,10 +120,11 @@ public class BasicLoan implements Loan {
     public String toString() {
         return "BasicLoan{" +
                 "id=" + id +
+                ", loanDetails=" + loanDetails +
                 ", duration=" + duration +
-                ", category='" + category + '\'' +
                 ", interest=" + interest +
                 ", status=" + status +
+                ", investments=" + investments +
                 ", loanAccount=" + loanAccount +
                 '}';
     }

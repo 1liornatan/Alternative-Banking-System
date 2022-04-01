@@ -8,6 +8,7 @@ import bank.loans.Loan;
 import bank.loans.LoanStatus;
 import bank.loans.handler.LoanHandler;
 import bank.loans.impl.BasicLoan;
+import bank.loans.impl.builder.LoanBuilder;
 import bank.loans.interest.Interest;
 import bank.loans.investments.Investment;
 import bank.loans.investments.impl.LoanInvestment;
@@ -32,9 +33,8 @@ public class BankLoanHandler implements LoanHandler {
     }
 
     @Override
-    public Loan createLoan(int ownerId, float baseAmount, float interestPercent, String category, String idName) {
-
-        return new BasicLoan(ownerId, baseAmount, interestPercent, category, idName);
+    public Loan createLoan(LoanBuilder loadDetails, Interest interest) {
+        return new BasicLoan(loadDetails, interest);
     }
 
     @Override

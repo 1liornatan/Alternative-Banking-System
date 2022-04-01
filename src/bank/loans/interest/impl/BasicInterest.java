@@ -6,10 +6,23 @@ import java.util.Objects;
 
 public class BasicInterest implements Interest {
     private float percent, baseAmount;
+    private final int cyclesPerPayment, duration;
 
-    public BasicInterest(float percent, float baseAmount) {
+    public BasicInterest(float percent, float baseAmount, int cyclesPerPayment, int duration) {
         this.percent = percent;
         this.baseAmount = baseAmount;
+        this.cyclesPerPayment = cyclesPerPayment;
+        this.duration = duration;
+    }
+
+    @Override
+    public int getCyclesPerPayment() {
+        return cyclesPerPayment;
+    }
+
+    @Override
+    public int getDuration() {
+        return duration;
     }
 
     @Override

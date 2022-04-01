@@ -6,10 +6,16 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
 
+import bank.Bank;
 import bank.accounts.Account;
 import bank.accounts.impl.CustomerAccount;
 import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
+import bank.loans.Loan;
+import bank.loans.impl.BasicLoan;
+import bank.loans.impl.builder.LoanBuilder;
+import bank.loans.interest.Interest;
+import bank.loans.interest.impl.BasicInterest;
 import files.schema.generated.*;
 
 import javax.xml.bind.JAXBContext;
@@ -34,7 +40,9 @@ public class XmlReader {
             List<String> categoryList = categories.getAbsCategory();
             List<AbsCustomer> customersList = descriptor.getAbsCustomers().getAbsCustomer();
             List<AbsLoan> loansList = descriptor.getAbsLoans().getAbsLoan();
+
             DataStorage<Account> customersDataStorage = new BankDataStorage<>();
+            DataStorage<Loan> loansDataStorage = new BankDataStorage<>();
 
             // add all categories to a set
 
@@ -59,16 +67,17 @@ public class XmlReader {
                 int totalTime = currLoan.getAbsTotalYazTime();
                 int payPerTime = currLoan.getAbsPaysEveryYaz();
                 int interestPercent = currLoan.getAbsIntristPerPayment();
+                int ownerId = customersDataDecoder.get(ownerName);
+
+                Interest interest = new BasicInterest(interestPercent, amount, payPerTime, totalTime);
+                LoanBuilder loanBuilder = new LoanBuilder(ownerId, categoryName, loanName);
+
+                loansDataStorage.addData(new BasicLoan(loanBuilder, interest));
+                // TODO: ADD LOAN ID TO CUSTOMER'S LOANS SET
 
 
             }
 
-
-
-
-
-
-            System.out.println(test.toString());
 
         } catch (FileNotFoundException | JAXBException e) {
             e.printStackTrace();
