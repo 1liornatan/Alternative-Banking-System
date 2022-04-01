@@ -12,6 +12,7 @@ import bank.transactions.Transaction;
 import files.schema.generated.AbsCategories;
 import files.schema.generated.AbsCustomer;
 import files.schema.generated.AbsDescriptor;
+import files.xmls.XmlReader;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -19,22 +20,25 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
 public class BankImpl implements Bank {
-    private BankDataStorage<Account> customersAccounts;
-    private BankDataStorage<Account> loanAccounts;
-    private BankDataStorage<Transaction> transactions;
-    private BankDataStorage<Loan> loans;
+    private DataStorage<Account> customersAccounts;
+    private DataStorage<Account> loanAccounts;
+    private DataStorage<Transaction> transactions;
+    private DataStorage<Loan> loans;
+    private Set<String> categories;
 
-    public BankImpl() {
-        customersAccounts = new BankDataStorage<>();
-        loanAccounts = new BankDataStorage<>();
-        transactions = new BankDataStorage<>();
-        loans = new BankDataStorage<>();
-    }
     @Override
     public void loadData(String filename) {
+        XmlReader xmlReader = new XmlReader(filename);
 
+        customersAccounts = xmlReader.getCustomersDataStorage();
+        loans = xmlReader.getLoansDataStorage();
+        categories = xmlReader.getCategoryNames();
+
+        loanAccounts = new BankDataStorage<>();
+        transactions = new BankDataStorage<>();
     }
     @Override
     public int withdraw(int accountId, float amount, String description) {

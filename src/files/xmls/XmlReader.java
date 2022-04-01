@@ -23,15 +23,17 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 public class XmlReader {
+    private static final String JAXB_XML_ABS_PACKAGE_NAME = "files.schema.generated";
+    private Set<String> categoryNames;
+    private DataStorage<Account> customersDataStorage;
+    private DataStorage<Loan> loansDataStorage;
 
-    public static final String JAXB_XML_ABS_PACKAGE_NAME = "files.schema.generated";
-
-    public static void main(String[] args) {
+    public XmlReader(String filePath) {
         try {
-            InputStream inputStream = new FileInputStream(new File("src/resources/ex1-big.xml"));
+            InputStream inputStream = new FileInputStream(new File(filePath));
             Map<String, Integer> customersDataDecoder = new HashMap<>();
             Map<String, Integer> loansDataDecoder = new HashMap<>();
-            Set<String> categoryNames = new HashSet<>();
+            categoryNames = new HashSet<>();
 
             AbsDescriptor descriptor = deserializeFrom(inputStream);
             AbsCategories categories = descriptor.getAbsCategories();
@@ -41,8 +43,8 @@ public class XmlReader {
             List<AbsCustomer> customersList = descriptor.getAbsCustomers().getAbsCustomer();
             List<AbsLoan> loansList = descriptor.getAbsLoans().getAbsLoan();
 
-            DataStorage<Account> customersDataStorage = new BankDataStorage<>();
-            DataStorage<Loan> loansDataStorage = new BankDataStorage<>();
+            customersDataStorage = new BankDataStorage<>();
+            loansDataStorage = new BankDataStorage<>();
 
             // add all categories to a set
 
@@ -84,7 +86,19 @@ public class XmlReader {
         }
     }
 
-    private static AbsDescriptor deserializeFrom(InputStream in) throws JAXBException {
+    public Set<String> getCategoryNames() {
+        return categoryNames;
+    }
+
+    public DataStorage<Account> getCustomersDataStorage() {
+        return customersDataStorage;
+    }
+
+    public DataStorage<Loan> getLoansDataStorage() {
+        return loansDataStorage;
+    }
+
+    private AbsDescriptor deserializeFrom(InputStream in) throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(JAXB_XML_ABS_PACKAGE_NAME);
         Unmarshaller u = jc.createUnmarshaller();
         return (AbsDescriptor) u.unmarshal(in);
