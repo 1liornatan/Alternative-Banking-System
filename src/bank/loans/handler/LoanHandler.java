@@ -7,7 +7,9 @@ import bank.loans.Loan;
 import bank.loans.investments.Investment;
 
 public interface LoanHandler {
-    Loan createLoan(int ownerId, float baseAmount, float interestPercent, String category);
+
+    Loan createLoan(int ownerId, float baseAmount, float interestPercent, String category, String idName);
+
     void addInvestment(Loan loan, Investment investment, Account srcAcc) throws NonPositiveAmountException, NoMoneyException;
 
 }

@@ -32,9 +32,9 @@ public class BankLoanHandler implements LoanHandler {
     }
 
     @Override
-    public Loan createLoan(int ownerId, float baseAmount, float interestPercent, String category) {
+    public Loan createLoan(int ownerId, float baseAmount, float interestPercent, String category, String idName) {
 
-        return new BasicLoan(ownerId, baseAmount, interestPercent, category);
+        return new BasicLoan(ownerId, baseAmount, interestPercent, category, idName);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class BankLoanHandler implements LoanHandler {
         Account srcAcc = customers.getDataById(loan.getOwnerId());
         float payment = loan.getCyclePayment();
         try {
-            // TODO : add details
+            // TODO : fix for (based on how loans work)
             transactions.addData(srcAcc.withdraw(payment, "Loan Cycle"));
             Collection<Investment> investments = loan.getInvestments();
             boolean isFinished = true;

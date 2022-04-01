@@ -15,7 +15,7 @@ public class BasicLoan implements Loan {
     private static int idGenerator = 40000;
     private final int id, ownerId;
     private int duration;
-    private final String category;
+    private final String category, idName;
     private final float baseAmount;
     private final BasicInterest interest;
     private LoanStatus status;
@@ -50,16 +50,21 @@ public class BasicLoan implements Loan {
         return loanAccount;
     }
 
-    public BasicLoan(int ownerId, float baseAmount, float interestPercent, String category) {
+    public BasicLoan(int ownerId, float baseAmount, float interestPercent, String category, String idName) {
         this.ownerId = ownerId;
         this.category = category;
         this.baseAmount = baseAmount;
+        this.idName = idName;
         this.interest = new BasicInterest(interestPercent, baseAmount);
         this.status = LoanStatus.PENDING;
         loanAccount = new LoanAccount();
         id = idGenerator++;
     }
 
+    @Override
+    public String getIdName() {
+        return idName;
+    }
     @Override
     public int getId() {
         return id;

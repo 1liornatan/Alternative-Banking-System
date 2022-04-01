@@ -3,14 +3,22 @@ package bank.impl;
 import bank.Bank;
 import bank.accounts.Account;
 import bank.accounts.impl.CustomerAccount;
-import bank.accounts.impl.LoanAccount;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
+import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
 import bank.loans.Loan;
-import bank.loans.impl.BasicLoan;
 import bank.transactions.Transaction;
-import bank.transactions.impl.BasicTransaction;
+import files.schema.generated.AbsCategories;
+import files.schema.generated.AbsCustomer;
+import files.schema.generated.AbsDescriptor;
+
+import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.List;
 
 public class BankImpl implements Bank {
     private BankDataStorage<Account> customersAccounts;
@@ -24,7 +32,10 @@ public class BankImpl implements Bank {
         transactions = new BankDataStorage<>();
         loans = new BankDataStorage<>();
     }
+    @Override
+    public void loadData(String filename) {
 
+    }
     @Override
     public int withdraw(int accountId, float amount, String description) {
         Account account = customersAccounts.getDataById(accountId);

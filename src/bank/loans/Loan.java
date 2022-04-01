@@ -9,6 +9,7 @@ import java.util.Set;
 public interface Loan extends Singular {
 
     int getId();
+    String getIdName();
     String getCategory();
     float getFinalAmount();
     float getInterest();
