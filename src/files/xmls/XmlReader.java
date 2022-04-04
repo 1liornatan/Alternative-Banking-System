@@ -19,9 +19,7 @@ import bank.loans.interest.Interest;
 import bank.loans.interest.impl.BasicInterest;
 import bank.time.TimeHandler;
 import files.schema.generated.*;
-import files.xmls.exceptions.NotXmlException;
-import files.xmls.exceptions.XmlNoCategoryException;
-import files.xmls.exceptions.XmlNoLoanOwnerException;
+import files.xmls.exceptions.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -34,7 +32,7 @@ public class XmlReader {
     private DataStorage<Loan> loansDataStorage;
     private boolean validation;
 
-    public XmlReader(String filePath, TimeHandler timeHandler) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException {
+    public XmlReader(String filePath, TimeHandler timeHandler) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException {
         Path path = Paths.get(filePath);
 
         if(!Files.exists(path))
@@ -65,6 +63,10 @@ public class XmlReader {
 
             for(AbsCustomer absCustomer : customersList) {
                 String currName = absCustomer.getName();
+
+                if(customersDataStorage.isDataExists(currName))
+                    throw new XmlAccountExistsException();
+
                 Account currCustomer = new CustomerAccount(currName, absCustomer.getAbsBalance());
                 customersDataStorage.addData(currCustomer);
             }
@@ -83,6 +85,9 @@ public class XmlReader {
 
                 if(!customersDataStorage.isDataExists(ownerName))
                     throw new XmlNoLoanOwnerException();
+
+                if(totalTime % payPerTime != 0)
+                    throw new XmlPaymentsException();
 
 
                 Interest interest = new BasicInterest(interestPercent, amount, payPerTime, totalTime);

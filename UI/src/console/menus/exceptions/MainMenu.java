@@ -6,6 +6,8 @@ import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import files.xmls.exceptions.NotXmlException;
+import files.xmls.exceptions.XmlNoCategoryException;
+import files.xmls.exceptions.XmlNoLoanOwnerException;
 
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -34,7 +36,7 @@ public class MainMenu {
         String fileName = scanner.nextLine();
         try {
             bankInstance.loadData(fileName);
-        } catch (FileNotFoundException | NotXmlException e) {
+        } catch (FileNotFoundException | NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException e) {
             System.out.println(e.getMessage());
         } finally {
             printMenu();
