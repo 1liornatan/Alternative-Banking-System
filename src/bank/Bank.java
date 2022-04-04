@@ -4,9 +4,12 @@ import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
+import files.xmls.exceptions.NotXmlException;
+
+import java.io.FileNotFoundException;
 
 public interface Bank {
-    void loadData(String filename);
+    void loadData(String filename) throws FileNotFoundException, NotXmlException;
 
     void printLoans();
 

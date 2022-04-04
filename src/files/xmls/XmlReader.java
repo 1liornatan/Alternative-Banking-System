@@ -3,6 +3,9 @@ package files.xmls;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import bank.accounts.Account;
@@ -16,6 +19,7 @@ import bank.loans.interest.Interest;
 import bank.loans.interest.impl.BasicInterest;
 import bank.time.TimeHandler;
 import files.schema.generated.*;
+import files.xmls.exceptions.NotXmlException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -28,7 +32,15 @@ public class XmlReader {
     private DataStorage<Loan> loansDataStorage;
     private boolean validation;
 
-    public XmlReader(String filePath, TimeHandler timeHandler) {
+    public XmlReader(String filePath, TimeHandler timeHandler) throws FileNotFoundException, NotXmlException {
+        Path path = Paths.get(filePath);
+
+        if(!Files.exists(path))
+            throw new FileNotFoundException();
+
+        int extIndex = filePath.lastIndexOf('.');
+        if(!filePath.substring(extIndex).equalsIgnoreCase(".xml"))
+            throw new NotXmlException(filePath);
         try {
             InputStream inputStream = new FileInputStream(filePath);
             categoryNames = new HashSet<>();

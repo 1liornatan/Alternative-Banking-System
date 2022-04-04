@@ -5,7 +5,9 @@ import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
+import files.xmls.exceptions.NotXmlException;
 
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class MainMenu {
@@ -30,7 +32,13 @@ public class MainMenu {
         System.out.println("Enter Xml full path:");
         Scanner scanner = new Scanner(System.in);
         String fileName = scanner.nextLine();
-        bankInstance.loadData(fileName);
+        try {
+            bankInstance.loadData(fileName);
+        } catch (FileNotFoundException | NotXmlException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            printMenu();
+        }
     }
 
     public void printLoans() {
