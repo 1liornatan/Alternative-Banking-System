@@ -5,12 +5,10 @@ import bank.data.Singular;
 import bank.loans.investments.Investment;
 
 import java.util.List;
-import java.util.Set;
 
 public interface Loan extends Singular {
 
-    int getId();
-    String getIdName();
+    String getId();
     String getCategory();
     float getFinalAmount();
     float getInterest();
@@ -30,5 +28,5 @@ public interface Loan extends Singular {
 
     Account getLoanAccount();
     float getCyclePayment();
-    int getOwnerId();
+    String getOwnerId();
 }

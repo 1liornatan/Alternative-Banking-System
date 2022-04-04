@@ -1,12 +1,10 @@
 package files.xmls;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
 
-import bank.Bank;
 import bank.accounts.Account;
 import bank.accounts.impl.CustomerAccount;
 import bank.data.storage.DataStorage;
@@ -32,14 +30,11 @@ public class XmlReader {
 
     public XmlReader(String filePath, TimeHandler timeHandler) {
         try {
-            InputStream inputStream = new FileInputStream(new File(filePath));
-            Map<String, Integer> customersDataDecoder = new HashMap<>();
-            Map<String, Integer> loansDataDecoder = new HashMap<>();
+            InputStream inputStream = new FileInputStream(filePath);
             categoryNames = new HashSet<>();
 
             AbsDescriptor descriptor = deserializeFrom(inputStream);
             AbsCategories categories = descriptor.getAbsCategories();
-            AbsLoans loans = descriptor.getAbsLoans();
 
             List<String> categoryList = categories.getAbsCategory();
             List<AbsCustomer> customersList = descriptor.getAbsCustomers().getAbsCustomer();
@@ -50,9 +45,7 @@ public class XmlReader {
 
             // add all categories to a set
 
-            for(String currCategory : categoryList) {
-                categoryNames.add(currCategory);
-            }
+            categoryNames.addAll(categoryList);
 
             // add all accounts to data storage
 
@@ -60,7 +53,6 @@ public class XmlReader {
                 String currName = absCustomer.getName();
                 Account currCustomer = new CustomerAccount(currName, absCustomer.getAbsBalance());
                 customersDataStorage.addData(currCustomer);
-                customersDataDecoder.put(currName, currCustomer.getId());
             }
 
             for(AbsLoan currLoan : loansList) {
@@ -71,10 +63,9 @@ public class XmlReader {
                 int totalTime = currLoan.getAbsTotalYazTime();
                 int payPerTime = currLoan.getAbsPaysEveryYaz();
                 int interestPercent = currLoan.getAbsIntristPerPayment();
-                int ownerId = customersDataDecoder.get(ownerName);
 
                 Interest interest = new BasicInterest(interestPercent, amount, payPerTime, totalTime);
-                LoanBuilder loanBuilder = new LoanBuilder(ownerId, categoryName, loanName);
+                LoanBuilder loanBuilder = new LoanBuilder(ownerName, categoryName, loanName);
 
                 loansDataStorage.addData(new BasicLoan(loanBuilder, interest));
                 // TODO: ADD LOAN ID TO CUSTOMER'S LOANS SET

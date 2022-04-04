@@ -1,7 +1,7 @@
 package bank.loans.investments;
 
 public interface Investment {
-    int getInvestorId();
+    String getInvestorId();
 
     float getRemainingPayment();
 

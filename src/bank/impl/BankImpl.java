@@ -7,6 +7,7 @@ import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
+import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
 import bank.loans.handler.impl.BankLoanHandler;
 import bank.time.TimeHandler;
@@ -55,7 +56,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public void advanceOneYaz() {
+    public void advanceOneYaz() throws DataNotFoundException {
         timeHandler.advanceTime();
         loanHandler.oneCycle();
     }
@@ -66,50 +67,28 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public int withdraw(int accountId, float amount, String description) {
+    public void withdraw(String accountId, float amount, String description) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
         Account account = customersAccounts.getDataById(accountId);
-
-        try {
-            Transaction transaction = account.withdraw(amount, description);
-            transactions.addData(transaction);
-
-            return transaction.getId();
-        } catch (NonPositiveAmountException e) {
-            e.printStackTrace();
-        } catch (NoMoneyException e) {
-            e.printStackTrace();
-        }
-
-        return -1;
+        Transaction transaction = account.withdraw(amount, description);
+        transactions.addData(transaction);
     }
 
     @Override
-    public int deposit(int accountId, float amount, String description) {
+    public void deposit(String accountId, float amount, String description) throws NonPositiveAmountException, DataNotFoundException {
         Account account = customersAccounts.getDataById(accountId);
-
-        try {
-            Transaction transaction = account.deposit(amount, description);
-            transactions.addData(transaction);
-
-            return transaction.getId();
-        } catch (NonPositiveAmountException e) {
-            e.printStackTrace();
-        }
-
-        return -1;
+        Transaction transaction = account.deposit(amount, description);
+        transactions.addData(transaction);
     }
 
     @Override
-    public int createAccount(String name, float balance) {
+    public void createAccount(String name, float balance) {
         Account account = new CustomerAccount(name, balance);
 
         customersAccounts.addData(account);
-
-        return account.getId();
     }
 
     @Override
-    public void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException {
+    public void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
         loanHandler.deriskLoan(loan);
     }
 
@@ -129,17 +108,8 @@ public class BankImpl implements Bank {
         System.out.println("All customers names:");
 
         for(Pair<Account,Integer> accountPair : allPairs) {
-            System.out.println(accountPair.getKey().getName());
+            System.out.println(accountPair.getKey().getId());
         }
-    }
-
-    @Override
-    public void withdrawByName(String name,float amount, String description) {
-       Pair<Account, Integer> customerPair =  (Pair<Account,Integer>)customersAccounts.getAllPairs().stream()
-               .filter((accountIntegerPair -> accountIntegerPair.getKey().getName() == name))
-               .findFirst()
-               .get();
-       withdraw(customerPair.getKey().getId(),amount,description);
     }
 
 }

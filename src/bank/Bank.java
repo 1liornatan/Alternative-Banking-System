@@ -2,6 +2,7 @@ package bank;
 
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
+import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
 
 public interface Bank {
@@ -9,16 +10,16 @@ public interface Bank {
 
     void printLoans();
 
-    void advanceOneYaz();
+    void advanceOneYaz() throws DataNotFoundException;
 
     int getCurrentYaz();
 
     //    int createLoan(int ownerId, float amount, String category); // returns loan's id
-    int withdraw(int accountId, float amount, String description); // returns transaction's id
-    int deposit(int accountId, float amount, String description); // returns transaction's id
-    int createAccount(String name, float balance); // returns account's id
+    void withdraw(String accountId, float amount, String description) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException; // returns transaction's id
+    void deposit(String accountId, float amount, String description) throws NonPositiveAmountException, DataNotFoundException; // returns transaction's id
+    void createAccount(String name, float balance); // returns account's id
 
-    void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException;
+    void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException;
 
     float getDeriskAmount(Loan loan);
 
@@ -26,7 +27,4 @@ public interface Bank {
 
     void printCustomersNames();
 
-    void withdrawByName(String name);
-
-    void withdrawByName(String name, float amount, String description);
 }

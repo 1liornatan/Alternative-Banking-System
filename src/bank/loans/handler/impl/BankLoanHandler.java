@@ -4,6 +4,7 @@ import bank.accounts.Account;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.storage.DataStorage;
+import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
 import bank.loans.LoanStatus;
 import bank.loans.handler.LoanHandler;
@@ -20,7 +21,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class BankLoanHandler implements LoanHandler {
-    private DataStorage<Transaction> transactions;
+    private final DataStorage<Transaction> transactions;
     private DataStorage<Loan> loans;
     private DataStorage<Account> customers;
     private BankTimeHandler timeHandler;
@@ -48,7 +49,7 @@ public class BankLoanHandler implements LoanHandler {
     }
 
     @Override
-    public void addInvestment(Loan loan, Investment investment, Account srcAcc) throws NonPositiveAmountException, NoMoneyException {
+    public void addInvestment(Loan loan, Investment investment, Account srcAcc) throws NonPositiveAmountException, NoMoneyException, DataNotFoundException {
         float amount = investment.getBaseAmount();
         loan.addInvestment(investment);
         transactions.addData(loan.getLoanAccount().deposit(amount, "Loan"));
@@ -57,7 +58,7 @@ public class BankLoanHandler implements LoanHandler {
         checkLoanStatus(loan, srcAcc);
     }
 
-    private void checkLoanStatus(Loan loan, Account srcAcc) throws NoMoneyException, NonPositiveAmountException {
+    private void checkLoanStatus(Loan loan, Account srcAcc) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
         float loanAmount = loan.getBaseAmount();
         float accountBalance = srcAcc.getBalance();
         Account requester;
@@ -70,11 +71,11 @@ public class BankLoanHandler implements LoanHandler {
         }
     }
 
-    public Investment createInvestment(int investorId, Interest interest, int duration) {
+    public Investment createInvestment(String investorId, Interest interest, int duration) {
         return new LoanInvestment(investorId, interest, duration);
     }
 
-    public void oneCycle() {
+    public void oneCycle() throws DataNotFoundException {
         Collection<Pair<Loan, Integer>> loanCollection = loans.getAllPairs();
         Collection<Pair<Loan, Integer>> filteredLoans = loanCollection.stream()
                 .filter((loan -> (loan.getKey().getStatus() != LoanStatus.FINISHED) && (loan.getKey().getStatus() != LoanStatus.PENDING)))
@@ -85,7 +86,7 @@ public class BankLoanHandler implements LoanHandler {
         }
     }
 
-    private void makePayment(Loan loan) {
+    private void makePayment(Loan loan) throws DataNotFoundException {
         Account srcAcc = customers.getDataById(loan.getOwnerId());
         float payment = loan.getCyclePayment();
         try {
@@ -113,7 +114,7 @@ public class BankLoanHandler implements LoanHandler {
         }
     }
 
-    public void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException {
+    public void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
         float amount = getDeriskAmount(loan);
         Account srcAcc = customers.getDataById(loan.getOwnerId());
 

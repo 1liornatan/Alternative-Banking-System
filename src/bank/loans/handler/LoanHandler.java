@@ -3,6 +3,7 @@ package bank.loans.handler;
 import bank.accounts.Account;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
+import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
 import bank.loans.impl.builder.LoanBuilder;
 import bank.loans.interest.Interest;
@@ -12,7 +13,7 @@ public interface LoanHandler {
 
     Loan createLoan(LoanBuilder loadDetails, Interest interest);
 
-    void addInvestment(Loan loan, Investment investment, Account srcAcc) throws NonPositiveAmountException, NoMoneyException;
+    void addInvestment(Loan loan, Investment investment, Account srcAcc) throws NonPositiveAmountException, NoMoneyException, DataNotFoundException;
 
     void printAllLoans();
 }

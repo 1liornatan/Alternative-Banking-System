@@ -4,12 +4,12 @@ import bank.loans.interest.Interest;
 import bank.loans.investments.Investment;
 
 public class LoanInvestment implements Investment {
-    private final int investorId;
+    private final String investorId;
     private final int duration;
     private final Interest interest;
     private float amountPaid;
 
-    public LoanInvestment(int investorId, Interest interest, int duration) {
+    public LoanInvestment(String investorId, Interest interest, int duration) {
         this.investorId = investorId;
         this.interest = interest;
         this.duration = duration;
@@ -48,7 +48,7 @@ public class LoanInvestment implements Investment {
     }
 
     @Override
-    public int getInvestorId() {
+    public String getInvestorId() {
         return investorId;
     }
 

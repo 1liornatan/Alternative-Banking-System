@@ -1,18 +1,31 @@
 package console.menus.exceptions;
 
 import bank.Bank;
+import bank.accounts.impl.exceptions.NoMoneyException;
+import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
+import bank.impl.exceptions.DataNotFoundException;
 
 import java.util.Scanner;
 
 public class MainMenu {
-    private Bank bankInstance;
+    private final Bank bankInstance;
 
 
     public MainMenu() {
         bankInstance = new BankImpl();
     }
+    public static void main(String[] args) {
+        MainMenu a = new MainMenu();
 
+        a.readXml();
+
+        a.printCustomers();
+
+        a.deposit();
+
+        a.printCustomers();
+    }
     public void readXml() {
         System.out.println("Enter Xml full path:");
         Scanner scanner = new Scanner(System.in);
@@ -37,7 +50,13 @@ public class MainMenu {
 
         System.out.println("Enter amount to withdraw:");
         float amount = scanner.nextFloat();
-        bankInstance.withdrawByName(customerName,amount,"Withdraw");
+        try {
+            bankInstance.withdraw(customerName,amount,"Basic Withdraw");
+        } catch (NoMoneyException | NonPositiveAmountException | DataNotFoundException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            this.printMenu();
+        }
 
     }
 
@@ -50,13 +69,29 @@ public class MainMenu {
 
         System.out.println("Enter amount to deposit:");
         float amount = scanner.nextFloat();
-        bankInstance.depositByName(customerName,amount);
+        try {
+            bankInstance.deposit(customerName, amount, "Basic Deposit");
+        } catch (DataNotFoundException | NonPositiveAmountException e) {
+            System.out.println(e.getMessage());
+        }
+        finally {
+            this.printMenu();
+        }
 
+    }
+
+    public void printMenu() {
     }
 
     public void advanceTime() {
         int currYaz = bankInstance.getCurrentYaz();
         System.out.println("Advancing from Yaz " + currYaz + " to Yaz " + (currYaz + 1) + ".");
-        bankInstance.advanceOneYaz();
+        try {
+            bankInstance.advanceOneYaz();
+        } catch (DataNotFoundException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            printMenu();
+        }
     }
 }

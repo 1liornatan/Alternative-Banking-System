@@ -11,22 +11,20 @@ import bank.loans.investments.Investment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public class BasicLoan implements Loan {
 
-    private static int idGenerator = 40000;
-    private final int id;
+    private final String id;
     private final LoanBuilder loanDetails;
     private int startingYaz;
     private final Interest interest;
     private LoanStatus status;
-    private List<Investment> investments;
+    private final List<Investment> investments;
     private final Account loanAccount;
 
 
     @Override
-    public int getOwnerId() {
+    public String getOwnerId() {
         return loanDetails.getOwnerId();
     }
 
@@ -68,20 +66,17 @@ public class BasicLoan implements Loan {
         this.interest = interest;
         this.status = LoanStatus.PENDING;
         loanAccount = new LoanAccount();
-        id = idGenerator++;
+        id = loanDetails.getIdName();
 
         investments = new ArrayList<>();
         startingYaz = -1;
     }
 
     @Override
-    public String getIdName() {
-        return loanDetails.getIdName();
-    }
-    @Override
-    public int getId() {
+    public String getId() {
         return id;
     }
+
     @Override
     public String getCategory() {
         return loanDetails.getCategory();
@@ -123,7 +118,7 @@ public class BasicLoan implements Loan {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BasicLoan basicLoan = (BasicLoan) o;
-        return id == basicLoan.id;
+        return Objects.equals(id, basicLoan.id);
     }
 
     @Override

@@ -10,9 +10,7 @@ import bank.transactions.Transaction;
  */
 public interface Account extends Singular {
 
-    int getId();
-
-    String getName();
+    String getId();
 
     float getBalance();
 

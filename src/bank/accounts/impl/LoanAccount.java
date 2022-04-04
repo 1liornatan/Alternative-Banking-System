@@ -12,19 +12,19 @@ import java.util.Objects;
 import java.util.Set;
 
 public class LoanAccount implements Account, Singular {
-    private static int idGenerator = 1;
-    private final int id;
+    private static Integer idGenerator = 60000;
+    private final String id;
     private float balance;
-    private Set<Integer> transactions;
+    private final Set<String> transactions;
 
     public LoanAccount() {
-        id = idGenerator++;
+        id = (idGenerator++).toString();
         balance = 0;
         transactions = new HashSet<>();
     }
 
     @Override
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -33,21 +33,21 @@ public class LoanAccount implements Account, Singular {
         return balance;
     }
 
+    public Set<String> getTransactions() {
+        return transactions;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LoanAccount that = (LoanAccount) o;
-        return id == that.id;
+        return Objects.equals(id, that.id);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    public Set<Integer> getTransactions() {
-        return transactions;
     }
 
     @Override
@@ -71,6 +71,4 @@ public class LoanAccount implements Account, Singular {
 
         return transaction;
     }
-    @Override
-    public String getName() {return "Loan Account";}
 }

@@ -3,16 +3,16 @@ package bank.loans.impl.builder;
 import java.util.Objects;
 
 public class LoanBuilder {
-    private final int ownerId;
+    private final String ownerId;
     private final String category, idName;
 
-    public LoanBuilder(int ownerId, String category, String idName) {
+    public LoanBuilder(String ownerId, String category, String idName) {
         this.ownerId = ownerId;
         this.category = category;
         this.idName = idName;
     }
 
-    public int getOwnerId() {
+    public String getOwnerId() {
         return ownerId;
     }
 

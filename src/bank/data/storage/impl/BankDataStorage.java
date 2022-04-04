@@ -2,14 +2,15 @@ package bank.data.storage.impl;
 
 import bank.data.storage.DataStorage;
 import bank.data.Singular;
+import bank.impl.exceptions.DataNotFoundException;
 import bank.time.TimeHandler;
 import javafx.util.Pair;
 
 import java.util.*;
 
 public class BankDataStorage<E extends Singular> implements DataStorage<E> {
-    private Map<Integer, F> container;
-    private TimeHandler timeHandler;
+    private final Map<String, F> container;
+    private final TimeHandler timeHandler;
 
     public class F {
         E data;
@@ -41,19 +42,27 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E> {
     }
 
     @Override
-    public boolean isDataExists(int id) {
+    public boolean isDataExists(String id) {
         return (container.get(id) != null);
     }
 
     @Override
-    public Pair<E, Integer> getDataPair(int id) {
+    public Pair<E, Integer> getDataPair(String id) throws DataNotFoundException {
         F dataBox = container.get(id);
-        return new Pair<E, Integer>(dataBox.getData(), dataBox.getTime());
+
+        if(dataBox == null)
+            throw new DataNotFoundException(id);
+
+        return new Pair<>(dataBox.getData(), dataBox.getTime());
     }
 
     @Override
-    public E getDataById(int id) {
+    public E getDataById(String id) throws DataNotFoundException {
         F dataBox = container.get(id);
+
+        if(dataBox == null)
+            throw new DataNotFoundException(id);
+
         return dataBox.getData();
     }
 
@@ -70,11 +79,16 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E> {
     }
 
     @Override
-    public Collection<E> getDataByIds(Collection<Integer> ids) {
+    public Collection<E> getDataByIds(Collection<String> ids) throws DataNotFoundException {
         Collection<E> data = new HashSet<>();
 
-        for(Integer currId : ids) {
-            data.add(container.get(currId).getData());
+        for(String currId : ids) {
+            F dataToAdd = container.get(currId);
+
+            if(dataToAdd == null)
+                throw new DataNotFoundException(currId);
+
+            data.add(dataToAdd.getData());
         }
 
         return data;

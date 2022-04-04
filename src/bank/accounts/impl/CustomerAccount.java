@@ -10,13 +10,11 @@ import bank.transactions.impl.BasicTransaction;
 import java.util.*;
 
 public class CustomerAccount implements Account, Singular {
-    private static int idGenerator = 1;
-    private final int id;
     private final String name;
     private float balance;
-    private List<Integer> transactions;
+    private final List<String> transactions;
 
-    public List<Integer> getTransactions() {
+    public List<String> getTransactions() {
         return transactions;
     }
 
@@ -25,30 +23,25 @@ public class CustomerAccount implements Account, Singular {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CustomerAccount that = (CustomerAccount) o;
-        return id == that.id;
+        return Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(name);
     }
 
     public CustomerAccount(String name, float balance) {
-        id = idGenerator++;
         this.name = name;
         this.balance = balance;
         this.transactions = new ArrayList<>();
     }
 
     @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
-    public String getName() {
+    public String getId() {
         return name;
     }
+
 
     @Override
     public float getBalance() {
@@ -79,14 +72,8 @@ public class CustomerAccount implements Account, Singular {
 
     @Override
     public String toString() {
-        return "Account id: " + id +
-                "\nName: " + name +
-                "\nCurrent Balance: " + balance +
-                "\nTransactions: " + printTransactions();
+        return "Account Name: " + name +
+                "\nCurrent Balance: " + balance;
     }
 
-    private String printTransactions() {
-        StringBuilder str = new StringBuilder();
-        return str.toString();
-    }
 }
