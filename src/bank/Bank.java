@@ -23,4 +23,10 @@ public interface Bank {
     float getDeriskAmount(Loan loan);
 
     void printCustomers();
+
+    void printCustomersNames();
+
+    void withdrawByName(String name);
+
+    void withdrawByName(String name, float amount, String description);
 }

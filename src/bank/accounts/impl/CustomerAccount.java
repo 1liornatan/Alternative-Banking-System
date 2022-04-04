@@ -45,6 +45,7 @@ public class CustomerAccount implements Account, Singular {
         return id;
     }
 
+    @Override
     public String getName() {
         return name;
     }

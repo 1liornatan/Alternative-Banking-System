@@ -71,4 +71,6 @@ public class LoanAccount implements Account, Singular {
 
         return transaction;
     }
+    @Override
+    public String getName() {return "Loan Account";}
 }

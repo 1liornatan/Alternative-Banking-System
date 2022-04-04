@@ -13,7 +13,9 @@ import bank.time.TimeHandler;
 import bank.time.handler.BankTimeHandler;
 import bank.transactions.Transaction;
 import files.xmls.XmlReader;
+import javafx.util.Pair;
 
+import java.util.Collection;
 import java.util.Set;
 
 public class BankImpl implements Bank {
@@ -119,6 +121,25 @@ public class BankImpl implements Bank {
     @Override
     public void printCustomers() {
         System.out.println(customersAccounts.toString());
+    }
+
+    @Override
+    public void printCustomersNames() {
+        Collection<Pair<Account, Integer>> allPairs = customersAccounts.getAllPairs();
+        System.out.println("All customers names:");
+
+        for(Pair<Account,Integer> accountPair : allPairs) {
+            System.out.println(accountPair.getKey().getName());
+        }
+    }
+
+    @Override
+    public void withdrawByName(String name,float amount, String description) {
+       Pair<Account, Integer> customerPair =  (Pair<Account,Integer>)customersAccounts.getAllPairs().stream()
+               .filter((accountIntegerPair -> accountIntegerPair.getKey().getName() == name))
+               .findFirst()
+               .get();
+       withdraw(customerPair.getKey().getId(),amount,description);
     }
 
 }

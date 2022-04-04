@@ -96,4 +96,5 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E> {
     public String toString() {
         return container.toString();
     }
+
 }

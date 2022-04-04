@@ -12,6 +12,8 @@ public interface Account extends Singular {
 
     int getId();
 
+    String getName();
+
     float getBalance();
 
     Transaction deposit(float amount, String description) throws NonPositiveAmountException;
