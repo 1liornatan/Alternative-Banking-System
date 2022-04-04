@@ -5,11 +5,13 @@ import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
 import files.xmls.exceptions.NotXmlException;
+import files.xmls.exceptions.XmlNoCategoryException;
+import files.xmls.exceptions.XmlNoLoanOwnerException;
 
 import java.io.FileNotFoundException;
 
 public interface Bank {
-    void loadData(String filename) throws FileNotFoundException, NotXmlException;
+    void loadData(String filename) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException;
 
     void printLoans();
 
