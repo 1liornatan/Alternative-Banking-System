@@ -7,18 +7,16 @@ import bank.data.Singular;
 import bank.transactions.Transaction;
 import bank.transactions.impl.BasicTransaction;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class CustomerAccount implements Account, Singular {
     private static int idGenerator = 1;
     private final int id;
     private final String name;
     private float balance;
-    private Set<Integer> transactions;
+    private List<Integer> transactions;
 
-    public Set<Integer> getTransactions() {
+    public List<Integer> getTransactions() {
         return transactions;
     }
 
@@ -39,7 +37,7 @@ public class CustomerAccount implements Account, Singular {
         id = idGenerator++;
         this.name = name;
         this.balance = balance;
-        this.transactions = new HashSet<>();
+        this.transactions = new ArrayList<>();
     }
 
     @Override
@@ -80,10 +78,14 @@ public class CustomerAccount implements Account, Singular {
 
     @Override
     public String toString() {
-        return "CustomerAccount{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", balance=" + balance +
-                '}';
+        return "Account id: " + id +
+                "\nName: " + name +
+                "\nCurrent Balance: " + balance +
+                "\nTransactions: " + printTransactions();
+    }
+
+    private String printTransactions() {
+        StringBuilder str = new StringBuilder();
+        return str.toString();
     }
 }

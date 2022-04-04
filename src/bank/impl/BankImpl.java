@@ -8,18 +8,12 @@ import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
 import bank.loans.Loan;
+import bank.loans.handler.impl.BankLoanHandler;
+import bank.time.TimeHandler;
+import bank.time.handler.BankTimeHandler;
 import bank.transactions.Transaction;
-import files.schema.generated.AbsCategories;
-import files.schema.generated.AbsCustomer;
-import files.schema.generated.AbsDescriptor;
 import files.xmls.XmlReader;
 
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.List;
 import java.util.Set;
 
 public class BankImpl implements Bank {
@@ -28,18 +22,47 @@ public class BankImpl implements Bank {
     private DataStorage<Transaction> transactions;
     private DataStorage<Loan> loans;
     private Set<String> categories;
+    private BankLoanHandler loanHandler;
+    private TimeHandler timeHandler;
+
+
 
     @Override
     public void loadData(String filename) {
-        XmlReader xmlReader = new XmlReader(filename);
+        TimeHandler timeHandler = new BankTimeHandler();
+        XmlReader xmlReader = new XmlReader(filename, timeHandler);
 
-        customersAccounts = xmlReader.getCustomersDataStorage();
-        loans = xmlReader.getLoansDataStorage();
-        categories = xmlReader.getCategoryNames();
+        if(xmlReader.isValid()) {
 
-        loanAccounts = new BankDataStorage<>();
-        transactions = new BankDataStorage<>();
+            customersAccounts = xmlReader.getCustomersDataStorage();
+            loans = xmlReader.getLoansDataStorage();
+            categories = xmlReader.getCategoryNames();
+
+            loanAccounts = new BankDataStorage<>(timeHandler);
+            transactions = new BankDataStorage<>(timeHandler);
+
+            loanHandler = new BankLoanHandler(transactions, loans, customersAccounts);
+
+            this.timeHandler = timeHandler;
+        }
     }
+
+    @Override
+    public void printLoans() {
+        loanHandler.printAllLoans();
+    }
+
+    @Override
+    public void advanceOneYaz() {
+        timeHandler.advanceTime();
+        loanHandler.oneCycle();
+    }
+
+    @Override
+    public int getCurrentYaz() {
+        return timeHandler.getCurrentTime();
+    }
+
     @Override
     public int withdraw(int accountId, float amount, String description) {
         Account account = customersAccounts.getDataById(accountId);
@@ -82,4 +105,20 @@ public class BankImpl implements Bank {
 
         return account.getId();
     }
+
+    @Override
+    public void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException {
+        loanHandler.deriskLoan(loan);
+    }
+
+    @Override
+    public float getDeriskAmount(Loan loan) {
+        return loanHandler.getDeriskAmount(loan);
+    }
+
+    @Override
+    public void printCustomers() {
+        System.out.println(customersAccounts.toString());
+    }
+
 }

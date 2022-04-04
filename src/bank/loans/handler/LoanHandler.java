@@ -14,4 +14,5 @@ public interface LoanHandler {
 
     void addInvestment(Loan loan, Investment investment, Account srcAcc) throws NonPositiveAmountException, NoMoneyException;
 
+    void printAllLoans();
 }

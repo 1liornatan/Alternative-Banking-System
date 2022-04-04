@@ -6,9 +6,10 @@ import bank.loans.Loan;
 import bank.loans.LoanStatus;
 import bank.loans.impl.builder.LoanBuilder;
 import bank.loans.interest.Interest;
-import bank.loans.interest.impl.BasicInterest;
 import bank.loans.investments.Investment;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -17,10 +18,10 @@ public class BasicLoan implements Loan {
     private static int idGenerator = 40000;
     private final int id;
     private final LoanBuilder loanDetails;
-    private int duration;
+    private int startingYaz;
     private final Interest interest;
     private LoanStatus status;
-    private Set<Investment> investments;
+    private List<Investment> investments;
     private final Account loanAccount;
 
 
@@ -34,17 +35,28 @@ public class BasicLoan implements Loan {
         this.status = status;
     }
 
+    @Override
     public int getDuration() {
-        return duration;
+        return interest.getDuration();
     }
 
     @Override
-    public Set<Investment> getInvestments() {
+    public List<Investment> getInvestments() {
         return investments;
     }
 
     @Override
     public void addInvestment(Investment investment) { investments.add(investment); }
+
+    @Override
+    public int getStartingYaz() {
+        return startingYaz;
+    }
+
+    @Override
+    public void setStartingYaz(int startingYaz) {
+        this.startingYaz = startingYaz;
+    }
 
     @Override
     public Account getLoanAccount() {
@@ -57,6 +69,9 @@ public class BasicLoan implements Loan {
         this.status = LoanStatus.PENDING;
         loanAccount = new LoanAccount();
         id = idGenerator++;
+
+        investments = new ArrayList<>();
+        startingYaz = -1;
     }
 
     @Override
@@ -88,7 +103,7 @@ public class BasicLoan implements Loan {
 
     @Override
     public float getCyclePayment() {
-        return getFinalAmount() / duration;
+        return getFinalAmount() / getDuration();
     }
 
     @Override
@@ -121,7 +136,6 @@ public class BasicLoan implements Loan {
         return "BasicLoan{" +
                 "id=" + id +
                 ", loanDetails=" + loanDetails +
-                ", duration=" + duration +
                 ", interest=" + interest +
                 ", status=" + status +
                 ", investments=" + investments +

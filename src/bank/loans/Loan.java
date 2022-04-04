@@ -4,6 +4,7 @@ import bank.accounts.Account;
 import bank.data.Singular;
 import bank.loans.investments.Investment;
 
+import java.util.List;
 import java.util.Set;
 
 public interface Loan extends Singular {
@@ -17,8 +18,16 @@ public interface Loan extends Singular {
     LoanStatus getStatus();
     void setStatus(LoanStatus status);
     float getMaxPortion();
-    Set<Investment> getInvestments();
+
+    int getDuration();
+
+    List<Investment> getInvestments();
     void addInvestment(Investment investment);
+
+    int getStartingYaz();
+
+    void setStartingYaz(int startingYaz);
+
     Account getLoanAccount();
     float getCyclePayment();
     int getOwnerId();

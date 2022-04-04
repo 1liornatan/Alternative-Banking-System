@@ -17,6 +17,11 @@ public class LoanInvestment implements Investment {
     }
 
     @Override
+    public float getAmountPaid() {
+        return amountPaid;
+    }
+
+    @Override
     public void payment() {
         amountPaid += getPayment();
     }

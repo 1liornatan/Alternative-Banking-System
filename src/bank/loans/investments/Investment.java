@@ -11,6 +11,8 @@ public interface Investment {
 
     float getTotalPayment();
 
+    float getAmountPaid();
+
     void payment();
 
     boolean isFullyPaid();

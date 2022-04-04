@@ -16,6 +16,7 @@ import bank.loans.impl.BasicLoan;
 import bank.loans.impl.builder.LoanBuilder;
 import bank.loans.interest.Interest;
 import bank.loans.interest.impl.BasicInterest;
+import bank.time.TimeHandler;
 import files.schema.generated.*;
 
 import javax.xml.bind.JAXBContext;
@@ -27,8 +28,9 @@ public class XmlReader {
     private Set<String> categoryNames;
     private DataStorage<Account> customersDataStorage;
     private DataStorage<Loan> loansDataStorage;
+    private boolean validation;
 
-    public XmlReader(String filePath) {
+    public XmlReader(String filePath, TimeHandler timeHandler) {
         try {
             InputStream inputStream = new FileInputStream(new File(filePath));
             Map<String, Integer> customersDataDecoder = new HashMap<>();
@@ -43,8 +45,8 @@ public class XmlReader {
             List<AbsCustomer> customersList = descriptor.getAbsCustomers().getAbsCustomer();
             List<AbsLoan> loansList = descriptor.getAbsLoans().getAbsLoan();
 
-            customersDataStorage = new BankDataStorage<>();
-            loansDataStorage = new BankDataStorage<>();
+            customersDataStorage = new BankDataStorage<>(timeHandler);
+            loansDataStorage = new BankDataStorage<>(timeHandler);
 
             // add all categories to a set
 
@@ -79,10 +81,10 @@ public class XmlReader {
 
 
             }
-
+            validation = true;
 
         } catch (FileNotFoundException | JAXBException e) {
-            e.printStackTrace();
+            validation = false;
         }
     }
 
@@ -105,4 +107,7 @@ public class XmlReader {
     }
 
 
+    public boolean isValid() {
+        return validation;
+    }
 }
