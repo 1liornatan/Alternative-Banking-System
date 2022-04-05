@@ -9,7 +9,7 @@ import files.xmls.exceptions.*;
 import java.io.FileNotFoundException;
 
 public interface Bank {
-    void loadData(String filename) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException;
+    void loadData(String filename) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException, XmlNotFoundException;
 
     void printLoans();
 

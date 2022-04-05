@@ -33,7 +33,7 @@ public class BankImpl implements Bank {
 
 
     @Override
-    public void loadData(String filename) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException {
+    public void loadData(String filename) throws NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException, XmlNotFoundException {
         TimeHandler timeHandler = new BankTimeHandler();
         XmlReader xmlReader = new XmlReader(filename, timeHandler);
 

@@ -32,11 +32,11 @@ public class XmlReader {
     private DataStorage<Loan> loansDataStorage;
     private boolean validation;
 
-    public XmlReader(String filePath, TimeHandler timeHandler) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException {
+    public XmlReader(String filePath, TimeHandler timeHandler) throws NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException, XmlNotFoundException {
         Path path = Paths.get(filePath);
 
         if(!Files.exists(path))
-            throw new FileNotFoundException();
+            throw new XmlNotFoundException(filePath);
 
         int extIndex = filePath.lastIndexOf('.');
         if(!filePath.substring(extIndex).equalsIgnoreCase(".xml"))

@@ -12,21 +12,25 @@ import java.util.Scanner;
 
 public class MainMenu {
     private final Bank bankInstance;
-
+    private boolean hasValidData;
+    private static final String MENU_MESSAGE = "Bank Actions:\n" +
+            "1.Read system data from XML.\n" +
+            "2.Show loans details.\n" +
+            "3.Show customers Details.\n" +
+            "4.Deposit money to account.\n" +
+            "5.Withdraw money from an account.\n" +
+            "6.Loan integration.\n" +
+            "7.Advance timeline.\n" +
+            "8.Exit System.";
 
     public MainMenu() {
         bankInstance = new BankImpl();
+        hasValidData = false;
     }
     public static void main(String[] args) {
         MainMenu a = new MainMenu();
 
-        a.readXml();
-
-        a.printCustomers();
-
-        a.deposit();
-
-        a.printCustomers();
+        a.printMenu();
     }
     public void readXml() {
         System.out.println("Enter an XML file's full path:");
@@ -34,23 +38,32 @@ public class MainMenu {
         String fileName = scanner.nextLine();
         try {
             bankInstance.loadData(fileName);
+            hasValidData = true;
             System.out.println("Loaded XML Successfully.");
-        } catch (FileNotFoundException | NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException e) {
+        } catch (NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException | FileNotFoundException | XmlNotFoundException e) {
             System.out.println(e.getMessage());
-        } finally {
-            printMenu();
         }
     }
 
-    public void printLoans() {
+    public void printLoans() throws XmlNotLoadedException {
+        if(!hasValidData)
+            throw new XmlNotLoadedException();
+
         bankInstance.printLoans();
     }
 
-    public void printCustomers() {
+    public void printCustomers() throws XmlNotLoadedException {
+        if(!hasValidData)
+            throw new XmlNotLoadedException();
+
         bankInstance.printCustomers();
     }
 
-    public void withdraw () {
+    public void withdraw () throws XmlNotLoadedException {
+
+        if(!hasValidData)
+            throw new XmlNotLoadedException();
+
         bankInstance.printCustomersNames();
         System.out.println("Enter a customer name:");
         Scanner scanner = new Scanner(System.in);
@@ -61,15 +74,17 @@ public class MainMenu {
         float amount = scanner.nextFloat();
         try {
             bankInstance.withdraw(customerName,amount,"Basic Withdraw");
+            System.out.println("Successfully withdrew " + amount + " from " + customerName);
         } catch (NoMoneyException | NonPositiveAmountException | DataNotFoundException e) {
             System.out.println(e.getMessage());
-        } finally {
-            this.printMenu();
         }
-
     }
 
-    public void deposit () {
+    public void deposit () throws XmlNotLoadedException {
+
+        if(!hasValidData)
+            throw new XmlNotLoadedException();
+
         bankInstance.printCustomersNames();
         System.out.println("Enter a customer name:");
         Scanner scanner = new Scanner(System.in);
@@ -80,27 +95,67 @@ public class MainMenu {
         float amount = scanner.nextFloat();
         try {
             bankInstance.deposit(customerName, amount, "Basic Deposit");
+            System.out.println("Successfully deposited " + amount + " to " + customerName);
         } catch (DataNotFoundException | NonPositiveAmountException e) {
             System.out.println(e.getMessage());
         }
-        finally {
-            this.printMenu();
-        }
-
     }
 
     public void printMenu() {
+        boolean exit = false;
+
+        while(!exit) {
+            try {
+                System.out.println(MENU_MESSAGE);
+                System.out.println("Choose an option:");
+
+                Scanner scanner = new Scanner(System.in);
+                int option = scanner.nextInt();
+
+                switch (option) {
+                    case 1:
+                        readXml();
+                        break;
+                    case 2:
+                        printLoans();
+                        break;
+                    case 3:
+                        printCustomers();
+                        break;
+                    case 4:
+                        deposit();
+                        break;
+                    case 5:
+                        withdraw();
+                        break;
+                    case 6:
+                        break;
+                    case 7:
+                        advanceTime();
+                        break;
+                    case 8:
+                        exit = true;
+                        break;
+                    default:
+                        throw new NoOptionException();
+                }
+            } catch (XmlNotLoadedException | NoOptionException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
-    public void advanceTime() {
+    public void advanceTime() throws XmlNotLoadedException {
+
+        if(!hasValidData)
+            throw new XmlNotLoadedException();
+
         int currYaz = bankInstance.getCurrentYaz();
         System.out.println("Advancing from Yaz " + currYaz + " to Yaz " + (currYaz + 1) + ".");
         try {
             bankInstance.advanceOneYaz();
         } catch (DataNotFoundException e) {
             System.out.println(e.getMessage());
-        } finally {
-            printMenu();
         }
     }
 }
