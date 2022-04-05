@@ -14,9 +14,7 @@ import bank.time.TimeHandler;
 import bank.time.handler.BankTimeHandler;
 import bank.transactions.Transaction;
 import files.xmls.XmlReader;
-import files.xmls.exceptions.NotXmlException;
-import files.xmls.exceptions.XmlNoCategoryException;
-import files.xmls.exceptions.XmlNoLoanOwnerException;
+import files.xmls.exceptions.*;
 import javafx.util.Pair;
 
 import java.io.FileNotFoundException;
@@ -35,7 +33,7 @@ public class BankImpl implements Bank {
 
 
     @Override
-    public void loadData(String filename) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException {
+    public void loadData(String filename) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException {
         TimeHandler timeHandler = new BankTimeHandler();
         XmlReader xmlReader = new XmlReader(filename, timeHandler);
 

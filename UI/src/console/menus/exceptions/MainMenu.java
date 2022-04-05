@@ -5,9 +5,7 @@ import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
-import files.xmls.exceptions.NotXmlException;
-import files.xmls.exceptions.XmlNoCategoryException;
-import files.xmls.exceptions.XmlNoLoanOwnerException;
+import files.xmls.exceptions.*;
 
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -31,12 +29,13 @@ public class MainMenu {
         a.printCustomers();
     }
     public void readXml() {
-        System.out.println("Enter Xml full path:");
+        System.out.println("Enter an XML file's full path:");
         Scanner scanner = new Scanner(System.in);
         String fileName = scanner.nextLine();
         try {
             bankInstance.loadData(fileName);
-        } catch (FileNotFoundException | NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException e) {
+            System.out.println("Loaded XML Successfully.");
+        } catch (FileNotFoundException | NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException e) {
             System.out.println(e.getMessage());
         } finally {
             printMenu();
@@ -53,12 +52,12 @@ public class MainMenu {
 
     public void withdraw () {
         bankInstance.printCustomersNames();
-        System.out.println("Enter customer name:");
+        System.out.println("Enter a customer name:");
         Scanner scanner = new Scanner(System.in);
         String customerName = scanner.nextLine();
 
 
-        System.out.println("Enter amount to withdraw:");
+        System.out.println("Enter an amount to withdraw:");
         float amount = scanner.nextFloat();
         try {
             bankInstance.withdraw(customerName,amount,"Basic Withdraw");
@@ -72,12 +71,12 @@ public class MainMenu {
 
     public void deposit () {
         bankInstance.printCustomersNames();
-        System.out.println("Enter customer name:");
+        System.out.println("Enter a customer name:");
         Scanner scanner = new Scanner(System.in);
         String customerName = scanner.nextLine();
 
 
-        System.out.println("Enter amount to deposit:");
+        System.out.println("Enter an amount to deposit:");
         float amount = scanner.nextFloat();
         try {
             bankInstance.deposit(customerName, amount, "Basic Deposit");
