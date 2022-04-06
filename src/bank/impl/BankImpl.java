@@ -109,7 +109,7 @@ public class BankImpl implements Bank {
             System.out.println("All account's transactions:");
             for(String transactionId : currAccount.getTransactions()) {
                 Pair<Transaction, Integer> currTransaction = transactions.getDataPair(transactionId);
-                System.out.println(currTransaction.toString());
+                System.out.println("(" + currTransaction.getKey().toString() + ", Yaz made at: " + currTransaction.getValue() + ")");
             }
         }
     }

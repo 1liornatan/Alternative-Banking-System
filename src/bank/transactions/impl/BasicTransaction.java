@@ -22,11 +22,10 @@ public class BasicTransaction implements Transaction {
 
     @Override
     public String toString() {
-        return "(Transaction: '" + description +
+        return "Transaction: '" + description +
                 ", Amount: " + (amount >= 0 ? "+":"") + amount +
                 ", Balance before: " + previousBalance +
-                ", Balance after: " + (previousBalance + amount) +
-                ')';
+                ", Balance after: " + (previousBalance + amount);
     }
 
     @Override
