@@ -8,12 +8,19 @@ import java.util.List;
 
 public interface Loan extends Singular {
 
+    int getCurrentPayment();
+
+    int getFinishedYaz();
+
+    void setFinishedYaz(int finishedYaz);
+
     void setPayments();
 
     String getId();
     String getCategory();
     int getFinalAmount();
-    int getInterest();
+    int getInterestAmount();
+    float getInterestPercent();
 
     int getCyclesPerPayment();
 
@@ -30,10 +37,17 @@ public interface Loan extends Singular {
     List<Investment> getInvestments();
     void addInvestment(Investment investment);
 
-    int getStartingYaz();
+    int getStartedYaz();
 
-    void setStartingYaz(int startingYaz);
+    void setStartedYaz(int startedYaz);
 
     Account getLoanAccount();
+
+    void fullPaymentCycle();
+
+    int getFullPaidCycles();
+
+    void nextPayment();
+
     String getOwnerId();
 }

@@ -16,14 +16,27 @@ public class BasicLoan implements Loan {
 
     private final String id;
     private final LoanBuilder loanDetails;
-    private int startingYaz, currentPayment, fullyPaidCycles;
+    private int startedYaz, finishedYaz, currentPayment, fullPaidCycles;
     private final Interest interest;
     private LoanStatus status;
     private final List<Investment> investments;
     private List<Integer> payments;
     private final Account loanAccount;
 
+    @Override
+    public void fullPaymentCycle() {
+        fullPaidCycles++;
+    }
 
+    @Override
+    public int getFullPaidCycles() {
+        return fullPaidCycles;
+    }
+
+    @Override
+    public void nextPayment() {
+        currentPayment++;
+    }
     @Override
     public String getOwnerId() {
         return loanDetails.getOwnerId();
@@ -48,13 +61,13 @@ public class BasicLoan implements Loan {
     public void addInvestment(Investment investment) { investments.add(investment); }
 
     @Override
-    public int getStartingYaz() {
-        return startingYaz;
+    public int getStartedYaz() {
+        return startedYaz;
     }
 
     @Override
-    public void setStartingYaz(int startingYaz) {
-        this.startingYaz = startingYaz;
+    public void setStartedYaz(int startedYaz) {
+        this.startedYaz = startedYaz;
     }
 
     @Override
@@ -70,12 +83,28 @@ public class BasicLoan implements Loan {
         id = loanDetails.getIdName();
 
         investments = new ArrayList<>();
-        startingYaz = -1;
+        startedYaz = 0;
+        finishedYaz = 0;
 
         currentPayment = 0;
-        fullyPaidCycles = 0;
+        fullPaidCycles = 0;
 
         payments = new ArrayList<>();
+    }
+
+    @Override
+    public int getCurrentPayment() {
+        return currentPayment;
+    }
+
+    @Override
+    public int getFinishedYaz() {
+        return finishedYaz;
+    }
+
+    @Override
+    public void setFinishedYaz(int finishedYaz) {
+        this.finishedYaz = finishedYaz;
     }
 
     @Override
@@ -107,8 +136,13 @@ public class BasicLoan implements Loan {
     }
 
     @Override
-    public int getInterest() {
+    public int getInterestAmount() {
         return interest.getInterest();
+    }
+
+    @Override
+    public float getInterestPercent() {
+        return interest.getPercent();
     }
 
     @Override

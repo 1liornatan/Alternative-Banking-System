@@ -35,7 +35,7 @@ public class BasicInterest implements Interest {
 
     @Override
     public int getInterest() {
-        return (int) (baseAmount * percent);
+        return (int) (baseAmount * percent / 100 );
     }
 
     @Override

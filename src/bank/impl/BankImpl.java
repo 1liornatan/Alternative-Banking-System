@@ -9,6 +9,7 @@ import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
+import bank.loans.LoanStatus;
 import bank.loans.handler.impl.BankLoanHandler;
 import bank.time.TimeHandler;
 import bank.time.handler.BankTimeHandler;
@@ -17,7 +18,6 @@ import files.xmls.XmlReader;
 import files.xmls.exceptions.*;
 import javafx.util.Pair;
 
-import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.Set;
 
@@ -109,9 +109,54 @@ public class BankImpl implements Bank {
             System.out.println("All account's transactions:");
             for(String transactionId : currAccount.getTransactions()) {
                 Pair<Transaction, Integer> currTransaction = transactions.getDataPair(transactionId);
-                System.out.println("(" + currTransaction.getKey().toString() + ", Yaz made at: " + currTransaction.getValue() + ")");
+                System.out.println("(" + currTransaction.getKey().toString() +
+                        ", Yaz made at: " + currTransaction.getValue() + ")");
+            }
+
+            System.out.println("All account's requested loans:");
+            for(String loanId : currAccount.getLoansRequested()) {
+                printLoan(loanId);
+            }
+
+            System.out.println("All account's invested loans:");
+            for(String loanId : currAccount.getLoansInvested()) {
+                printLoan(loanId);
             }
         }
+    }
+
+    private void printLoan(String loanId) throws DataNotFoundException {
+        Loan loan = loans.getDataById(loanId);
+        LoanStatus loanStatus = loan.getStatus();
+
+        System.out.println("Loan name: " + loanId + ", Category: " + loan.getCategory() + ", Base amount: " +
+                loan.getBaseAmount() + ", Total amount: " + loan.getFinalAmount() + ", Pay Every: " +
+                loan.getCyclesPerPayment() + " Yaz, Interest percent: " +
+                loan.getInterestPercent() + "%, Status: " + loanStatus.toString());
+
+        switch(loanStatus) {
+            case PENDING:
+                System.out.println("[Money left for becoming Active: " +
+                        (loan.getBaseAmount() - loan.getLoanAccount().getBalance()) + "]");
+                break;
+
+            case ACTIVE:
+                int cyclesPerPayment = loan.getCyclesPerPayment();
+                int nextYaz = cyclesPerPayment - ((getCurrentYaz() - loan.getStartedYaz()) % cyclesPerPayment);
+                System.out.println("[Next payment is in: " + nextYaz +
+                        "Yaz, Payment amount: " + loan.getPayment() + ".]");
+                break;
+
+            case FINISHED:
+                System.out.println("[Yaz Started: " + loan.getStartedYaz() + ", Yaz Finished: " + loan.getFinishedYaz() + ".]");
+                break;
+
+            case RISK:
+                int missingCycles = (loan.getCurrentPayment() - loan.getFullPaidCycles());
+                System.out.println("[Missing payments: " + missingCycles + ", Missing Amount: " + getDeriskAmount(loan) + ".]");
+                break;
+        }
+
     }
 
     @Override

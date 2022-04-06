@@ -95,6 +95,7 @@ public class BankLoanHandler implements LoanHandler {
         try {
             // TODO : fix for (based on how loans work)
             transactions.addData(srcAcc.withdraw(payment, "Loan Cycle"));
+            loan.fullPaymentCycle();
             Collection<Investment> investments = loan.getInvestments();
             boolean isFinished = true;
 
@@ -115,6 +116,8 @@ public class BankLoanHandler implements LoanHandler {
         } catch (NoMoneyException e) {
             loan.setStatus(LoanStatus.RISK);
             partiallyPayment(loan);
+        } finally {
+            loan.nextPayment();
         }
     }
 
@@ -149,10 +152,15 @@ public class BankLoanHandler implements LoanHandler {
         Account srcAcc = customers.getDataById(loan.getOwnerId());
 
         transactions.addData(srcAcc.withdraw(amount, "Derisk Loan"));
+        int missingCycles = (loan.getCurrentPayment() - loan.getFullPaidCycles());
+
+        for(int i = 0; i < missingCycles; i++)
+            loan.fullPaymentCycle();
+
         loan.setStatus(LoanStatus.ACTIVE);
 
         List<Investment> investments = loan.getInvestments();
-        int cycles = (timeHandler.getCurrentTime() - loan.getStartingYaz()) / loan.getCyclesPerPayment();
+        int cycles = (timeHandler.getCurrentTime() - loan.getStartedYaz()) / loan.getCyclesPerPayment();
 
         for(Investment investment : investments) {
             for(int i = investment.getPaymentsReceived(); i < cycles; i++) {
@@ -163,7 +171,7 @@ public class BankLoanHandler implements LoanHandler {
 
     public int getDeriskAmount(Loan loan) {
         List<Investment> investments = loan.getInvestments();
-        int startingYaz = loan.getStartingYaz();
+        int startingYaz = loan.getStartedYaz();
         int cycles = (timeHandler.getCurrentTime() - startingYaz) / loan.getCyclesPerPayment();
         int sum = 0;
 
