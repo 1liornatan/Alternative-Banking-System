@@ -3,47 +3,91 @@ package bank.loans.investments.impl;
 import bank.loans.interest.Interest;
 import bank.loans.investments.Investment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LoanInvestment implements Investment {
     private final String investorId;
-    private final int duration;
     private final Interest interest;
-    private float amountPaid;
+    private int amountPaid, paymentsReceived;
+    private List<Integer> payments;
 
     public LoanInvestment(String investorId, Interest interest, int duration) {
         this.investorId = investorId;
         this.interest = interest;
-        this.duration = duration;
+
         amountPaid = 0;
+        paymentsReceived = 0;
+
+        payments = new ArrayList<>();
+        setPayments();
     }
 
     @Override
-    public float getAmountPaid() {
+    public int getPaymentsReceived() {
+        return paymentsReceived;
+    }
+    private void setPayments() {
+
+        int duration = interest.getDuration();
+        int cycles = interest.getCyclesPerPayment();
+        int paymentsCount = (duration / cycles);
+
+        int totalPayment = interest.getFinalAmount();
+        int basePayment = totalPayment / paymentsCount;
+
+        int leftOver = totalPayment % paymentsCount;
+
+        for(int i = 0; i < paymentsCount; i++) {
+            int payment = basePayment;
+            if(i < leftOver)
+                payment++;
+
+            payments.add(payment);
+
+        }
+
+    }
+
+    @Override
+    public int getAmountPaid() {
         return amountPaid;
     }
 
     @Override
     public void payment() {
-        amountPaid += getPayment();
+        if(!isFullyPaid()) {
+            amountPaid += getPayment();
+            paymentsReceived++;
+        }
     }
 
 
     @Override
-    public float getBaseAmount() {
+    public int getBaseAmount() {
         return interest.getBaseAmount();
     }
 
     @Override
-    public float getPayment() {
-        return getBaseAmount() / duration;
+    public int getPayment() {
+        if(isFullyPaid())
+            return 0;
+
+        return payments.get(paymentsReceived);
     }
 
     @Override
-    public float getRemainingPayment() {
+    public int getPayment(int index) {
+        return payments.get(index);
+    }
+
+    @Override
+    public int getRemainingPayment() {
         return getTotalPayment() - amountPaid;
     }
 
     @Override
-    public float getTotalPayment() {
+    public int getTotalPayment() {
         return interest.getFinalAmount();
     }
 

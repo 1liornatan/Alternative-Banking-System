@@ -5,17 +5,29 @@ import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.Singular;
 import bank.transactions.Transaction;
 
+import java.util.List;
+
 /* An interface for all kind of accounts
    with the default actions required
  */
 public interface Account extends Singular {
 
+    List<String> getTransactions();
+
+    void addRequestedLoan(String id);
+
+    void addInvestedLoan(String id);
+
+    List<String> getLoansRequested();
+
+    List<String> getLoansInvested();
+
     String getId();
 
-    float getBalance();
+    int getBalance();
 
-    Transaction deposit(float amount, String description) throws NonPositiveAmountException;
+    Transaction deposit(int amount, String description) throws NonPositiveAmountException;
 
-    Transaction withdraw(float amount, String description) throws NonPositiveAmountException, NoMoneyException;
+    Transaction withdraw(int amount, String description) throws NonPositiveAmountException, NoMoneyException;
 
 }

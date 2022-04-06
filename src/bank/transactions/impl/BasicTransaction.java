@@ -5,11 +5,11 @@ import bank.transactions.Transaction;
 public class BasicTransaction implements Transaction {
     private static Integer idGenerator = 40000;
     private final String id;
-    private String accountId;
     private final String description;
-    private final float amount;
+    private final int amount, previousBalance;
 
-    public BasicTransaction(float amount, String description) {
+    public BasicTransaction(int amount, String description, int previousBalance) {
+        this.previousBalance = previousBalance;
         id = (idGenerator++).toString();
         this.amount = amount;
         this.description = description;
@@ -21,16 +21,17 @@ public class BasicTransaction implements Transaction {
     }
 
     @Override
-    public String getAccountId() {
-        return accountId;
+    public String toString() {
+        return "(Transaction: '" + description +
+                ", Amount: " + (amount >= 0 ? "+":"") + amount +
+                ", Balance before: " + previousBalance +
+                ", Balance after: " + (previousBalance + amount) +
+                ')';
     }
 
     @Override
-    public String toString() {
-        return "(Transaction Name: " + description +
-                ", ID: " + id +
-                ", Amount: " + amount +
-                ')';
+    public int getPreviousBalance() {
+        return previousBalance;
     }
 
     @Override
@@ -39,7 +40,7 @@ public class BasicTransaction implements Transaction {
     }
 
     @Override
-    public float getAmount() {
+    public int getAmount() {
         return amount;
     }
 }

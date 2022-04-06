@@ -33,7 +33,7 @@ public class BankImpl implements Bank {
 
 
     @Override
-    public void loadData(String filename) throws NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException, XmlNotFoundException {
+    public void loadData(String filename) throws NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException, XmlNotFoundException, DataNotFoundException {
         TimeHandler timeHandler = new BankTimeHandler();
         XmlReader xmlReader = new XmlReader(filename, timeHandler);
 
@@ -58,7 +58,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public void advanceOneYaz() throws DataNotFoundException {
+    public void advanceOneYaz() throws DataNotFoundException, NonPositiveAmountException {
         timeHandler.advanceTime();
         loanHandler.oneCycle();
     }
@@ -69,21 +69,21 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public void withdraw(String accountId, float amount, String description) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
+    public void withdraw(String accountId, int amount, String description) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
         Account account = customersAccounts.getDataById(accountId);
         Transaction transaction = account.withdraw(amount, description);
         transactions.addData(transaction);
     }
 
     @Override
-    public void deposit(String accountId, float amount, String description) throws NonPositiveAmountException, DataNotFoundException {
+    public void deposit(String accountId, int amount, String description) throws NonPositiveAmountException, DataNotFoundException {
         Account account = customersAccounts.getDataById(accountId);
         Transaction transaction = account.deposit(amount, description);
         transactions.addData(transaction);
     }
 
     @Override
-    public void createAccount(String name, float balance) {
+    public void createAccount(String name, int balance) {
         Account account = new CustomerAccount(name, balance);
 
         customersAccounts.addData(account);
@@ -95,13 +95,23 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public float getDeriskAmount(Loan loan) {
+    public int getDeriskAmount(Loan loan) {
         return loanHandler.getDeriskAmount(loan);
     }
 
     @Override
-    public void printCustomers() {
-        System.out.println(customersAccounts.toString());
+    public void printCustomers() throws DataNotFoundException {
+        Collection<Pair<Account, Integer>> allCustomers = customersAccounts.getAllPairs();
+
+        for(Pair<Account, Integer> pairOfAccount : allCustomers) {
+            Account currAccount = pairOfAccount.getKey();
+            System.out.println(currAccount.toString());
+            System.out.println("All account's transactions:");
+            for(String transactionId : currAccount.getTransactions()) {
+                Pair<Transaction, Integer> currTransaction = transactions.getDataPair(transactionId);
+                System.out.println(currTransaction.toString());
+            }
+        }
     }
 
     @Override

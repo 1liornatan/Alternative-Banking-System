@@ -18,6 +18,8 @@ import bank.transactions.Transaction;
 import javafx.util.Pair;
 
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class BankLoanHandler implements LoanHandler {
@@ -50,17 +52,18 @@ public class BankLoanHandler implements LoanHandler {
 
     @Override
     public void addInvestment(Loan loan, Investment investment, Account srcAcc) throws NonPositiveAmountException, NoMoneyException, DataNotFoundException {
-        float amount = investment.getBaseAmount();
+        int amount = investment.getBaseAmount();
         loan.addInvestment(investment);
         transactions.addData(loan.getLoanAccount().deposit(amount, "Loan"));
         transactions.addData(srcAcc.withdraw(amount, "Loan"));
+        srcAcc.addInvestedLoan(loan.getId());
 
         checkLoanStatus(loan, srcAcc);
     }
 
     private void checkLoanStatus(Loan loan, Account srcAcc) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
-        float loanAmount = loan.getBaseAmount();
-        float accountBalance = srcAcc.getBalance();
+        int loanAmount = loan.getBaseAmount();
+        int accountBalance = srcAcc.getBalance();
         Account requester;
 
         if(loanAmount == accountBalance) {
@@ -75,7 +78,7 @@ public class BankLoanHandler implements LoanHandler {
         return new LoanInvestment(investorId, interest, duration);
     }
 
-    public void oneCycle() throws DataNotFoundException {
+    public void oneCycle() throws DataNotFoundException, NonPositiveAmountException {
         Collection<Pair<Loan, Integer>> loanCollection = loans.getAllPairs();
         Collection<Pair<Loan, Integer>> filteredLoans = loanCollection.stream()
                 .filter((loan -> (loan.getKey().getStatus() != LoanStatus.FINISHED) && (loan.getKey().getStatus() != LoanStatus.PENDING)))
@@ -86,9 +89,9 @@ public class BankLoanHandler implements LoanHandler {
         }
     }
 
-    private void makePayment(Loan loan) throws DataNotFoundException {
+    private void makePayment(Loan loan) throws DataNotFoundException, NonPositiveAmountException {
         Account srcAcc = customers.getDataById(loan.getOwnerId());
-        float payment = loan.getCyclePayment();
+        int payment = loan.getPayment();
         try {
             // TODO : fix for (based on how loans work)
             transactions.addData(srcAcc.withdraw(payment, "Loan Cycle"));
@@ -111,37 +114,66 @@ public class BankLoanHandler implements LoanHandler {
             e.printStackTrace();
         } catch (NoMoneyException e) {
             loan.setStatus(LoanStatus.RISK);
+            partiallyPayment(loan);
         }
     }
 
+    private void investmentPayment(Investment investment) throws DataNotFoundException, NonPositiveAmountException {
+        Account investor = customers.getDataById(investment.getInvestorId());
+        transactions.addData(investor.deposit(investment.getPayment(), "Loan Cycle"));
+        investment.payment();
+    }
+
+    private void partiallyPayment(Loan loan) throws DataNotFoundException, NonPositiveAmountException {
+        Account srcAcc = customers.getDataById(loan.getOwnerId());
+        int accountBalance = srcAcc.getBalance();
+        int sumPaid = 0;
+
+        List<Investment> sortedInvestors = loan.getInvestments().stream()
+                .sorted(Comparator.comparingInt(Investment::getPayment))
+                .collect(Collectors.toList());
+
+        for(Investment investment : sortedInvestors) {
+            if(!investment.isFullyPaid() && investment.getPayment() < (accountBalance - sumPaid)) {
+                sumPaid += investment.getPayment();
+                investmentPayment(investment);
+            }
+            else
+                break;
+        }
+
+    }
+
     public void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
-        float amount = getDeriskAmount(loan);
+        int amount = getDeriskAmount(loan);
         Account srcAcc = customers.getDataById(loan.getOwnerId());
 
         transactions.addData(srcAcc.withdraw(amount, "Derisk Loan"));
         loan.setStatus(LoanStatus.ACTIVE);
 
-        int times = (int) (amount / loan.getCyclePayment());
+        List<Investment> investments = loan.getInvestments();
+        int cycles = (timeHandler.getCurrentTime() - loan.getStartingYaz()) / loan.getCyclesPerPayment();
 
-        for(int i = 0; i < times; i++) {
-            makePayment(loan);
+        for(Investment investment : investments) {
+            for(int i = investment.getPaymentsReceived(); i < cycles; i++) {
+                investmentPayment(investment);
+            }
         }
     }
 
-    public float getDeriskAmount(Loan loan) {
-        Investment investment = loan.getInvestments().get(0);
+    public int getDeriskAmount(Loan loan) {
+        List<Investment> investments = loan.getInvestments();
         int startingYaz = loan.getStartingYaz();
-        int cycles = timeHandler.getCurrentTime() - startingYaz;
+        int cycles = (timeHandler.getCurrentTime() - startingYaz) / loan.getCyclesPerPayment();
+        int sum = 0;
 
-        return getMissingCycles(investment, cycles) * loan.getCyclePayment();
-//        loan.getStartingYaz();
+        for(Investment investment : investments) {
+            for(int i = investment.getPaymentsReceived(); i < cycles; i++) {
+                sum += investment.getPayment(i);
+            }
+        }
 
-
-    }
-
-    private int getMissingCycles(Investment investment, int cycles) {
-        return (int) (((investment.getPayment() * cycles) - (investment.getAmountPaid()))
-                                / (investment.getPayment()));
+        return sum;
     }
 
     @Override

@@ -3,15 +3,19 @@ package bank.loans.investments;
 public interface Investment {
     String getInvestorId();
 
-    float getRemainingPayment();
+    int getPayment(int index);
 
-    float getBaseAmount();
+    int getRemainingPayment();
 
-    float getPayment();
+    int getBaseAmount();
 
-    float getTotalPayment();
+    int getPayment();
 
-    float getAmountPaid();
+    int getTotalPayment();
+
+    int getPaymentsReceived();
+
+    int getAmountPaid();
 
     void payment();
 

@@ -7,20 +7,19 @@ import bank.data.Singular;
 import bank.transactions.Transaction;
 import bank.transactions.impl.BasicTransaction;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.sql.Array;
+import java.util.*;
 
 public class LoanAccount implements Account, Singular {
     private static Integer idGenerator = 60000;
     private final String id;
-    private float balance;
-    private final Set<String> transactions;
+    private int balance;
+    private final List<String> transactions;
 
     public LoanAccount() {
         id = (idGenerator++).toString();
         balance = 0;
-        transactions = new HashSet<>();
+        transactions = new ArrayList<>();
     }
 
     @Override
@@ -29,12 +28,22 @@ public class LoanAccount implements Account, Singular {
     }
 
     @Override
-    public float getBalance() {
+    public int getBalance() {
         return balance;
     }
 
-    public Set<String> getTransactions() {
+    public List<String> getTransactions() {
         return transactions;
+    }
+
+    @Override
+    public void addRequestedLoan(String id) {
+
+    }
+
+    @Override
+    public void addInvestedLoan(String id) {
+
     }
 
     @Override
@@ -46,26 +55,36 @@ public class LoanAccount implements Account, Singular {
     }
 
     @Override
+    public List<String> getLoansRequested(){
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<String> getLoansInvested(){
+        return new ArrayList<>();
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(id);
     }
 
     @Override
-    public Transaction deposit(float amount, String description) throws NonPositiveAmountException {
+    public Transaction deposit(int amount, String description) throws NonPositiveAmountException {
         if(amount <= 0) throw new NonPositiveAmountException();
 
-        Transaction transaction = new BasicTransaction(amount, description);
+        Transaction transaction = new BasicTransaction(amount, description, balance);
         transactions.add(transaction.getId());
         balance += amount;
 
         return transaction;
     }
     @Override
-    public Transaction withdraw(float amount, String description) throws NonPositiveAmountException, NoMoneyException {
+    public Transaction withdraw(int amount, String description) throws NonPositiveAmountException, NoMoneyException {
         if(amount <= 0) throw new NonPositiveAmountException();
         if(amount > balance) throw new NoMoneyException();
 
-        Transaction transaction = new BasicTransaction(amount, description);
+        Transaction transaction = new BasicTransaction(amount * (-1), description, balance);
         transactions.add(transaction.getId());
         balance -= amount;
 

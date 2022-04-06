@@ -8,11 +8,19 @@ import java.util.List;
 
 public interface Loan extends Singular {
 
+    void setPayments();
+
     String getId();
     String getCategory();
-    float getFinalAmount();
-    float getInterest();
-    float getBaseAmount();
+    int getFinalAmount();
+    int getInterest();
+
+    int getCyclesPerPayment();
+
+    int getBaseAmount();
+
+    int getPayment();
+
     LoanStatus getStatus();
     void setStatus(LoanStatus status);
     float getMaxPortion();
@@ -27,6 +35,5 @@ public interface Loan extends Singular {
     void setStartingYaz(int startingYaz);
 
     Account getLoanAccount();
-    float getCyclePayment();
     String getOwnerId();
 }

@@ -16,10 +16,11 @@ public class BasicLoan implements Loan {
 
     private final String id;
     private final LoanBuilder loanDetails;
-    private int startingYaz;
+    private int startingYaz, currentPayment, fullyPaidCycles;
     private final Interest interest;
     private LoanStatus status;
     private final List<Investment> investments;
+    private List<Integer> payments;
     private final Account loanAccount;
 
 
@@ -70,6 +71,25 @@ public class BasicLoan implements Loan {
 
         investments = new ArrayList<>();
         startingYaz = -1;
+
+        currentPayment = 0;
+        fullyPaidCycles = 0;
+
+        payments = new ArrayList<>();
+    }
+
+    @Override
+    public void setPayments() {
+        int sum;
+        int duration = interest.getDuration() / interest.getCyclesPerPayment();
+
+        for(int i = 0 ; i < duration; i++) {
+            sum = 0;
+            for(Investment investment : investments) {
+                sum += investment.getPayment(i);
+            }
+            payments.add(sum);
+        }
     }
 
     @Override
@@ -82,23 +102,28 @@ public class BasicLoan implements Loan {
         return loanDetails.getCategory();
     }
     @Override
-    public float getFinalAmount() {
+    public int getFinalAmount() {
         return interest.getFinalAmount();
     }
 
     @Override
-    public float getInterest() {
+    public int getInterest() {
         return interest.getInterest();
     }
 
     @Override
-    public float getBaseAmount() {
+    public int getCyclesPerPayment() {
+        return interest.getCyclesPerPayment();
+    }
+
+    @Override
+    public int getBaseAmount() {
         return interest.getBaseAmount();
     }
 
     @Override
-    public float getCyclePayment() {
-        return getFinalAmount() / getDuration();
+    public int getPayment() {
+        return payments.get(currentPayment);
     }
 
     @Override

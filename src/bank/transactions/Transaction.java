@@ -5,7 +5,9 @@ import bank.data.Singular;
 public interface Transaction extends Singular {
 
     String getId();
-    float getAmount();
+    int getAmount();
+
+    int getPreviousBalance();
+
     String getDescription();
-    String getAccountId();
 }

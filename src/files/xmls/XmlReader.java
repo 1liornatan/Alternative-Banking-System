@@ -12,6 +12,7 @@ import bank.accounts.Account;
 import bank.accounts.impl.CustomerAccount;
 import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
+import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
 import bank.loans.impl.BasicLoan;
 import bank.loans.impl.builder.LoanBuilder;
@@ -32,7 +33,7 @@ public class XmlReader {
     private DataStorage<Loan> loansDataStorage;
     private boolean validation;
 
-    public XmlReader(String filePath, TimeHandler timeHandler) throws NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException, XmlNotFoundException {
+    public XmlReader(String filePath, TimeHandler timeHandler) throws NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException, XmlNotFoundException, DataNotFoundException {
         Path path = Paths.get(filePath);
 
         if(!Files.exists(path))
@@ -75,7 +76,7 @@ public class XmlReader {
                 String loanName = currLoan.getId();
                 String ownerName = currLoan.getAbsOwner();
                 String categoryName = currLoan.getAbsCategory();
-                float amount = currLoan.getAbsCapital();
+                int amount = currLoan.getAbsCapital();
                 int totalTime = currLoan.getAbsTotalYazTime();
                 int payPerTime = currLoan.getAbsPaysEveryYaz();
                 int interestPercent = currLoan.getAbsIntristPerPayment();
@@ -93,7 +94,9 @@ public class XmlReader {
                 Interest interest = new BasicInterest(interestPercent, amount, payPerTime, totalTime);
                 LoanBuilder loanBuilder = new LoanBuilder(ownerName, categoryName, loanName);
 
-                loansDataStorage.addData(new BasicLoan(loanBuilder, interest));
+                Loan loanData = new BasicLoan(loanBuilder, interest);
+                customersDataStorage.getDataById(ownerName).addRequestedLoan(loanData.getId());
+                loansDataStorage.addData(loanData);
                 // TODO: ADD LOAN ID TO CUSTOMER'S LOANS SET
 
 

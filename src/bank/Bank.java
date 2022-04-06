@@ -9,24 +9,24 @@ import files.xmls.exceptions.*;
 import java.io.FileNotFoundException;
 
 public interface Bank {
-    void loadData(String filename) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException, XmlNotFoundException;
+    void loadData(String filename) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException, XmlNotFoundException, DataNotFoundException;
 
     void printLoans();
 
-    void advanceOneYaz() throws DataNotFoundException;
+    void advanceOneYaz() throws DataNotFoundException, NonPositiveAmountException;
 
     int getCurrentYaz();
 
     //    int createLoan(int ownerId, float amount, String category); // returns loan's id
-    void withdraw(String accountId, float amount, String description) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException; // returns transaction's id
-    void deposit(String accountId, float amount, String description) throws NonPositiveAmountException, DataNotFoundException; // returns transaction's id
-    void createAccount(String name, float balance); // returns account's id
+    void withdraw(String accountId, int amount, String description) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException; // returns transaction's id
+    void deposit(String accountId, int amount, String description) throws NonPositiveAmountException, DataNotFoundException; // returns transaction's id
+    void createAccount(String name, int balance); // returns account's id
 
     void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException;
 
-    float getDeriskAmount(Loan loan);
+    int getDeriskAmount(Loan loan);
 
-    void printCustomers();
+    void printCustomers() throws DataNotFoundException;
 
     void printCustomersNames();
 

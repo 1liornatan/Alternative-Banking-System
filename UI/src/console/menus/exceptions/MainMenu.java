@@ -40,7 +40,7 @@ public class MainMenu {
             bankInstance.loadData(fileName);
             hasValidData = true;
             System.out.println("Loaded XML Successfully.");
-        } catch (NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException | FileNotFoundException | XmlNotFoundException e) {
+        } catch (NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException | FileNotFoundException | XmlNotFoundException | DataNotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -56,7 +56,11 @@ public class MainMenu {
         if(!hasValidData)
             throw new XmlNotLoadedException();
 
-        bankInstance.printCustomers();
+        try {
+            bankInstance.printCustomers();
+        } catch (DataNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void withdraw () throws XmlNotLoadedException {
@@ -71,9 +75,9 @@ public class MainMenu {
 
 
         System.out.println("Enter an amount to withdraw:");
-        float amount = scanner.nextFloat();
+        int amount = scanner.nextInt();
         try {
-            bankInstance.withdraw(customerName,amount,"Basic Withdraw");
+            bankInstance.withdraw(customerName, amount,"Basic Withdraw");
             System.out.println("Successfully withdrew " + amount + " from " + customerName);
         } catch (NoMoneyException | NonPositiveAmountException | DataNotFoundException e) {
             System.out.println(e.getMessage());
@@ -92,7 +96,7 @@ public class MainMenu {
 
 
         System.out.println("Enter an amount to deposit:");
-        float amount = scanner.nextFloat();
+        int amount = scanner.nextInt();
         try {
             bankInstance.deposit(customerName, amount, "Basic Deposit");
             System.out.println("Successfully deposited " + amount + " to " + customerName);
@@ -154,7 +158,7 @@ public class MainMenu {
         System.out.println("Advancing from Yaz " + currYaz + " to Yaz " + (currYaz + 1) + ".");
         try {
             bankInstance.advanceOneYaz();
-        } catch (DataNotFoundException e) {
+        } catch (DataNotFoundException | NonPositiveAmountException e) {
             System.out.println(e.getMessage());
         }
     }
