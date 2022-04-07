@@ -3,6 +3,7 @@ package utils;
 import bank.accounts.Account;
 import javafx.util.Pair;
 
+
 import java.util.Collection;
 
 public class impl {
@@ -12,7 +13,7 @@ public class impl {
 
 
 
-    public void printCustomersNames() {
+    public void printCustomersNames(AccountDTO accountDTO) {
         Collection<Pair<Account, Integer>> allPairs = customersAccounts.getAllPairs();
         System.out.println("All customers names:");
 
