@@ -14,7 +14,7 @@ import java.util.List;
 public class PrintUtils {
 
     public static void printCustomersNames(CustomersDTO customers) {
-        List<CustomerDTO> customersList = new ArrayList<CustomerDTO>();
+        List<CustomerDTO> customersList = customers.getCustomers();
         System.out.println("All customers names:");
         for(CustomerDTO customer : customersList) {
             System.out.println(customer.getName());

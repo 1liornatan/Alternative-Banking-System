@@ -17,8 +17,4 @@ public enum LoanStatus {
     public String toString() {
         return statusText;
     }
-
-    public boolean isInvestable() {
-        return this == ACTIVE || this == NEW;
-    }
 }

@@ -127,8 +127,8 @@ public class BankImpl implements Bank {
         int minDuration = requestDTO.getMinLoanDuration();
 
         List<Pair<Loan, Integer>> relevantLoans = loans.getAllPairs().stream()
-                .filter(p -> p.getKey().getOwnerId() != requesterName)
-                .filter((p -> p.getKey().getStatus().isInvestable()))
+                .filter(p -> !p.getKey().getOwnerId().equals(requesterName))
+                .filter(p -> p.getKey().isInvestible())
                 .filter(p -> p.getKey().getInterestPercent() >= minInterest)
                 .filter(p -> categories.contains(p.getKey().getCategory()))
                 .filter(p -> p.getKey().getDuration() >= minDuration)
@@ -211,10 +211,10 @@ public class BankImpl implements Bank {
 
     @Override
     public CustomersDTO getCustomersDTO() throws DataNotFoundException {
-        List<CustomerDTO> customersDTOList = new ArrayList<CustomerDTO>();
-        Collection<Pair<Account,Integer>> customersList = customersAccounts.getAllPairs();
+        List<CustomerDTO> customersDTOList = new ArrayList<>();
+        Collection<Pair<Account, Integer>> customersList = customersAccounts.getAllPairs();
 
-        for(Pair<Account,Integer> account  : customersList) {
+        for(Pair<Account, Integer> account : customersList) {
             customersDTOList.add(getCustomerDTO(account.getKey().getId()));
         }
 
@@ -224,8 +224,8 @@ public class BankImpl implements Bank {
     @Override
     public CustomerDTO getCustomerDTO(String id) throws DataNotFoundException {
         Account account = customersAccounts.getDataById(id);
-        List<LoanDTO> loansInvestedDTOList = new ArrayList<LoanDTO>();
-        List<LoanDTO> loansRequestedDTOList = new ArrayList<LoanDTO>();
+        List<LoanDTO> loansInvestedDTOList = new ArrayList<>();
+        List<LoanDTO> loansRequestedDTOList = new ArrayList<>();
         List<Loan> loansInvested = account.getLoansInvested();
         List<Loan> loansRequested = account.getLoansRequested();
 
