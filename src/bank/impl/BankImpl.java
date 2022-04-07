@@ -17,8 +17,14 @@ import bank.transactions.Transaction;
 import files.xmls.XmlReader;
 import files.xmls.exceptions.*;
 import javafx.util.Pair;
+import manager.customers.CustomerDTO;
+import manager.loans.LoanDTO;
+import manager.loans.LoansDTO;
+import manager.loans.details.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 public class BankImpl implements Bank {
@@ -167,6 +173,30 @@ public class BankImpl implements Bank {
         for(Pair<Account,Integer> accountPair : allPairs) {
             System.out.println(accountPair.getKey().getId());
         }
+    }
+
+    @Override
+    public CustomerDTO getCustomerDTO(String id) throws DataNotFoundException {
+        List<LoanDTO> loansInvestedDTO = new ArrayList<LoanDTO>();
+        List<LoanDTO> loansRequestedDTO = new ArrayList<LoanDTO>();
+        List<Loan> loansInvested = customersAccounts.getDataById(id).getLoansInvested();
+        List<Loan> loansRequested = customersAccounts.getDataById(id).getLoansRequested();
+
+        for(Loan loan : loansInvested)
+            loansInvestedDTO.add(getLoanDTO(loan));
+        for(Loan loan : loansRequested)
+            loansRequestedDTO.add(getLoanDTO(loan));
+        return new CustomerDTO()
+    }
+
+    @Override
+    public LoanDTO getLoanDTO(Loan loan) {
+        InterestDTO interestDTO = new InterestDTO(loan.getBaseAmount(),loan.getFinalAmount(),loan.getInterestPercent());
+        LoanDetailsDTO loanDetailsDTO = new LoanDetailsDTO(loan.getId(),loan.getCategory(),loan.getStatus().toString());
+        LoanPaymentDTO loanPaymentDTO = new LoanPaymentDTO(loan.getPayment(),loan.getNextYaz(),loan.getCyclesPerPayment());
+        ActiveLoanDTO activeLoanDTO = new ActiveLoanDTO(loan.getAmountToActive(),loan.getDeriskAmount(),loan.getMissingCycles());
+        YazDTO yazDTO = new YazDTO(loan.getStartedYaz(),loan.getFinishedYaz());
+        return new LoanDTO(loanDetailsDTO,interestDTO,yazDTO,loanPaymentDTO,activeLoanDTO);
     }
 
 }

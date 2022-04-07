@@ -8,6 +8,9 @@ import bank.loans.impl.builder.LoanBuilder;
 import bank.loans.interest.Interest;
 import bank.loans.investments.Investment;
 import bank.time.TimeHandler;
+import manager.loans.LoanDTO;
+import manager.loans.LoansDTO;
+import manager.loans.details.*;
 
 import java.util.ArrayList;
 import java.util.List;
