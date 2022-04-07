@@ -96,7 +96,7 @@ public class BankImpl implements Bank {
 
     @Override
     public int getDeriskAmount(Loan loan) {
-        return loan.getDeriskAmount(loan);
+        return loan.getDeriskAmount();
     }
 
 
@@ -108,15 +108,15 @@ public class BankImpl implements Bank {
             Account currAccount = pairOfAccount.getKey();
             System.out.println(currAccount.toString());
             System.out.println("All account's transactions:");
-            for(String transactionId : currAccount.getTransactions()) {
-                Pair<Transaction, Integer> currTransaction = transactions.getDataPair(transactionId);
+            for(Transaction transaction : currAccount.getTransactions()) {
+                Pair<Transaction, Integer> currTransaction = transactions.getDataPair(transaction.getId());
                 System.out.println("(" + currTransaction.getKey().toString() +
                         ", Yaz made at: " + currTransaction.getValue() + ")");
             }
 
             System.out.println("All account's requested loans:");
-            for(String loanId : currAccount.getLoansRequested()) {
-                printLoan(loanId);
+            for(Loan loan : currAccount.getLoansRequested()) {
+                printLoan(loan);
             }
 
             System.out.println("All account's invested loans:");

@@ -94,8 +94,8 @@ public class XmlReader {
                 Interest interest = new BasicInterest(interestPercent, amount, payPerTime, totalTime);
                 LoanBuilder loanBuilder = new LoanBuilder(ownerName, categoryName, loanName);
 
-                Loan loanData = new BasicLoan(loanBuilder, interest);
-                customersDataStorage.getDataById(ownerName).addRequestedLoan(loanData.getId());
+                Loan loanData = new BasicLoan(loanBuilder, interest, timeHandler);
+                customersDataStorage.getDataById(ownerName).addRequestedLoan(loanData);
                 loansDataStorage.addData(loanData);
                 // TODO: ADD LOAN ID TO CUSTOMER'S LOANS SET
 
