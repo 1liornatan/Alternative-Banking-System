@@ -18,6 +18,7 @@ import files.xmls.XmlReader;
 import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.customers.CustomerDTO;
+import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
 import manager.loans.details.*;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class BankImpl implements Bank {
     private DataStorage<Account> customersAccounts;
@@ -107,6 +109,30 @@ public class BankImpl implements Bank {
     }
 
 
+    @Override
+    public LoansDTO loanAssignmentRequest(RequestDTO requestDTO) {
+        int amount = requestDTO.getAmount();
+        String requesterName = requestDTO.getRequesterName();
+        float minInterest = requestDTO.getMinInterest();
+        Set<String> categories = requestDTO.getCategoriesDTO().getCategories();
+        int minDuration = requestDTO.getMinLoanDuration();
+
+        List<Pair<Loan, Integer>> releventLoans = loans.getAllPairs().stream()
+                .filter((p -> p.getKey().getStatus().isInvestable()))
+                .filter(p -> p.getKey().getInterestPercent() >= minInterest)
+                .filter(p -> categories.contains(p.getKey().getCategory()))
+                .filter(p -> p.getKey().getDuration() >= minDuration)
+                .collect(Collectors.toList());
+
+        List<LoanDTO> loansDTOList = new ArrayList<>();
+
+        for(Pair<Loan, Integer> loanPair : releventLoans) {
+            loansDTOList.add(getLoanDTO(loanPair.getKey()));
+        }
+
+        return new LoansDTO(loansDTOList);
+
+    }
     @Override
     public void printCustomers() throws DataNotFoundException {
         Collection<Pair<Account, Integer>> allCustomers = customersAccounts.getAllPairs();

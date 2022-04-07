@@ -6,8 +6,10 @@ import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
 import files.xmls.exceptions.*;
 import manager.customers.CustomerDTO;
+import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.categories.CategoriesDTO;
+import manager.loans.LoansDTO;
 
 import java.io.FileNotFoundException;
 
@@ -28,6 +30,8 @@ public interface Bank {
     void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException;
 
     int getDeriskAmount(Loan loan);
+
+    LoansDTO loanAssignmentRequest(RequestDTO requestDTO);
 
     void printCustomers() throws DataNotFoundException;
 
