@@ -9,7 +9,6 @@ import bank.loans.interest.Interest;
 import bank.loans.investments.Investment;
 import bank.time.TimeHandler;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +39,7 @@ public class BasicLoan implements Loan {
     public void nextPayment() {
         currentPayment++;
     }
+
     @Override
     public String getOwnerId() {
         return loanDetails.getOwnerId();
@@ -61,7 +61,9 @@ public class BasicLoan implements Loan {
     }
 
     @Override
-    public void addInvestment(Investment investment) { investments.add(investment); }
+    public void addInvestment(Investment investment) {
+        investments.add(investment);
+    }
 
     @Override
     public int getStartedYaz() {
@@ -97,6 +99,23 @@ public class BasicLoan implements Loan {
     }
 
     @Override
+    public int getMissingCycles() {
+        return currentPayment - fullPaidCycles;
+    }
+
+    @Override
+    public int getAmountToActive() {
+        return (getBaseAmount() - loanAccount.getBalance());
+    }
+
+    @Override
+    public int getNextYaz() {
+        int currentYaz = timeHandler.getCurrentTime();
+        int cyclesPerPayment = getCyclesPerPayment();
+        return cyclesPerPayment - ((currentYaz - startedYaz) % cyclesPerPayment);
+    }
+
+    @Override
     public int getCurrentPayment() {
         return currentPayment;
     }
@@ -116,9 +135,9 @@ public class BasicLoan implements Loan {
         int sum;
         int duration = interest.getDuration() / interest.getCyclesPerPayment();
 
-        for(int i = 0 ; i < duration; i++) {
+        for (int i = 0; i < duration; i++) {
             sum = 0;
-            for(Investment investment : investments) {
+            for (Investment investment : investments) {
                 sum += investment.getPayment(i);
             }
             payments.add(sum);
@@ -134,6 +153,7 @@ public class BasicLoan implements Loan {
     public String getCategory() {
         return loanDetails.getCategory();
     }
+
     @Override
     public int getFinalAmount() {
         return interest.getFinalAmount();
@@ -199,5 +219,19 @@ public class BasicLoan implements Loan {
                 ", investments=" + investments +
                 ", loanAccount=" + loanAccount +
                 '}';
+    }
+
+    @Override
+    public int getDeriskAmount() {
+        int startingYaz = startedYaz;
+        int cycles = (timeHandler.getCurrentTime() - startingYaz) / getCyclesPerPayment();
+        int sum = 0;
+
+        for (Investment investment : investments) {
+            for (int i = investment.getPaymentsReceived(); i < cycles; i++) {
+                sum += investment.getPayment(i);
+            }
+        }
+        return sum;
     }
 }

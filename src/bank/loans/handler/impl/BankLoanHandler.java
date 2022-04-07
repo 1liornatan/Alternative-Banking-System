@@ -47,7 +47,7 @@ public class BankLoanHandler implements LoanHandler {
 
     @Override
     public Loan createLoan(LoanBuilder loadDetails, Interest interest) {
-        return new BasicLoan(loadDetails, interest);
+        return new BasicLoan(loadDetails, interest,timeHandler);
     }
 
     @Override
@@ -148,7 +148,7 @@ public class BankLoanHandler implements LoanHandler {
     }
 
     public void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
-        int amount = getDeriskAmount(loan);
+        int amount = loan.getDeriskAmount();
         Account srcAcc = customers.getDataById(loan.getOwnerId());
 
         transactions.addData(srcAcc.withdraw(amount, "Derisk Loan"));
@@ -167,21 +167,6 @@ public class BankLoanHandler implements LoanHandler {
                 investmentPayment(investment);
             }
         }
-    }
-
-    public int getDeriskAmount(Loan loan) {
-        List<Investment> investments = loan.getInvestments();
-        int startingYaz = loan.getStartedYaz();
-        int cycles = (timeHandler.getCurrentTime() - startingYaz) / loan.getCyclesPerPayment();
-        int sum = 0;
-
-        for(Investment investment : investments) {
-            for(int i = investment.getPaymentsReceived(); i < cycles; i++) {
-                sum += investment.getPayment(i);
-            }
-        }
-
-        return sum;
     }
 
     @Override

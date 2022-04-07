@@ -96,7 +96,7 @@ public class BankImpl implements Bank {
 
     @Override
     public int getDeriskAmount(Loan loan) {
-        return loanHandler.getDeriskAmount(loan);
+        return loan.getDeriskAmount(loan);
     }
 
 
@@ -138,12 +138,12 @@ public class BankImpl implements Bank {
         switch(loanStatus) {
             case PENDING:
                 System.out.println("[Money left for becoming Active: " +
-                        (loan.getBaseAmount() - loan.getLoanAccount().getBalance()) + "]");
+                        (loan.getAmountToActive()) + "]");
                 break;
 
             case ACTIVE:
                 int cyclesPerPayment = loan.getCyclesPerPayment();
-                int nextYaz = cyclesPerPayment - ((getCurrentYaz() - loan.getStartedYaz()) % cyclesPerPayment);
+                int nextYaz = loan.getNextYaz();
                 System.out.println("[Next payment is in: " + nextYaz +
                         "Yaz, Payment amount: " + loan.getPayment() + ".]");
                 break;
@@ -153,7 +153,7 @@ public class BankImpl implements Bank {
                 break;
 
             case RISK:
-                int missingCycles = (loan.getCurrentPayment() - loan.getFullPaidCycles());
+                int missingCycles = loan.getMissingCycles();
                 System.out.println("[Missing payments: " + missingCycles + ", Missing Amount: " + getDeriskAmount(loan) + ".]");
                 break;
         }

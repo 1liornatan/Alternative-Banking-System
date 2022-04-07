@@ -1,12 +1,21 @@
 package bank.loans;
 
 import bank.accounts.Account;
+import bank.accounts.impl.exceptions.NoMoneyException;
+import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.Singular;
+import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.investments.Investment;
 
 import java.util.List;
 
 public interface Loan extends Singular {
+
+    int getMissingCycles();
+
+    int getAmountToActive();
+
+    int getNextYaz();
 
     int getCurrentPayment();
 
@@ -50,4 +59,6 @@ public interface Loan extends Singular {
     void nextPayment();
 
     String getOwnerId();
+
+    int getDeriskAmount();
 }

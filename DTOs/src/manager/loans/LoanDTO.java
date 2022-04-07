@@ -32,7 +32,7 @@ public class LoanDTO {
         endedYaz = loan.getFinishedYaz();
         nextPaymentYaz = cyclesPerPayment - ((currentYaz - startedYaz) % cyclesPerPayment);
         missingCycles = loan.getCurrentPayment() - loan.getFullPaidCycles();
-        deriskAmount =
+        deriskAmount = loan.getDeriskAmount();
     }
 
 }
