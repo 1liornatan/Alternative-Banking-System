@@ -188,6 +188,7 @@ public class BankImpl implements Bank {
             loansInvestedDTOList.add(getLoanDTO(loan));
         for(Loan loan : loansRequested)
             loansRequestedDTOList.add(getLoanDTO(loan));
+
         LoansDTO loansInvestedDTO = new LoansDTO(loansInvestedDTOList);
         LoansDTO loansRequestedDTO = new LoansDTO(loansRequestedDTOList);
         AccountDTO accountDTO = new AccountDTO(account.getId(),account.getBalance());
