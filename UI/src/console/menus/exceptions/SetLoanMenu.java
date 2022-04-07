@@ -7,6 +7,7 @@ import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
+import utils.PrintUtils;
 
 import java.util.*;
 
@@ -30,7 +31,7 @@ public class SetLoanMenu {
         bankInstance = bank;
     }
 
-    public void printMenu() throws NoOptionException {
+    public void printMenu() throws NoOptionException, DataNotFoundException {
         System.out.println("Loan Investment requirements: \n1.Set Investment Amount [MUST].\n" +
                 "2.Set Loan Category.\n" + "3.Set Loan's Minimum Interest.\n" +
                 "4.Set Loan's Minimum Duration.\n\n" + "6.Request Loan Investment.");
@@ -73,7 +74,7 @@ public class SetLoanMenu {
             for(LoanDTO loan : loanDTOList) {
                 System.out.println("Loan #" + i + " Details:");
                 i++;
-                printLoan(loan);
+                PrintUtils.printLoan(loan);
             }
 
             List<LoanDTO> chosenLoans = getChosenLoans(loanDTOList);
