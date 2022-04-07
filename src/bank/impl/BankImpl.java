@@ -120,17 +120,16 @@ public class BankImpl implements Bank {
             }
 
             System.out.println("All account's invested loans:");
-            for(String loanId : currAccount.getLoansInvested()) {
-                printLoan(loanId);
+            for(Loan loan : currAccount.getLoansInvested()) {
+                printLoan(loan);
             }
         }
     }
 
-    private void printLoan(String loanId) throws DataNotFoundException {
-        Loan loan = loans.getDataById(loanId);
+    private void printLoan(Loan loan) throws DataNotFoundException {
         LoanStatus loanStatus = loan.getStatus();
 
-        System.out.println("Loan name: " + loanId + ", Category: " + loan.getCategory() + ", Base amount: " +
+        System.out.println("Loan name: " + loan.getId() + ", Category: " + loan.getCategory() + ", Base amount: " +
                 loan.getBaseAmount() + ", Total amount: " + loan.getFinalAmount() + ", Pay Every: " +
                 loan.getCyclesPerPayment() + " Yaz, Interest percent: " +
                 loan.getInterestPercent() + "%, Status: " + loanStatus.toString());

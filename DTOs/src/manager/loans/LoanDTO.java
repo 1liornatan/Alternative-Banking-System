@@ -2,15 +2,15 @@ package manager.loans;
 
 import bank.loans.Loan;
 import bank.loans.LoanStatus;
+import manager.loans.details.InterestDTO;
+import manager.loans.details.LoanDetailsDTO;
+import manager.loans.details.YazDTO;
 
 public class LoanDTO {
-    String name;
-    LoanStatus status;
-    String category;
-    int baseAmount;
-    int finalAmount;
+    LoanDetailsDTO details;
+    InterestDTO interest;
+    YazDTO yazDetails;
     int cyclesPerPayment;
-    float interestPercent;
     int loanAccountBalance;
     int startedYaz;
     int endedYaz;
@@ -19,18 +19,12 @@ public class LoanDTO {
     int missingCycles;
     int deriskAmount;
 
-    public LoanDTO(Loan loan, int currentYaz) {
-        name = loan.getId();
-        status = loan.getStatus();
-        category = loan.getCategory();
-        baseAmount = loan.getBaseAmount();
-        finalAmount = loan.getFinalAmount();
+    public LoanDTO(LoanDetailsDTO loanDetails, InterestDTO interest, YazDTO yazDetails) {
+        this.details = loanDetails;
+        this.interest = interest;
+        this.yazDetails = yazDetails;
         cyclesPerPayment = loan.getCyclesPerPayment();
-        interestPercent = loan.getInterestPercent();
         loanAccountBalance = loan.getLoanAccount().getBalance();
-        startedYaz = loan.getStartedYaz();
-        endedYaz = loan.getFinishedYaz();
-        nextPaymentYaz = cyclesPerPayment - ((currentYaz - startedYaz) % cyclesPerPayment);
         missingCycles = loan.getCurrentPayment() - loan.getFullPaidCycles();
         deriskAmount = loan.getDeriskAmount();
     }
