@@ -18,4 +18,5 @@ public class AccountsDTO {
     public List<AccountDTO> getList() {
         return accountsDTO;
     }
+
 }

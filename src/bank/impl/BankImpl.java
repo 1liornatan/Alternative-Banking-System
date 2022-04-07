@@ -161,7 +161,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public void printCustomersNames() {
+    public void getCustomersNames() {
         Collection<Pair<Account, Integer>> allPairs = customersAccounts.getAllPairs();
         System.out.println("All customers names:");
 

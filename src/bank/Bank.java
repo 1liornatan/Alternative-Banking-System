@@ -28,6 +28,6 @@ public interface Bank {
 
     void printCustomers() throws DataNotFoundException;
 
-    void printCustomersNames();
+    void getCustomersNames();
 
 }
