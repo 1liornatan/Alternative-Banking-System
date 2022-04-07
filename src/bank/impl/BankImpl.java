@@ -20,6 +20,7 @@ import javafx.util.Pair;
 import manager.accounts.AccountDTO;
 import manager.customers.CustomerDTO;
 import manager.customers.CustomersDTO;
+import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
@@ -127,7 +128,6 @@ public class BankImpl implements Bank {
 
         List<Pair<Loan, Integer>> relevantLoans = loans.getAllPairs().stream()
                 .filter(p -> p.getKey().getOwnerId() != requesterName)
-        List<Pair<Loan, Integer>> relevantLoans = loans.getAllPairs().stream()
                 .filter((p -> p.getKey().getStatus().isInvestable()))
                 .filter(p -> p.getKey().getInterestPercent() >= minInterest)
                 .filter(p -> categories.contains(p.getKey().getCategory()))

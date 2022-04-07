@@ -1,13 +1,7 @@
 package utils;
 
-import bank.accounts.Account;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
-import bank.loans.LoanStatus;
-import bank.transactions.Transaction;
-import javafx.util.Pair;
-import manager.accounts.AccountDTO;
-import manager.accounts.AccountsDTO;
 import manager.customers.CustomerDTO;
 import manager.customers.CustomersDTO;
 import manager.loans.LoanDTO;
@@ -15,14 +9,11 @@ import manager.transactions.TransactionDTO;
 
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import static bank.loans.LoanStatus.*;
+public class PrintUtils {
 
-public class impl {
-
-    static public void printCustomersNames(CustomersDTO customers) {
+    public static void printCustomersNames(CustomersDTO customers) {
         List<CustomerDTO> customersList = new ArrayList<CustomerDTO>();
         System.out.println("All customers names:");
         for(CustomerDTO customer : customersList) {
@@ -30,11 +21,11 @@ public class impl {
         }
     }
 
-    static public void printCustomerName(CustomerDTO customer) {
+    public static void printCustomerName(CustomerDTO customer) {
             System.out.println(customer.getName());
     }
 
-    static void printCustomers(CustomersDTO customersDTO) throws DataNotFoundException {
+    /*public static void printCustomers(CustomersDTO customersDTO) throws DataNotFoundException {
         List<CustomerDTO> customers = customersDTO.getCustomers();
         for(CustomerDTO customer : customers) {
             printCustomerName(customer);
@@ -46,7 +37,7 @@ public class impl {
             }
 
             System.out.println("All account's requested loans:");
-            for(Loan loan : currAccount.getLoansRequested()) {
+            for(Loan loan : customer.getLoansRequested()) {
                 printLoan(loan);
             }
 
@@ -55,9 +46,9 @@ public class impl {
                 printLoan(loan);
             }
         }
-    }
+    }*/
 
-    static void printLoan(LoanDTO loan) throws DataNotFoundException {
+    public static void printLoan(LoanDTO loan) throws DataNotFoundException {
         String status = loan.getDetails().getStatus();
 
         System.out.println("Loan name: " + loan.getDetails().getName() + ", Category: " + loan.getDetails().getCategory() + ", Base amount: " +
