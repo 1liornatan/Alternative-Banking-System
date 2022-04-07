@@ -96,7 +96,7 @@ public class BankImpl implements Bank {
 
     @Override
     public int getDeriskAmount(Loan loan) {
-        return loan.getDeriskAmount(loan);
+        return loan.getDeriskAmount();
     }
 
 
