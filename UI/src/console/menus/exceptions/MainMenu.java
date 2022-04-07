@@ -6,6 +6,7 @@ import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import files.xmls.exceptions.*;
+import manager.customers.CustomersDTO;
 
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -84,12 +85,14 @@ public class MainMenu {
         }
     }
 
-    public void deposit () throws XmlNotLoadedException {
+    public void deposit () throws XmlNotLoadedException, DataNotFoundException {
 
         if(!hasValidData)
             throw new XmlNotLoadedException();
 
-        bankInstance.printCustomersNames();
+        CustomersDTO customers = bankInstance.getCustomersDTO();
+        customers.printCustomersNames();
+
         System.out.println("Enter a customer name:");
         Scanner scanner = new Scanner(System.in);
         String customerName = scanner.nextLine();

@@ -2,9 +2,15 @@ package utils;
 
 import bank.accounts.Account;
 import javafx.util.Pair;
+import manager.accounts.AccountDTO;
+import manager.accounts.AccountsDTO;
+import manager.customers.CustomerDTO;
+import manager.customers.CustomersDTO;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class impl {
 
@@ -13,12 +19,5 @@ public class impl {
 
 
 
-    public void printCustomersNames(AccountDTO accountDTO) {
-        Collection<Pair<Account, Integer>> allPairs = customersAccounts.getAllPairs();
-        System.out.println("All customers names:");
 
-        for(Pair<Account,Integer> accountPair : allPairs) {
-            System.out.println(accountPair.getKey().getId());
-        }
-    }
 }

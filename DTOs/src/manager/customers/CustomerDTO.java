@@ -5,17 +5,31 @@ import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
 
 public class CustomerDTO {
-    LoanDTO loan;
     LoansDTO investedLoans;
     LoansDTO requestedLoans;
     AccountDTO account;
+    String name;
 
+    public LoansDTO getInvestedLoans() {
+        return investedLoans;
+    }
 
-    public CustomerDTO(LoanDTO loan, LoansDTO investedLoans, LoansDTO requestedLoans, AccountDTO account) {
-        this.loan = loan;
+    public LoansDTO getRequestedLoans() {
+        return requestedLoans;
+    }
+
+    public AccountDTO getAccount() {
+        return account;
+    }
+
+    public CustomerDTO(LoansDTO investedLoans, LoansDTO requestedLoans, AccountDTO account) {
         this.investedLoans = investedLoans;
         this.requestedLoans = requestedLoans;
         this.account = account;
+        this.name = account.getName();
     }
 
+    public String getName() {
+        return name;
+    }
 }
