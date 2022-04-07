@@ -1,8 +1,12 @@
 package manager.accounts;
 
+import manager.transactions.TransactionDTO;
+import manager.transactions.TransactionsDTO;
+
 public class AccountDTO {
     String name;
     int balance;
+    TransactionsDTO transactions;
 
     public String getName() {
         return name;
@@ -12,9 +16,14 @@ public class AccountDTO {
         return balance;
     }
 
-    public AccountDTO(String name, int balance) {
+    public AccountDTO(String name, int balance, TransactionsDTO transactions) {
         this.name = name;
         this.balance = balance;
+        this.transactions = transactions;
+    }
+
+    public TransactionsDTO getTransactions() {
+        return transactions;
     }
 
     @Override
