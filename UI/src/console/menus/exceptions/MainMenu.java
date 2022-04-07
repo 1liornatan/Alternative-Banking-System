@@ -133,7 +133,7 @@ public class MainMenu {
                         withdraw();
                         break;
                     case 6:
-                        printCustomers();
+                        setLoan();
 
                         break;
                     case 7:
@@ -151,6 +151,19 @@ public class MainMenu {
         }
     }
 
+    private void setLoan() {
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Choose a customer:");
+        String customerName = scanner.nextLine();
+
+        System.out.println("Choose amount to invest:");
+        Integer amount = scanner.nextInt();
+
+        System.out.println();
+
+    }
     public void advanceTime() throws XmlNotLoadedException {
 
         if(!hasValidData)

@@ -17,6 +17,7 @@ import bank.transactions.Transaction;
 import files.xmls.XmlReader;
 import files.xmls.exceptions.*;
 import javafx.util.Pair;
+import manager.categories.CategoriesDTO;
 
 import java.util.Collection;
 import java.util.Set;
@@ -159,6 +160,12 @@ public class BankImpl implements Bank {
 
     }
 
+    @Override
+    public CategoriesDTO getCategories() {
+        CategoriesDTO categoriesDTO = new CategoriesDTO(categories);
+
+        return categoriesDTO;
+    }
     @Override
     public void printCustomersNames() {
         Collection<Pair<Account, Integer>> allPairs = customersAccounts.getAllPairs();
