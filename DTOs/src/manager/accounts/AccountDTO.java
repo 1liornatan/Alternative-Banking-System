@@ -6,7 +6,7 @@ import manager.transactions.TransactionsDTO;
 public class AccountDTO {
     String name;
     int balance;
-    TransactionsDTO transactions;
+    TransactionsDTO transactionsDTO;
 
     public String getName() {
         return name;
@@ -19,11 +19,11 @@ public class AccountDTO {
     public AccountDTO(String name, int balance, TransactionsDTO transactions) {
         this.name = name;
         this.balance = balance;
-        this.transactions = transactions;
+        this.transactionsDTO = transactions;
     }
 
-    public TransactionsDTO getTransactions() {
-        return transactions;
+    public TransactionsDTO getTransactionsDTO() {
+        return transactionsDTO;
     }
 
     @Override
