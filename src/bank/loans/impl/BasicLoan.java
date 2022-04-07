@@ -7,7 +7,9 @@ import bank.loans.LoanStatus;
 import bank.loans.impl.builder.LoanBuilder;
 import bank.loans.interest.Interest;
 import bank.loans.investments.Investment;
+import bank.time.TimeHandler;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +24,7 @@ public class BasicLoan implements Loan {
     private final List<Investment> investments;
     private List<Integer> payments;
     private final Account loanAccount;
+    private final TimeHandler timeHandler;
 
     @Override
     public void fullPaymentCycle() {
@@ -75,7 +78,7 @@ public class BasicLoan implements Loan {
         return loanAccount;
     }
 
-    public BasicLoan(LoanBuilder loanDetails, Interest interest) {
+    public BasicLoan(LoanBuilder loanDetails, Interest interest, TimeHandler timeHandler) {
         this.loanDetails = loanDetails;
         this.interest = interest;
         this.status = LoanStatus.PENDING;
@@ -90,6 +93,7 @@ public class BasicLoan implements Loan {
         fullPaidCycles = 0;
 
         payments = new ArrayList<>();
+        this.timeHandler = timeHandler;
     }
 
     @Override

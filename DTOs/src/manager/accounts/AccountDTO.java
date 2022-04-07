@@ -10,5 +10,12 @@ public class AccountDTO {
         name = account.getId();
         balance = account.getBalance();
     }
+
+    @Override
+    public String toString() {
+        return "Account Name: " + name +
+                ", Balance: " + balance +
+                ".";
+    }
 }
 
