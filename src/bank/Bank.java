@@ -7,6 +7,7 @@ import bank.loans.Loan;
 import files.xmls.exceptions.*;
 import manager.customers.CustomerDTO;
 import manager.loans.LoanDTO;
+import manager.categories.CategoriesDTO;
 
 import java.io.FileNotFoundException;
 
@@ -35,4 +36,5 @@ public interface Bank {
     CustomerDTO getCustomerDTO(String id) throws DataNotFoundException;
 
     LoanDTO getLoanDTO(Loan loan);
+    CategoriesDTO getCategories();
 }

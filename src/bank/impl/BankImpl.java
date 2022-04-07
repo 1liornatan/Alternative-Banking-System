@@ -22,6 +22,7 @@ import manager.customers.CustomerDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
 import manager.loans.details.*;
+import manager.categories.CategoriesDTO;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -166,6 +167,12 @@ public class BankImpl implements Bank {
 
     }
 
+    @Override
+    public CategoriesDTO getCategories() {
+        CategoriesDTO categoriesDTO = new CategoriesDTO(categories);
+
+        return categoriesDTO;
+    }
     @Override
     public void getCustomersNames() {
         Collection<Pair<Account, Integer>> allPairs = customersAccounts.getAllPairs();
