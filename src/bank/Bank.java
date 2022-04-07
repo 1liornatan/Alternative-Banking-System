@@ -5,6 +5,7 @@ import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
+import bank.transactions.Transaction;
 import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.customers.CustomerDTO;
@@ -14,6 +15,8 @@ import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.categories.CategoriesDTO;
 import manager.loans.LoansDTO;
+import manager.transactions.TransactionDTO;
+import manager.transactions.TransactionsDTO;
 
 import java.io.FileNotFoundException;
 import java.util.Collection;
@@ -48,4 +51,8 @@ public interface Bank {
 
     LoanDTO getLoanDTO(Loan loan);
     CategoriesDTO getCategories();
+
+    TransactionDTO getTransactionDTO(Transaction transaction) throws DataNotFoundException;
+
+    TransactionsDTO getTransactionsDTO(Account account) throws DataNotFoundException;
 }
