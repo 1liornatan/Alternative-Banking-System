@@ -1,7 +1,7 @@
 package manager.loans.details;
 
 public class YazDTO {
-    private final int startedYaz, finishedYaz, nextPaymentYaz;
+    private final int startedYaz, finishedYaz;
 
     public int getStartedYaz() {
         return startedYaz;
@@ -11,13 +11,8 @@ public class YazDTO {
         return finishedYaz;
     }
 
-    public int getNextPaymentYaz() {
-        return nextPaymentYaz;
-    }
-
-    public YazDTO(int startedYaz, int finishedYaz, int nextPaymentYaz) {
+    public YazDTO(int startedYaz, int finishedYaz) {
         this.startedYaz = startedYaz;
         this.finishedYaz = finishedYaz;
-        this.nextPaymentYaz = nextPaymentYaz;
     }
 }

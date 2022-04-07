@@ -7,12 +7,8 @@ import java.util.List;
 public class AccountsDTO {
     List<AccountDTO>  accountsDTO;
 
-    public AccountsDTO() {
-        accountsDTO = new ArrayList<>();
-    }
-
-    public void addAccount(AccountDTO accountDTO) {
-        accountsDTO.add(accountDTO);
+    public AccountsDTO(List<AccountDTO> accountsDTO) {
+        this.accountsDTO = accountsDTO;
     }
 
     public List<AccountDTO> getList() {

@@ -1,32 +1,40 @@
 package manager.loans;
 
-import bank.loans.Loan;
-import bank.loans.LoanStatus;
-import manager.loans.details.InterestDTO;
-import manager.loans.details.LoanDetailsDTO;
-import manager.loans.details.YazDTO;
+import manager.loans.details.*;
 
 public class LoanDTO {
     LoanDetailsDTO details;
     InterestDTO interest;
     YazDTO yazDetails;
-    int cyclesPerPayment;
-    int loanAccountBalance;
-    int startedYaz;
-    int endedYaz;
-    int nextPaymentYaz;
-    int nextPayment;
-    int missingCycles;
-    int deriskAmount;
+    LoanPaymentDTO paymentDetails;
+    ActiveLoanDTO activeLoanDTO;
 
-    public LoanDTO(LoanDetailsDTO loanDetails, InterestDTO interest, YazDTO yazDetails) {
-        this.details = loanDetails;
+    public LoanDTO(LoanDetailsDTO details, InterestDTO interest, YazDTO yazDetails,
+                   LoanPaymentDTO paymentDetails, ActiveLoanDTO activeLoanDTO) {
+        this.details = details;
         this.interest = interest;
         this.yazDetails = yazDetails;
-        cyclesPerPayment = loan.getCyclesPerPayment();
-        loanAccountBalance = loan.getLoanAccount().getBalance();
-        missingCycles = loan.getCurrentPayment() - loan.getFullPaidCycles();
-        deriskAmount = loan.getDeriskAmount();
+        this.paymentDetails = paymentDetails;
+        this.activeLoanDTO = activeLoanDTO;
     }
 
+    public LoanDetailsDTO getDetails() {
+        return details;
+    }
+
+    public InterestDTO getInterest() {
+        return interest;
+    }
+
+    public YazDTO getYazDetails() {
+        return yazDetails;
+    }
+
+    public LoanPaymentDTO getPaymentDetails() {
+        return paymentDetails;
+    }
+
+    public ActiveLoanDTO getActiveLoanDTO() {
+        return activeLoanDTO;
+    }
 }
