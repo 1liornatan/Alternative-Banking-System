@@ -17,6 +17,7 @@ import bank.transactions.Transaction;
 import files.xmls.XmlReader;
 import files.xmls.exceptions.*;
 import javafx.util.Pair;
+import manager.accounts.AccountDTO;
 import manager.customers.CustomerDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
@@ -177,16 +178,20 @@ public class BankImpl implements Bank {
 
     @Override
     public CustomerDTO getCustomerDTO(String id) throws DataNotFoundException {
-        List<LoanDTO> loansInvestedDTO = new ArrayList<LoanDTO>();
-        List<LoanDTO> loansRequestedDTO = new ArrayList<LoanDTO>();
-        List<Loan> loansInvested = customersAccounts.getDataById(id).getLoansInvested();
-        List<Loan> loansRequested = customersAccounts.getDataById(id).getLoansRequested();
+        Account account = customersAccounts.getDataById(id);
+        List<LoanDTO> loansInvestedDTOList = new ArrayList<LoanDTO>();
+        List<LoanDTO> loansRequestedDTOList = new ArrayList<LoanDTO>();
+        List<Loan> loansInvested = account.getLoansInvested();
+        List<Loan> loansRequested = account.getLoansRequested();
 
         for(Loan loan : loansInvested)
-            loansInvestedDTO.add(getLoanDTO(loan));
+            loansInvestedDTOList.add(getLoanDTO(loan));
         for(Loan loan : loansRequested)
-            loansRequestedDTO.add(getLoanDTO(loan));
-        return new CustomerDTO()
+            loansRequestedDTOList.add(getLoanDTO(loan));
+        LoansDTO loansInvestedDTO = new LoansDTO(loansInvestedDTOList);
+        LoansDTO loansRequestedDTO = new LoansDTO(loansRequestedDTOList);
+        AccountDTO accountDTO = new AccountDTO(account.getId(),account.getBalance());
+        return new CustomerDTO(loansInvestedDTO,loansRequestedDTO,accountDTO);
     }
 
     @Override
