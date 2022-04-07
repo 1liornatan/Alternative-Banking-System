@@ -38,12 +38,11 @@ public class impl {
         List<CustomerDTO> customers = customersDTO.getCustomers();
         for(CustomerDTO customer : customers) {
             printCustomerName(customer);
-            List<TransactionDTO> transactions = customer.getAccount().getTransactions();
+            List<TransactionDTO> transactions = customer.getAccount().getTransactionsDTO().getTransactions();
             System.out.println("All account's transactions:");
-            for(TransactionDTO transaction : ) {
-                Pair<Transaction, Integer> currTransaction = transactions.getDataPair(transaction.getId());
-                System.out.println("(" + currTransaction.getKey().toString() +
-                        ", Yaz made at: " + currTransaction.getValue() + ")");
+            for(TransactionDTO transaction : transactions) {
+                System.out.println("(" + transaction.getDescription() +
+                        ", Yaz made at: " + transaction.getYazMade() + ")");
             }
 
             System.out.println("All account's requested loans:");
