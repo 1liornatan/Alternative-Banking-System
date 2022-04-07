@@ -99,6 +99,7 @@ public class BankImpl implements Bank {
         return loanHandler.getDeriskAmount(loan);
     }
 
+
     @Override
     public void printCustomers() throws DataNotFoundException {
         Collection<Pair<Account, Integer>> allCustomers = customersAccounts.getAllPairs();
