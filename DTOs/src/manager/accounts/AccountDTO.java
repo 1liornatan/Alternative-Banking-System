@@ -1,14 +1,20 @@
 package manager.accounts;
 
-import bank.accounts.Account;
-
 public class AccountDTO {
     String name;
     int balance;
 
-    public AccountDTO(Account account) {
-        name = account.getId();
-        balance = account.getBalance();
+    public String getName() {
+        return name;
+    }
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public AccountDTO(String name, int balance) {
+        this.name = name;
+        this.balance = balance;
     }
 
     @Override

@@ -1,38 +1,40 @@
 package manager.loans;
 
-import bank.loans.Loan;
-import bank.loans.LoanStatus;
+import manager.loans.details.*;
 
 public class LoanDTO {
-    String name;
-    LoanStatus status;
-    String category;
-    int baseAmount;
-    int finalAmount;
-    int cyclesPerPayment;
-    float interestPercent;
-    int loanAccountBalance;
-    int startedYaz;
-    int endedYaz;
-    int nextPaymentYaz;
-    int nextPayment;
-    int missingCycles;
-    int deriskAmount;
+    LoanDetailsDTO details;
+    InterestDTO interest;
+    YazDTO yazDetails;
+    LoanPaymentDTO paymentDetails;
+    ActiveLoanDTO activeLoanDTO;
 
-    public LoanDTO(Loan loan, int currentYaz) {
-        name = loan.getId();
-        status = loan.getStatus();
-        category = loan.getCategory();
-        baseAmount = loan.getBaseAmount();
-        finalAmount = loan.getFinalAmount();
-        cyclesPerPayment = loan.getCyclesPerPayment();
-        interestPercent = loan.getInterestPercent();
-        loanAccountBalance = loan.getLoanAccount().getBalance();
-        startedYaz = loan.getStartedYaz();
-        endedYaz = loan.getFinishedYaz();
-        nextPaymentYaz = cyclesPerPayment - ((currentYaz - startedYaz) % cyclesPerPayment);
-        missingCycles = loan.getCurrentPayment() - loan.getFullPaidCycles();
-        deriskAmount = loan.getDeriskAmount();
+    public LoanDTO(LoanDetailsDTO details, InterestDTO interest, YazDTO yazDetails,
+                   LoanPaymentDTO paymentDetails, ActiveLoanDTO activeLoanDTO) {
+        this.details = details;
+        this.interest = interest;
+        this.yazDetails = yazDetails;
+        this.paymentDetails = paymentDetails;
+        this.activeLoanDTO = activeLoanDTO;
     }
 
+    public LoanDetailsDTO getDetails() {
+        return details;
+    }
+
+    public InterestDTO getInterest() {
+        return interest;
+    }
+
+    public YazDTO getYazDetails() {
+        return yazDetails;
+    }
+
+    public LoanPaymentDTO getPaymentDetails() {
+        return paymentDetails;
+    }
+
+    public ActiveLoanDTO getActiveLoanDTO() {
+        return activeLoanDTO;
+    }
 }

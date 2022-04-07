@@ -1,16 +1,14 @@
 package manager.transactions;
 
-import bank.transactions.Transaction;
-
 public class TransactionDTO {
     String description;
     int amount;
     int previousBalance, yazMade;
 
-    public TransactionDTO(Transaction transaction, int yazMade) {
-        description = transaction.getDescription();
-        amount = transaction.getAmount();
-        previousBalance = transaction.getPreviousBalance();
+    public TransactionDTO(String description, int amount, int previousBalance, int yazMade) {
+        this.description = description;
+        this.amount = amount;
+        this.previousBalance = previousBalance;
         this.yazMade = yazMade;
     }
 
