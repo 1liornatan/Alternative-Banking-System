@@ -9,6 +9,7 @@ import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.customers.CustomerDTO;
 import manager.customers.CustomersDTO;
+import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.categories.CategoriesDTO;
@@ -34,6 +35,8 @@ public interface Bank {
     void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException;
 
     int getDeriskAmount(Loan loan);
+
+    void createInvestment(InvestDTO investDetails);
 
     LoansDTO loanAssignmentRequest(RequestDTO requestDTO);
 

@@ -20,6 +20,7 @@ import javafx.util.Pair;
 import manager.accounts.AccountDTO;
 import manager.customers.CustomerDTO;
 import manager.customers.CustomersDTO;
+import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
@@ -112,6 +113,10 @@ public class BankImpl implements Bank {
 
 
     @Override
+    public void createInvestment(InvestDTO investDetails) {
+
+    }
+    @Override
     public LoansDTO loanAssignmentRequest(RequestDTO requestDTO) {
         int amount = requestDTO.getAmount();
         String requesterName = requestDTO.getRequesterName();
@@ -119,7 +124,8 @@ public class BankImpl implements Bank {
         Set<String> categories = requestDTO.getCategoriesDTO().getCategories();
         int minDuration = requestDTO.getMinLoanDuration();
 
-        List<Pair<Loan, Integer>> releventLoans = loans.getAllPairs().stream()
+        List<Pair<Loan, Integer>> relevantLoans = loans.getAllPairs().stream()
+                .filter(p -> p.getKey().getOwnerId() != requesterName)
                 .filter((p -> p.getKey().getStatus().isInvestable()))
                 .filter(p -> p.getKey().getInterestPercent() >= minInterest)
                 .filter(p -> categories.contains(p.getKey().getCategory()))
@@ -128,7 +134,7 @@ public class BankImpl implements Bank {
 
         List<LoanDTO> loansDTOList = new ArrayList<>();
 
-        for(Pair<Loan, Integer> loanPair : releventLoans) {
+        for(Pair<Loan, Integer> loanPair : relevantLoans) {
             loansDTOList.add(getLoanDTO(loanPair.getKey()));
         }
 
@@ -200,10 +206,6 @@ public class BankImpl implements Bank {
 
         return categoriesDTO;
     }
-    @Override
-    public Collection<Pair<Account, Integer>> getCustomersNames() {
-        return customersAccounts.getAllPairs();
-    }
 
     @Override
     public CustomersDTO getCustomersDTO() throws DataNotFoundException {
@@ -213,6 +215,7 @@ public class BankImpl implements Bank {
         for(Pair<Account,Integer> account  : customersList) {
             customersDTOList.add(getCustomerDTO(account.getKey().getId()));
         }
+
         return new CustomersDTO(customersDTOList);
     }
 
