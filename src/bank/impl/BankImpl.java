@@ -25,6 +25,8 @@ import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
 import manager.loans.details.*;
 import manager.categories.CategoriesDTO;
+import manager.transactions.TransactionDTO;
+import manager.transactions.TransactionsDTO;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -119,7 +121,7 @@ public class BankImpl implements Bank {
         Set<String> categories = requestDTO.getCategoriesDTO().getCategories();
         int minDuration = requestDTO.getMinLoanDuration();
 
-        List<Pair<Loan, Integer>> releventLoans = loans.getAllPairs().stream()
+        List<Pair<Loan, Integer>> relevantLoans = loans.getAllPairs().stream()
                 .filter((p -> p.getKey().getStatus().isInvestable()))
                 .filter(p -> p.getKey().getInterestPercent() >= minInterest)
                 .filter(p -> categories.contains(p.getKey().getCategory()))
@@ -128,7 +130,7 @@ public class BankImpl implements Bank {
 
         List<LoanDTO> loansDTOList = new ArrayList<>();
 
-        for(Pair<Loan, Integer> loanPair : releventLoans) {
+        for(Pair<Loan, Integer> loanPair : relevantLoans) {
             loansDTOList.add(getLoanDTO(loanPair.getKey()));
         }
 
@@ -200,10 +202,6 @@ public class BankImpl implements Bank {
 
         return categoriesDTO;
     }
-    @Override
-    public Collection<Pair<Account, Integer>> getCustomersNames() {
-        return customersAccounts.getAllPairs();
-    }
 
     @Override
     public CustomersDTO getCustomersDTO() throws DataNotFoundException {
@@ -229,20 +227,38 @@ public class BankImpl implements Bank {
         for(Loan loan : loansRequested)
             loansRequestedDTOList.add(getLoanDTO(loan));
 
+        TransactionsDTO transactions = getTransactionsDTO(account);
         LoansDTO loansInvestedDTO = new LoansDTO(loansInvestedDTOList);
         LoansDTO loansRequestedDTO = new LoansDTO(loansRequestedDTOList);
-        AccountDTO accountDTO = new AccountDTO(account.getId(),account.getBalance());
+        AccountDTO accountDTO = new AccountDTO(account.getId(),account.getBalance(),transactions);
         return new CustomerDTO(loansInvestedDTO,loansRequestedDTO,accountDTO);
     }
 
     @Override
     public LoanDTO getLoanDTO(Loan loan) {
         InterestDTO interestDTO = new InterestDTO(loan.getBaseAmount(),loan.getFinalAmount(),loan.getInterestPercent());
-        LoanDetailsDTO loanDetailsDTO = new LoanDetailsDTO(loan.getId(),loan.getCategory(),loan.getStatus().toString());
+        LoanDetailsDTO loanDetailsDTO = new LoanDetailsDTO(loan.getId(),loan.getCategory(),loan.getStatus().name());
         LoanPaymentDTO loanPaymentDTO = new LoanPaymentDTO(loan.getPayment(),loan.getNextYaz(),loan.getCyclesPerPayment());
         ActiveLoanDTO activeLoanDTO = new ActiveLoanDTO(loan.getAmountToActive(),loan.getDeriskAmount(),loan.getMissingCycles());
         YazDTO yazDTO = new YazDTO(loan.getStartedYaz(),loan.getFinishedYaz());
         return new LoanDTO(loanDetailsDTO,interestDTO,yazDTO,loanPaymentDTO,activeLoanDTO);
     }
 
+    @Override
+    public TransactionDTO getTransactionDTO(Transaction transaction) throws DataNotFoundException {
+        return new TransactionDTO(transaction.getDescription(),transaction.getAmount(),
+                    transaction.getPreviousBalance(),transactions.getDataPair(transaction.getId()).getValue());
+    }
+
+    @Override
+    public TransactionsDTO getTransactionsDTO(Account account) throws DataNotFoundException {
+        List<TransactionDTO> transactionsList = new ArrayList<TransactionDTO>();
+        List<Transaction> accountTransactions = account.getTransactions();
+
+        for(Transaction transaction : accountTransactions) {
+            transactionsList.add(getTransactionDTO(transaction));
+        }
+        return new TransactionsDTO(transactionsList);
+
+    }
 }

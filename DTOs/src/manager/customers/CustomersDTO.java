@@ -13,10 +13,4 @@ public class CustomersDTO {
         return customers;
     }
 
-    public void printCustomersNames() {
-        System.out.println("All customers names:");
-        for(CustomerDTO customer : customers) {
-            System.out.println(customer.getName());
-        }
-    }
 }

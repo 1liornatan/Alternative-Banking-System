@@ -7,6 +7,7 @@ import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import files.xmls.exceptions.*;
 import manager.customers.CustomersDTO;
+import utils.impl;
 
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -64,12 +65,12 @@ public class MainMenu {
         }
     }
 
-    public void withdraw () throws XmlNotLoadedException {
+    public void withdraw () throws XmlNotLoadedException, DataNotFoundException {
 
         if(!hasValidData)
             throw new XmlNotLoadedException();
 
-        bankInstance.printCustomersNames();
+        impl.printCustomersNames(bankInstance.getCustomersDTO());
         System.out.println("Enter a customer name:");
         Scanner scanner = new Scanner(System.in);
         String customerName = scanner.nextLine();
@@ -90,8 +91,7 @@ public class MainMenu {
         if(!hasValidData)
             throw new XmlNotLoadedException();
 
-        CustomersDTO customers = bankInstance.getCustomersDTO();
-        customers.printCustomersNames();
+        impl.printCustomersNames(bankInstance.getCustomersDTO());
 
         System.out.println("Enter a customer name:");
         Scanner scanner = new Scanner(System.in);
@@ -148,7 +148,7 @@ public class MainMenu {
                     default:
                         throw new NoOptionException();
                 }
-            } catch (XmlNotLoadedException | NoOptionException e) {
+            } catch (XmlNotLoadedException | NoOptionException | DataNotFoundException e) {
                 System.out.println(e.getMessage());
             }
         }
