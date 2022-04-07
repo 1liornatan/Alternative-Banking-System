@@ -1,6 +1,7 @@
 package bank.loans;
 
 public enum LoanStatus {
+    NEW("New"),
     PENDING("Pending"),
     ACTIVE("Active"),
     RISK("In Risk"),
@@ -15,5 +16,9 @@ public enum LoanStatus {
     @Override
     public String toString() {
         return statusText;
+    }
+
+    public boolean isInvestable() {
+        return this == ACTIVE || this == NEW;
     }
 }

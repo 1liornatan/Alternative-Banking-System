@@ -2,6 +2,7 @@ package console.menus.exceptions;
 
 import bank.Bank;
 import manager.categories.CategoriesDTO;
+import manager.investments.RequestDTO;
 
 import java.util.HashSet;
 import java.util.Scanner;
@@ -12,9 +13,11 @@ public class SetLoanMenu {
     Set<String> categories;
     float minInterest;
     int minLoanDuration;
+    String requesterName;
     Bank bankInstance;
 
-    public SetLoanMenu(Bank bank) {
+    public SetLoanMenu(Bank bank, String requesterName) {
+        this.requesterName = requesterName;
         amount = 0;
         categories = new HashSet<>();
         minInterest = 0;
@@ -26,7 +29,7 @@ public class SetLoanMenu {
     public void printMenu() throws NoOptionException {
         System.out.println("Loan Investment requirements: \n1.Set Investment Amount [MUST].\n" +
                 "2.Set Loan Category.\n" + "3.Set Loan's Minimum Interest.\n" +
-                "4.Set Loan's Minimum Duration.");
+                "4.Set Loan's Minimum Duration.\n\n" + "6.Request Loan Investment.");
 
         Scanner scanner = new Scanner(System.in);
         switch(scanner.nextInt()) {
@@ -42,9 +45,19 @@ public class SetLoanMenu {
             case 4:
                 setDuration();
                 break;
+            case 6:
+                requestInvestment();
+                break;
             default:
                 throw new NoOptionException();
         }
+    }
+
+    private void requestInvestment() {
+        RequestDTO requestDTO = new RequestDTO(requesterName, amount, new CategoriesDTO(categories),
+                minInterest, minLoanDuration);
+
+
     }
 
     private void setCategory() {
