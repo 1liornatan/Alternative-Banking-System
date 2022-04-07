@@ -133,6 +133,8 @@ public class MainMenu {
                         withdraw();
                         break;
                     case 6:
+                        printCustomers();
+
                         break;
                     case 7:
                         advanceTime();

@@ -56,7 +56,7 @@ public class BankLoanHandler implements LoanHandler {
         loan.addInvestment(investment);
         transactions.addData(loan.getLoanAccount().deposit(amount, "Loan"));
         transactions.addData(srcAcc.withdraw(amount, "Loan"));
-        srcAcc.addInvestedLoan(loan.getId());
+        srcAcc.addInvestedLoan(loan);
 
         checkLoanStatus(loan, srcAcc);
     }

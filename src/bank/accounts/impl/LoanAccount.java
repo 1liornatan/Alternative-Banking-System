@@ -4,6 +4,7 @@ import bank.accounts.Account;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.Singular;
+import bank.loans.Loan;
 import bank.transactions.Transaction;
 import bank.transactions.impl.BasicTransaction;
 
@@ -14,7 +15,7 @@ public class LoanAccount implements Account, Singular {
     private static Integer idGenerator = 60000;
     private final String id;
     private int balance;
-    private final List<String> transactions;
+    private final List<Transaction> transactions;
 
     public LoanAccount() {
         id = (idGenerator++).toString();
@@ -32,17 +33,17 @@ public class LoanAccount implements Account, Singular {
         return balance;
     }
 
-    public List<String> getTransactions() {
+    public List<Transaction> getTransactions() {
         return transactions;
     }
 
     @Override
-    public void addRequestedLoan(String id) {
+    public void addRequestedLoan(Loan loan) {
 
     }
 
     @Override
-    public void addInvestedLoan(String id) {
+    public void addInvestedLoan(Loan loan) {
 
     }
 
@@ -55,12 +56,12 @@ public class LoanAccount implements Account, Singular {
     }
 
     @Override
-    public List<String> getLoansRequested(){
+    public List<Loan> getLoansRequested(){
         return new ArrayList<>();
     }
 
     @Override
-    public List<String> getLoansInvested(){
+    public List<Loan> getLoansInvested(){
         return new ArrayList<>();
     }
 
@@ -74,7 +75,7 @@ public class LoanAccount implements Account, Singular {
         if(amount <= 0) throw new NonPositiveAmountException();
 
         Transaction transaction = new BasicTransaction(amount, description, balance);
-        transactions.add(transaction.getId());
+        transactions.add(transaction);
         balance += amount;
 
         return transaction;
@@ -85,7 +86,7 @@ public class LoanAccount implements Account, Singular {
         if(amount > balance) throw new NoMoneyException();
 
         Transaction transaction = new BasicTransaction(amount * (-1), description, balance);
-        transactions.add(transaction.getId());
+        transactions.add(transaction);
         balance -= amount;
 
         return transaction;

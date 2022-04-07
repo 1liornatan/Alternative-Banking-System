@@ -3,6 +3,7 @@ package bank.accounts;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.Singular;
+import bank.loans.Loan;
 import bank.transactions.Transaction;
 
 import java.util.List;
@@ -12,15 +13,15 @@ import java.util.List;
  */
 public interface Account extends Singular {
 
-    List<String> getTransactions();
+    List<Transaction> getTransactions();
 
-    void addRequestedLoan(String id);
+    void addRequestedLoan(Loan loan);
 
-    void addInvestedLoan(String id);
+    void addInvestedLoan(Loan loan);
 
-    List<String> getLoansRequested();
+    List<Loan> getLoansRequested();
 
-    List<String> getLoansInvested();
+    List<Loan> getLoansInvested();
 
     String getId();
 
