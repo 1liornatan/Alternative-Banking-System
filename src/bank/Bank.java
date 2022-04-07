@@ -1,15 +1,19 @@
 package bank;
 
+import bank.accounts.Account;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
 import files.xmls.exceptions.*;
+import javafx.util.Pair;
 import manager.customers.CustomerDTO;
+import manager.customers.CustomersDTO;
 import manager.loans.LoanDTO;
 import manager.categories.CategoriesDTO;
 
 import java.io.FileNotFoundException;
+import java.util.Collection;
 
 public interface Bank {
     void loadData(String filename) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException, XmlNotFoundException, DataNotFoundException;
@@ -31,7 +35,7 @@ public interface Bank {
 
     void printCustomers() throws DataNotFoundException;
 
-    void getCustomersNames();
+    CustomersDTO getCustomersDTO() throws DataNotFoundException;
 
     CustomerDTO getCustomerDTO(String id) throws DataNotFoundException;
 

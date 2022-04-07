@@ -19,6 +19,7 @@ import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.accounts.AccountDTO;
 import manager.customers.CustomerDTO;
+import manager.customers.CustomersDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
 import manager.loans.details.*;
@@ -174,13 +175,19 @@ public class BankImpl implements Bank {
         return categoriesDTO;
     }
     @Override
-    public void getCustomersNames() {
-        Collection<Pair<Account, Integer>> allPairs = customersAccounts.getAllPairs();
-        System.out.println("All customers names:");
+    public Collection<Pair<Account, Integer>> getCustomersNames() {
+        return customersAccounts.getAllPairs();
+    }
 
-        for(Pair<Account,Integer> accountPair : allPairs) {
-            System.out.println(accountPair.getKey().getId());
+    @Override
+    public CustomersDTO getCustomersDTO() throws DataNotFoundException {
+        List<CustomerDTO> customersDTOList = new ArrayList<CustomerDTO>();
+        Collection<Pair<Account,Integer>> customersList = customersAccounts.getAllPairs();
+
+        for(Pair<Account,Integer> account  : customersList) {
+            customersDTOList.add(getCustomerDTO(account.getKey().getId()));
         }
+        return new CustomersDTO(customersDTOList);
     }
 
     @Override
