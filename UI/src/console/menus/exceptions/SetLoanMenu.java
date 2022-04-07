@@ -2,11 +2,12 @@ package console.menus.exceptions;
 
 import bank.Bank;
 import manager.categories.CategoriesDTO;
+import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
+import manager.loans.LoanDTO;
+import manager.loans.LoansDTO;
 
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 public class SetLoanMenu {
     int amount;
@@ -57,7 +58,80 @@ public class SetLoanMenu {
         RequestDTO requestDTO = new RequestDTO(requesterName, amount, new CategoriesDTO(categories),
                 minInterest, minLoanDuration);
 
+        LoansDTO loansDTO = bankInstance.loanAssignmentRequest(requestDTO);
+        List<LoanDTO> loanDTOList = loansDTO.getLoansList();
+        int listSize = loanDTOList.size();
 
+        if(listSize == 0) {
+            System.out.println("No relevant loans found.");
+        } else {
+            int i = 1;
+            System.out.println("Found " + loanDTOList.size() + " relevant loans:");
+            for(LoanDTO loan : loanDTOList) {
+                System.out.println("Loan #" + i + " Details:");
+                i++;
+                printLoan(loan);
+            }
+
+            List<LoanDTO> chosenLoans = getChosenLoans(loanDTOList);
+            int amountLeft = amount;
+            int minAmount, loansAmount;
+            int avgAmount = amountLeft / chosenLoans.size();
+            boolean averageSplit = false;
+
+            chosenLoans.sort(Comparator.comparingInt(p -> p.getActiveLoanDTO().getAmountToActive()));
+            minAmount = chosenLoans.get(0).getActiveLoanDTO().getAmountToActive();
+
+            while(avgAmount > minAmount) {
+                for (LoanDTO loan : chosenLoans) {
+
+                    if (minAmount <= amountLeft) {
+                        InvestDTO investDTO = new InvestDTO(requesterName, loan.getDetails().getName(), minAmount);
+                        bankInstance.createInvestment(investDTO);
+
+                        amountLeft -= minAmount;
+                        if (loan.getActiveLoanDTO().getAmountToActive() == minAmount)
+                            chosenLoans.remove(loan);
+                    }
+                    else {
+                        break;
+                    }
+
+                }
+
+                if(chosenLoans.size() == 0)
+                    break;
+
+                avgAmount = amountLeft / chosenLoans.size();
+                minAmount = chosenLoans.get(0).getActiveLoanDTO().getAmountToActive();
+            }
+
+            for(LoanDTO loan : chosenLoans) {
+                InvestDTO investDTO = new InvestDTO(requesterName, loan.getDetails().getName(), avgAmount);
+                bankInstance.createInvestment(investDTO);
+                amountLeft -= avgAmount;
+            }
+
+        }
+    }
+
+    private List<LoanDTO> getChosenLoans(List<LoanDTO> loanDTOList) {
+
+        List<LoanDTO> chosenLoans = new ArrayList<>();
+        System.out.println("Choose the loans you want to invest in:");
+        System.out.println(("[for example: 1 3 5]"));
+
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        line = line.replaceAll("[^-?0-9]+", " ");
+        System.out.println();
+
+        for(String numStr : Arrays.asList(line.trim().split(" "))) {
+            int index = Integer.parseInt(numStr) - 1;
+            chosenLoans.add(loanDTOList.get(index));
+        }
+
+        return chosenLoans;
     }
 
     private void setCategory() {
