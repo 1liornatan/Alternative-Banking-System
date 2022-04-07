@@ -1,8 +1,12 @@
 package console.menus.exceptions;
 
 import bank.Bank;
+import bank.accounts.impl.exceptions.NegativeAmountException;
+import bank.accounts.impl.exceptions.NoMoneyException;
+import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.exceptions.DataNotFoundException;
 import manager.categories.CategoriesDTO;
+import manager.customers.CustomerDTO;
 import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
@@ -18,48 +22,58 @@ public class SetLoanMenu {
     Set<String> categories;
     float minInterest;
     int minLoanDuration;
+    int balance;
     String requesterName;
     Bank bankInstance;
 
-    public SetLoanMenu(Bank bank, String requesterName) {
-        this.requesterName = requesterName;
+    public SetLoanMenu(Bank bank, CustomerDTO customerDTO) {
+        this.requesterName = customerDTO.getName();
         amount = 0;
+        balance = customerDTO.getAccount().getBalance();
         categories = new HashSet<>();
         minInterest = 0;
         minLoanDuration = 0;
-
         bankInstance = bank;
     }
 
-    public void printMenu() throws NoOptionException, DataNotFoundException {
-        System.out.println("Loan Investment requirements: \n1.Set Investment Amount [MUST].\n" +
-                "2.Set Loan Category.\n" + "3.Set Loan's Minimum Interest.\n" +
-                "4.Set Loan's Minimum Duration.\n\n" + "6.Request Loan Investment.");
+    public void printMenu() {
 
         Scanner scanner = new Scanner(System.in);
-        switch(scanner.nextInt()) {
-            case 1:
-                setAmount();
-                break;
-            case 2:
-                setCategory();
-                break;
-            case 3:
-                setInterest();
-                break;
-            case 4:
-                setDuration();
-                break;
-            case 6:
-                requestInvestment();
-                break;
-            default:
-                throw new NoOptionException();
-        }
+        int option;
+        do {
+            System.out.println("Loan Investment requirements: \n1.Set Investment Amount [MUST].\n" +
+                    "2.Set Loan Category.\n" + "3.Set Loan's Minimum Interest.\n" +
+                    "4.Set Loan's Minimum Duration.\n" + "5.Request Loan Investment.\n\n" + "9.Cancel Request.");
+            option = scanner.nextInt();
+            try {
+                switch (option) {
+                    case 1:
+                        setAmount();
+                        break;
+                    case 2:
+                        setCategory();
+                        break;
+                    case 3:
+                        setInterest();
+                        break;
+                    case 4:
+                        setDuration();
+                        break;
+                    case 5:
+                        requestInvestment();
+                        break;
+                    default:
+                        throw new NoOptionException();
+                }
+            } catch (NoMoneyException | DataNotFoundException | NoOptionException | NonPositiveAmountException e) {
+                System.out.println(e.getMessage());
+            }
+        } while (option != 5 && option != 9);
     }
 
     private void requestInvestment() throws DataNotFoundException {
-        RequestDTO requestDTO = new RequestDTO(requesterName, amount, new CategoriesDTO(categories),
+
+        RequestDTO requestDTO = new RequestDTO(requesterName, amount, bankInstance.getCategories(),
                 minInterest, minLoanDuration);
 
         LoansDTO loansDTO = bankInstance.loanAssignmentRequest(requestDTO);
@@ -155,9 +169,17 @@ public class SetLoanMenu {
         minInterest = scanner.nextFloat();
     }
 
-    private void setAmount() {
+    private void setAmount() throws NoMoneyException, NonPositiveAmountException {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Type max amount to invest");
-        amount = scanner.nextInt();
+        System.out.println("Type max amount to invest [Current Amount: " + amount + ", Account Balance: " + balance + "]");
+        int investAmount = scanner.nextInt();
+
+        if(investAmount > balance)
+            throw new NoMoneyException();
+
+        if(investAmount <= 0)
+            throw new NonPositiveAmountException();
+
+        amount = investAmount;
     }
 }

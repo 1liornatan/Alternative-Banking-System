@@ -184,7 +184,10 @@ public class BasicLoan implements Loan {
 
     @Override
     public int getPayment() {
-        return payments.get(currentPayment);
+        if(status != LoanStatus.PENDING && status != LoanStatus.NEW)
+            return payments.get(currentPayment);
+
+        return 0;
     }
 
     @Override
@@ -236,5 +239,10 @@ public class BasicLoan implements Loan {
             }
         }
         return sum;
+    }
+
+    @Override
+    public boolean isInvestible() {
+        return (status == LoanStatus.NEW || status == LoanStatus.PENDING);
     }
 }
