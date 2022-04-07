@@ -5,6 +5,8 @@ import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
 import files.xmls.exceptions.*;
+import manager.customers.CustomerDTO;
+import manager.loans.LoanDTO;
 import manager.categories.CategoriesDTO;
 
 import java.io.FileNotFoundException;
@@ -29,7 +31,10 @@ public interface Bank {
 
     void printCustomers() throws DataNotFoundException;
 
-    void printCustomersNames();
+    void getCustomersNames();
 
+    CustomerDTO getCustomerDTO(String id) throws DataNotFoundException;
+
+    LoanDTO getLoanDTO(Loan loan);
     CategoriesDTO getCategories();
 }
