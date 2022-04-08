@@ -12,7 +12,7 @@ import utils.PrintUtils;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import static utils.impl.printCustomersDetails;
+import static utils.PrintUtils.printCustomersDetails;
 
 public class MainMenu {
     private final Bank bankInstance;
@@ -61,7 +61,7 @@ public class MainMenu {
             throw new XmlNotLoadedException();
 
         try {
-            impl.printCustomersDetails(bankInstance.getCustomersDTO());
+            PrintUtils.printCustomersDetails(bankInstance.getCustomersDTO());
         } catch (DataNotFoundException e) {
             System.out.println(e.getMessage());
         }

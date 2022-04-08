@@ -25,7 +25,7 @@ public class PrintUtils {
             System.out.println(customer.getName());
     }
 
-    /*public static void printCustomers(CustomersDTO customersDTO) throws DataNotFoundException {
+    public static void printCustomersDetails(CustomersDTO customersDTO) throws DataNotFoundException {
         List<CustomerDTO> customers = customersDTO.getCustomers();
         for(CustomerDTO customer : customers) {
             printCustomerName(customer);
@@ -37,16 +37,16 @@ public class PrintUtils {
             }
 
             System.out.println("All account's requested loans:");
-            for(Loan loan : customer.getLoansRequested()) {
+            for(LoanDTO loan : customer.getRequestedLoans().getLoansList()) {
                 printLoan(loan);
             }
 
             System.out.println("All account's invested loans:");
-            for(Loan loan : currAccount.getLoansInvested()) {
+            for(LoanDTO loan : customer.getInvestedLoans().getLoansList()) {
                 printLoan(loan);
             }
         }
-    }*/
+    }
 
     public static void printLoan(LoanDTO loan) throws DataNotFoundException {
         String status = loan.getDetails().getStatus();
