@@ -71,7 +71,7 @@ public class SetLoanMenu {
         } while (option != 5 && option != 9);
     }
 
-    private void requestInvestment() throws DataNotFoundException {
+    private void requestInvestment() throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
 
         RequestDTO requestDTO = new RequestDTO(requesterName, amount, bankInstance.getCategories(),
                 minInterest, minLoanDuration);
@@ -101,6 +101,8 @@ public class SetLoanMenu {
             minAmount = chosenLoans.get(0).getActiveLoanDTO().getAmountToActive();
 
             while(avgAmount > minAmount) {
+                List<LoanDTO> tempList = new ArrayList<>();
+
                 for (LoanDTO loan : chosenLoans) {
 
                     if (minAmount <= amountLeft) {
@@ -108,14 +110,15 @@ public class SetLoanMenu {
                         bankInstance.createInvestment(investDTO);
 
                         amountLeft -= minAmount;
-                        if (loan.getActiveLoanDTO().getAmountToActive() == minAmount)
-                            chosenLoans.remove(loan);
+                        if (loan.getActiveLoanDTO().getAmountToActive() != minAmount)
+                            tempList.add(loan);
                     }
                     else {
                         break;
                     }
-
                 }
+
+                chosenLoans = tempList;
 
                 if(chosenLoans.size() == 0)
                     break;

@@ -38,6 +38,7 @@ public class impl {
         List<CustomerDTO> customers = customersDTO.getCustomers();
         for(CustomerDTO customer : customers) {
             printCustomerName(customer);
+            System.out.println("Balance: " + customer.getAccount().getBalance());
             List<TransactionDTO> transactions = customer.getAccount().getTransactionsDTO().getTransactions();
 
             System.out.println("All account's transactions:");

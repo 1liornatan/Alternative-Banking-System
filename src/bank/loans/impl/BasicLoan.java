@@ -20,7 +20,11 @@ public class BasicLoan implements Loan {
 
     private final String id;
     private final LoanBuilder loanDetails;
-    private int startedYaz, finishedYaz, currentPayment, fullPaidCycles;
+    private int startedYaz;
+    private int finishedYaz;
+    private int currentPayment;
+    private int fullPaidCycles;
+    private final int averagePayment;
     private final Interest interest;
     private LoanStatus status;
     private final List<Investment> investments;
@@ -86,7 +90,7 @@ public class BasicLoan implements Loan {
     public BasicLoan(LoanBuilder loanDetails, Interest interest, TimeHandler timeHandler) {
         this.loanDetails = loanDetails;
         this.interest = interest;
-        this.status = LoanStatus.PENDING;
+        this.status = LoanStatus.NEW;
         loanAccount = new LoanAccount();
         id = loanDetails.getIdName();
 
@@ -97,6 +101,7 @@ public class BasicLoan implements Loan {
         currentPayment = 0;
         fullPaidCycles = 0;
 
+        averagePayment = interest.getFinalAmount() / (interest.getDuration() / interest.getCyclesPerPayment());
         payments = new ArrayList<>();
         this.timeHandler = timeHandler;
     }
@@ -184,10 +189,10 @@ public class BasicLoan implements Loan {
 
     @Override
     public int getPayment() {
-        if(status != LoanStatus.PENDING && status != LoanStatus.NEW)
+        if(status == LoanStatus.ACTIVE || status == LoanStatus.RISK)
             return payments.get(currentPayment);
 
-        return 0;
+        return averagePayment;
     }
 
     @Override

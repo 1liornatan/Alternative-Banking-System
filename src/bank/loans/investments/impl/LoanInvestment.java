@@ -12,7 +12,7 @@ public class LoanInvestment implements Investment {
     private int amountPaid, paymentsReceived;
     private List<Integer> payments;
 
-    public LoanInvestment(String investorId, Interest interest, int duration) {
+    public LoanInvestment(String investorId, Interest interest) {
         this.investorId = investorId;
         this.interest = interest;
 
