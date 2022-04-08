@@ -34,6 +34,8 @@ public class SetLoanMenu {
         minInterest = 0;
         minLoanDuration = 0;
         bankInstance = bank;
+
+        setAllCategories();
     }
 
     public void printMenu() {
@@ -73,7 +75,7 @@ public class SetLoanMenu {
 
     private void requestInvestment() throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
 
-        RequestDTO requestDTO = new RequestDTO(requesterName, amount, bankInstance.getCategories(),
+        RequestDTO requestDTO = new RequestDTO(requesterName, amount, new CategoriesDTO(categories),
                 minInterest, minLoanDuration);
 
         LoansDTO loansDTO = bankInstance.loanAssignmentRequest(requestDTO);
@@ -155,9 +157,43 @@ public class SetLoanMenu {
         return chosenLoans;
     }
 
+    private List<String> getChosenCategories(List<String> allCategories) {
+
+        List<String> chosenCategories = new ArrayList<>();
+        System.out.println("Choose the categories:");
+        System.out.println(("[for example: 1 3 5]"));
+
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        line = line.replaceAll("[^-?0-9]+", " ");
+        System.out.println();
+
+        for(String numStr : Arrays.asList(line.trim().split(" "))) {
+            int index = Integer.parseInt(numStr) - 1;
+            chosenCategories.add(allCategories.get(index));
+        }
+
+        return chosenCategories;
+    }
+
     private void setCategory() {
         System.out.println("Choose a category to add:");
-        CategoriesDTO categories = bankInstance.getCategories();
+        CategoriesDTO categoriesDTO = bankInstance.getCategories();
+        List<String> categoryList = categoriesDTO.getCategories();
+
+        int num = 1;
+        for(String str : categoryList) {
+            System.out.println(num + ". " + str);
+            num++;
+        }
+
+        categories.clear();
+
+        categories.addAll(getChosenCategories(categoryList));
+    }
+
+    private void setAllCategories() {
+        categories.addAll(bankInstance.getCategories().getCategories());
     }
 
     private void setDuration() {
