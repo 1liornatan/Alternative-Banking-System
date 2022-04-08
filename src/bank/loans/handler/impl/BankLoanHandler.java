@@ -99,7 +99,6 @@ public class BankLoanHandler implements LoanHandler {
         Account srcAcc = customers.getDataById(loan.getOwnerId());
         int payment = loan.getPayment();
         try {
-            // TODO : fix for (based on how loans work)
             transactions.addData(srcAcc.withdraw(payment, "Loan Cycle"));
             loan.fullPaymentCycle();
             Collection<Investment> investments = loan.getInvestments();

@@ -10,6 +10,7 @@ import manager.customers.CustomerDTO;
 import utils.PrintUtils;
 
 import java.io.FileNotFoundException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import static utils.PrintUtils.printCustomersDetails;
@@ -151,6 +152,8 @@ public class MainMenu {
                 }
             } catch (XmlNotLoadedException | NoOptionException | DataNotFoundException e) {
                 System.out.println(e.getMessage());
+            } catch (InputMismatchException e) {
+                System.out.println("Line entered is not matching what expected.");
             }
         }
     }
