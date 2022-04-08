@@ -12,6 +12,8 @@ import utils.impl;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import static utils.impl.printCustomersDetails;
+
 public class MainMenu {
     private final Bank bankInstance;
     private boolean hasValidData;
@@ -51,7 +53,7 @@ public class MainMenu {
         if(!hasValidData)
             throw new XmlNotLoadedException();
 
-        bankInstance.printLoans();
+        bankInstance.printLoans();//TODO: FIX
     }
 
     public void printCustomers() throws XmlNotLoadedException {
@@ -59,7 +61,7 @@ public class MainMenu {
             throw new XmlNotLoadedException();
 
         try {
-            bankInstance.printCustomers();
+            impl.printCustomersDetails(bankInstance.getCustomersDTO());
         } catch (DataNotFoundException e) {
             System.out.println(e.getMessage());
         }
@@ -172,7 +174,7 @@ public class MainMenu {
         if(!hasValidData)
             throw new XmlNotLoadedException();
 
-        int currYaz = bankInstance.getCurrentYaz();
+        int currYaz = bankInstance.getCurrentYaz();//TODO: FIX
         System.out.println("Advancing from Yaz " + currYaz + " to Yaz " + (currYaz + 1) + ".");
         try {
             bankInstance.advanceOneYaz();

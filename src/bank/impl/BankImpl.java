@@ -9,7 +9,6 @@ import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
-import bank.loans.LoanStatus;
 import bank.loans.handler.impl.BankLoanHandler;
 import bank.time.TimeHandler;
 import bank.time.handler.BankTimeHandler;
@@ -20,6 +19,7 @@ import javafx.util.Pair;
 import manager.accounts.AccountDTO;
 import manager.customers.CustomerDTO;
 import manager.customers.CustomersDTO;
+import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
@@ -143,64 +143,64 @@ public class BankImpl implements Bank {
         return new LoansDTO(loansDTOList);
 
     }
-    @Override
-    public void printCustomers() throws DataNotFoundException {
-        Collection<Pair<Account, Integer>> allCustomers = customersAccounts.getAllPairs();
+//    @Override
+//    public void printCustomers() throws DataNotFoundException {
+//        Collection<Pair<Account, Integer>> allCustomers = customersAccounts.getAllPairs();
+//
+//        for(Pair<Account, Integer> pairOfAccount : allCustomers) {
+//            Account currAccount = pairOfAccount.getKey();
+//            System.out.println(currAccount.toString());
+//            System.out.println("All account's transactions:");
+//            for(Transaction transaction : currAccount.getTransactions()) {
+//                Pair<Transaction, Integer> currTransaction = transactions.getDataPair(transaction.getId());
+//                System.out.println("(" + currTransaction.getKey().toString() +
+//                        ", Yaz made at: " + currTransaction.getValue() + ")");
+//            }
+//
+//            System.out.println("All account's requested loans:");
+//            for(Loan loan : currAccount.getLoansRequested()) {
+//                printLoan(loan);
+//            }
+//
+//            System.out.println("All account's invested loans:");
+//            for(Loan loan : currAccount.getLoansInvested()) {
+//                printLoan(loan);
+//            }
+//        }
+//    }
 
-        for(Pair<Account, Integer> pairOfAccount : allCustomers) {
-            Account currAccount = pairOfAccount.getKey();
-            System.out.println(currAccount.toString());
-            System.out.println("All account's transactions:");
-            for(Transaction transaction : currAccount.getTransactions()) {
-                Pair<Transaction, Integer> currTransaction = transactions.getDataPair(transaction.getId());
-                System.out.println("(" + currTransaction.getKey().toString() +
-                        ", Yaz made at: " + currTransaction.getValue() + ")");
-            }
-
-            System.out.println("All account's requested loans:");
-            for(Loan loan : currAccount.getLoansRequested()) {
-                printLoan(loan);
-            }
-
-            System.out.println("All account's invested loans:");
-            for(Loan loan : currAccount.getLoansInvested()) {
-                printLoan(loan);
-            }
-        }
-    }
-
-    private void printLoan(Loan loan) throws DataNotFoundException {
-        LoanStatus loanStatus = loan.getStatus();
-
-        System.out.println("Loan name: " + loan.getId() + ", Category: " + loan.getCategory() + ", Base amount: " +
-                loan.getBaseAmount() + ", Total amount: " + loan.getFinalAmount() + ", Pay Every: " +
-                loan.getCyclesPerPayment() + " Yaz, Interest percent: " +
-                loan.getInterestPercent() + "%, Status: " + loanStatus.toString());
-
-        switch(loanStatus) {
-            case PENDING:
-                System.out.println("[Money left for becoming Active: " +
-                        (loan.getAmountToActive()) + "]");
-                break;
-
-            case ACTIVE:
-                int cyclesPerPayment = loan.getCyclesPerPayment();
-                int nextYaz = loan.getNextYaz();
-                System.out.println("[Next payment is in: " + nextYaz +
-                        "Yaz, Payment amount: " + loan.getPayment() + ".]");
-                break;
-
-            case FINISHED:
-                System.out.println("[Yaz Started: " + loan.getStartedYaz() + ", Yaz Finished: " + loan.getFinishedYaz() + ".]");
-                break;
-
-            case RISK:
-                int missingCycles = loan.getMissingCycles();
-                System.out.println("[Missing payments: " + missingCycles + ", Missing Amount: " + getDeriskAmount(loan) + ".]");
-                break;
-        }
-
-    }
+//    private void printLoan(Loan loan) throws DataNotFoundException {
+//        LoanStatus loanStatus = loan.getStatus();
+//
+//        System.out.println("Loan name: " + loan.getId() + ", Category: " + loan.getCategory() + ", Base amount: " +
+//                loan.getBaseAmount() + ", Total amount: " + loan.getFinalAmount() + ", Pay Every: " +
+//                loan.getCyclesPerPayment() + " Yaz, Interest percent: " +
+//                loan.getInterestPercent() + "%, Status: " + loanStatus.toString());
+//
+//        switch(loanStatus) {
+//            case PENDING:
+//                System.out.println("[Money left for becoming Active: " +
+//                        (loan.getAmountToActive()) + "]");
+//                break;
+//
+//            case ACTIVE:
+//                int cyclesPerPayment = loan.getCyclesPerPayment();
+//                int nextYaz = loan.getNextYaz();
+//                System.out.println("[Next payment is in: " + nextYaz +
+//                        "Yaz, Payment amount: " + loan.getPayment() + ".]");
+//                break;
+//
+//            case FINISHED:
+//                System.out.println("[Yaz Started: " + loan.getStartedYaz() + ", Yaz Finished: " + loan.getFinishedYaz() + ".]");
+//                break;
+//
+//            case RISK:
+//                int missingCycles = loan.getMissingCycles();
+//                System.out.println("[Missing payments: " + missingCycles + ", Missing Amount: " + getDeriskAmount(loan) + ".]");
+//                break;
+//        }
+//
+//    }
 
     @Override
     public CategoriesDTO getCategories() {

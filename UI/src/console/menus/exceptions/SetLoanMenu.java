@@ -1,6 +1,7 @@
 package console.menus.exceptions;
 
 import bank.Bank;
+import bank.impl.exceptions.DataNotFoundException;
 import manager.categories.CategoriesDTO;
 import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
@@ -8,6 +9,8 @@ import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
 
 import java.util.*;
+
+import static utils.impl.printLoan;
 
 public class SetLoanMenu {
     int amount;
@@ -54,7 +57,7 @@ public class SetLoanMenu {
         }
     }
 
-    private void requestInvestment() {
+    private void requestInvestment() throws DataNotFoundException {
         RequestDTO requestDTO = new RequestDTO(requesterName, amount, new CategoriesDTO(categories),
                 minInterest, minLoanDuration);
 

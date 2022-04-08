@@ -43,7 +43,6 @@ public interface Bank {
 
     LoansDTO loanAssignmentRequest(RequestDTO requestDTO);
 
-    void printCustomers() throws DataNotFoundException;
 
     CustomersDTO getCustomersDTO() throws DataNotFoundException;
 
