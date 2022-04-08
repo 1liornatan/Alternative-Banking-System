@@ -39,7 +39,7 @@ public interface Bank {
 
     int getDeriskAmount(Loan loan);
 
-    void createInvestment(InvestDTO investDetails);
+    void createInvestment(InvestDTO investDetails) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
 
     LoansDTO loanAssignmentRequest(RequestDTO requestDTO);
 

@@ -10,6 +10,10 @@ import bank.data.storage.impl.BankDataStorage;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
 import bank.loans.handler.impl.BankLoanHandler;
+import bank.loans.interest.Interest;
+import bank.loans.interest.impl.BasicInterest;
+import bank.loans.investments.Investment;
+import bank.loans.investments.impl.LoanInvestment;
 import bank.time.TimeHandler;
 import bank.time.handler.BankTimeHandler;
 import bank.transactions.Transaction;
@@ -59,7 +63,7 @@ public class BankImpl implements Bank {
             loanAccounts = new BankDataStorage<>(timeHandler);
             transactions = new BankDataStorage<>(timeHandler);
 
-            loanHandler = new BankLoanHandler(transactions, loans, customersAccounts);
+            loanHandler = new BankLoanHandler(transactions, loans, customersAccounts, timeHandler);
 
             this.timeHandler = timeHandler;
         }
@@ -114,9 +118,22 @@ public class BankImpl implements Bank {
 
 
     @Override
-    public void createInvestment(InvestDTO investDetails) {
+    public void createInvestment(InvestDTO investDetails) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
+        Loan loan = loans.getDataById(investDetails.getLoanName());
+        String investor = investDetails.getInvestorName();
+        Account investingAccount = customersAccounts.getDataById(investor);
 
+        float percent = loan.getInterestPercent();
+        int amountInvesting = investDetails.getAmount();
+        int cyclesPerPayment = loan.getCyclesPerPayment();
+        int duration = loan.getDuration();
+
+        Interest interest = new BasicInterest(percent, amountInvesting, cyclesPerPayment, duration);
+
+        Investment loanInvestment = new LoanInvestment(investor, interest);
+        loanHandler.addInvestment(loan, loanInvestment, investingAccount);
     }
+
     @Override
     public LoansDTO loanAssignmentRequest(RequestDTO requestDTO) {
         int amount = requestDTO.getAmount();

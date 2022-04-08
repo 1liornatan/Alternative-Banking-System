@@ -13,6 +13,7 @@ import bank.loans.impl.builder.LoanBuilder;
 import bank.loans.interest.Interest;
 import bank.loans.investments.Investment;
 import bank.loans.investments.impl.LoanInvestment;
+import bank.time.TimeHandler;
 import bank.time.handler.BankTimeHandler;
 import bank.transactions.Transaction;
 import javafx.util.Pair;
@@ -26,9 +27,9 @@ public class BankLoanHandler implements LoanHandler {
     private final DataStorage<Transaction> transactions;
     private DataStorage<Loan> loans;
     private DataStorage<Account> customers;
-    private BankTimeHandler timeHandler;
+    private TimeHandler timeHandler;
 
-    public BankLoanHandler(DataStorage<Transaction> transactions, DataStorage<Loan> loans, DataStorage<Account> customers, BankTimeHandler timeHandler) {
+    public BankLoanHandler(DataStorage<Transaction> transactions, DataStorage<Loan> loans, DataStorage<Account> customers, TimeHandler timeHandler) {
         this.transactions = transactions;
         this.loans = loans;
         this.customers = customers;
@@ -58,30 +59,35 @@ public class BankLoanHandler implements LoanHandler {
         transactions.addData(srcAcc.withdraw(amount, "Loan"));
         srcAcc.addInvestedLoan(loan);
 
-        checkLoanStatus(loan, srcAcc);
+        checkLoanStatus(loan);
     }
 
-    private void checkLoanStatus(Loan loan, Account srcAcc) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
+    private void checkLoanStatus(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
         int loanAmount = loan.getBaseAmount();
-        int accountBalance = srcAcc.getBalance();
+        Account loanAccount = loan.getLoanAccount();
+        int accountBalance = loanAccount.getBalance();
+
         Account requester;
 
-        if(loanAmount == accountBalance) {
+        if(loanAmount == loan.getLoanAccount().getBalance()) {
             requester = customers.getDataById(loan.getOwnerId());
-            srcAcc.withdraw(loanAmount, "Loan started");
-            requester.deposit(loanAmount, "Loan started");
+            transactions.addData(loanAccount.withdraw(loanAmount, "Loan started"));
+            transactions.addData(requester.deposit(loanAmount, "Loan started"));
+            loan.setPayments();
             loan.setStatus(LoanStatus.ACTIVE);
+            loan.setStartedYaz(timeHandler.getCurrentTime());
+        }
+        else if(loan.getStatus() == LoanStatus.NEW) {
+            loan.setStatus(LoanStatus.PENDING);
         }
     }
 
-    public Investment createInvestment(String investorId, Interest interest, int duration) {
-        return new LoanInvestment(investorId, interest, duration);
-    }
 
     public void oneCycle() throws DataNotFoundException, NonPositiveAmountException {
         Collection<Pair<Loan, Integer>> loanCollection = loans.getAllPairs();
         Collection<Pair<Loan, Integer>> filteredLoans = loanCollection.stream()
-                .filter((loan -> (loan.getKey().getStatus() != LoanStatus.FINISHED) && (loan.getKey().getStatus() != LoanStatus.PENDING)))
+                .filter((loan -> (loan.getKey().getStatus() == LoanStatus.RISK) || (loan.getKey().getStatus() == LoanStatus.ACTIVE)))
+                .filter((loan -> ((timeHandler.getCurrentTime() % loan.getKey().getCyclesPerPayment()) == 0)))
                 .collect(Collectors.toList());
 
         for(Pair<Loan, Integer> loanPair : filteredLoans) {
@@ -109,6 +115,7 @@ public class BankLoanHandler implements LoanHandler {
 
             if(isFinished) {
                 loan.setStatus(LoanStatus.FINISHED);
+                loan.setFinishedYaz(timeHandler.getCurrentTime());
             }
 
         } catch (NonPositiveAmountException e) {
