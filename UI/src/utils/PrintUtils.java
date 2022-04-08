@@ -35,6 +35,7 @@ public class PrintUtils {
             System.out.println("All account's transactions:");
             for(TransactionDTO transaction : transactions) {
                 System.out.println("(" + transaction.getDescription() +
+                        "Transaction amount: " + transaction.getAmount() +
                         ", Yaz made at: " + transaction.getYazMade() + ")");
             }
 

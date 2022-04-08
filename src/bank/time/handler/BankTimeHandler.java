@@ -4,9 +4,11 @@ import bank.time.TimeHandler;
 
 public class BankTimeHandler implements TimeHandler {
     private int currentTime;
+    private int previousTime;
 
     public BankTimeHandler() {
         currentTime = 1;
+        previousTime = 1;
     }
 
     @Override
@@ -15,7 +17,13 @@ public class BankTimeHandler implements TimeHandler {
     }
 
     @Override
+    public int getPreviousTime() {
+        return previousTime;
+    }
+
+    @Override
     public void advanceTime() {
+        previousTime = currentTime;
         currentTime++;
     }
 }
