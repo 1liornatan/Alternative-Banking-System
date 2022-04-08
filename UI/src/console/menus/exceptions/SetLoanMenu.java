@@ -61,17 +61,20 @@ public class SetLoanMenu {
                         break;
                     case 5:
                         requestInvestment();
+                        option = 9;
                         break;
                     default:
                         throw new NoOptionException();
                 }
-            } catch (NoMoneyException | DataNotFoundException | NoOptionException | NonPositiveAmountException e) {
+            } catch (NoMoneyException | DataNotFoundException | NoOptionException | NonPositiveAmountException | NoAmountSetException e) {
                 System.out.println(e.getMessage());
             }
-        } while (option != 5 && option != 9);
+        } while (option != 9);
     }
 
-    private void requestInvestment() throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
+    private void requestInvestment() throws DataNotFoundException, NoMoneyException, NonPositiveAmountException, NoAmountSetException {
+        if(amount == 0)
+            throw new NoAmountSetException();
 
         RequestDTO requestDTO = new RequestDTO(requesterName, amount, new CategoriesDTO(categories),
                 minInterest, minLoanDuration);
