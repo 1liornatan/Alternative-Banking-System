@@ -1,6 +1,8 @@
 package bank.loans.interest;
 
-public interface Interest {
+import java.io.Serializable;
+
+public interface Interest extends Serializable {
     int getFinalAmount();
     int getInterest(); // returns calculated amount of interest to all payments
 

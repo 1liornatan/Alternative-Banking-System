@@ -1,7 +1,6 @@
 package console.menus.exceptions;
 
 import bank.Bank;
-import bank.accounts.impl.exceptions.NegativeAmountException;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.exceptions.DataNotFoundException;
@@ -181,7 +180,7 @@ public class SetLoanMenu {
 
     private void setCategory() {
         System.out.println("Choose a category to add:");
-        CategoriesDTO categoriesDTO = bankInstance.getCategories();
+        CategoriesDTO categoriesDTO = bankInstance.getCategoriesDTO();
         List<String> categoryList = categoriesDTO.getCategories();
 
         int num = 1;
@@ -196,7 +195,7 @@ public class SetLoanMenu {
     }
 
     private void setAllCategories() {
-        categories.addAll(bankInstance.getCategories().getCategories());
+        categories.addAll(bankInstance.getCategoriesDTO().getCategories());
     }
 
     private void setDuration() {

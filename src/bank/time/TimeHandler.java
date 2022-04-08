@@ -1,6 +1,8 @@
 package bank.time;
 
-public interface TimeHandler {
+import java.io.Serializable;
+
+public interface TimeHandler extends Serializable {
     int getCurrentTime();
 
     int getPreviousTime();
