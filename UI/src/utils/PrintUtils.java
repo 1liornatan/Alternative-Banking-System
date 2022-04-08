@@ -7,6 +7,7 @@ import manager.customers.CustomersDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
 import manager.transactions.TransactionDTO;
+import manager.transactions.TransactionsDTO;
 
 
 import java.util.ArrayList;
@@ -26,30 +27,44 @@ public class PrintUtils {
             System.out.println(customer.getName());
     }
 
+    public static void printTransactions(TransactionsDTO transactionsDTO) {
+        List<TransactionDTO> transactions = transactionsDTO.getTransactions();
+        if (transactions.isEmpty()) {
+            System.out.println("No Transactions.");
+            return;
+        }
+        System.out.println("All account's transactions:");
+        for (TransactionDTO transaction : transactions) {
+            System.out.println("(" + " Transaction amount: " + transaction.getAmount() +
+                    ", Yaz made at: " + transaction.getYazMade() + ")");
+        }
+    }
+
+    public static void printLoansList(List<LoanDTO> loanList, String message) throws DataNotFoundException {
+        if(loanList.isEmpty())
+        {
+            System.out.println("No " + message);
+            return;
+        }
+
+        System.out.println("All account`s " + message);
+        for(LoanDTO loan : loanList) {
+            printLoan(loan);
+        }
+    }
+
     public static void printCustomersDetails(CustomersDTO customersDTO) throws DataNotFoundException {
         List<CustomerDTO> customers = customersDTO.getCustomers();
         for(CustomerDTO customer : customers) {
             printCustomerName(customer);
             System.out.println("Balance: " + customer.getAccount().getBalance());
-            List<TransactionDTO> transactions = customer.getAccount().getTransactionsDTO().getTransactions();
-            System.out.println("All account's transactions:");
-            for(TransactionDTO transaction : transactions) {
-                System.out.println("(" + transaction.getDescription() +
-                        "Transaction amount: " + transaction.getAmount() +
-                        ", Yaz made at: " + transaction.getYazMade() + ")");
-            }
 
-            System.out.println("All account's requested loans:");
-            for(LoanDTO loan : customer.getRequestedLoans().getLoansList()) {
-                printLoan(loan);
-            }
-
-            System.out.println("All account's invested loans:");
-            for(LoanDTO loan : customer.getInvestedLoans().getLoansList()) {
-                printLoan(loan);
-            }
+            printTransactions(customer.getAccount().getTransactionsDTO());
+            printLoansList(customer.getRequestedLoans().getLoansList(),"requested loans:");
+            printLoansList(customer.getInvestedLoans().getLoansList(), "invested loans:");
         }
     }
+
 
     public static void printLoan(LoanDTO loan) throws DataNotFoundException {
         String status = loan.getDetails().getStatus();
