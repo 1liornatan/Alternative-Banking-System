@@ -30,15 +30,16 @@ public class impl {
         }
     }
 
-    static public void printCustomerName(CustomerDTO customer) {
+    public static void printCustomerName(CustomerDTO customer) {
             System.out.println(customer.getName());
     }
 
-    static void printCustomers(CustomersDTO customersDTO) throws DataNotFoundException {
+    public static void printCustomersDetails(CustomersDTO customersDTO) throws DataNotFoundException {
         List<CustomerDTO> customers = customersDTO.getCustomers();
         for(CustomerDTO customer : customers) {
             printCustomerName(customer);
             List<TransactionDTO> transactions = customer.getAccount().getTransactionsDTO().getTransactions();
+
             System.out.println("All account's transactions:");
             for(TransactionDTO transaction : transactions) {
                 System.out.println("(" + transaction.getDescription() +
@@ -46,18 +47,18 @@ public class impl {
             }
 
             System.out.println("All account's requested loans:");
-            for(Loan loan : currAccount.getLoansRequested()) {
+            for(LoanDTO loan : customer.getRequestedLoans().getLoansList()) {
                 printLoan(loan);
             }
 
             System.out.println("All account's invested loans:");
-            for(Loan loan : currAccount.getLoansInvested()) {
+            for(LoanDTO loan : customer.getInvestedLoans().getLoansList()) {
                 printLoan(loan);
             }
         }
     }
 
-    static void printLoan(LoanDTO loan) throws DataNotFoundException {
+    public static void printLoan(LoanDTO loan) throws DataNotFoundException {
         String status = loan.getDetails().getStatus();
 
         System.out.println("Loan name: " + loan.getDetails().getName() + ", Category: " + loan.getDetails().getCategory() + ", Base amount: " +
