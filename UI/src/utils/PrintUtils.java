@@ -5,6 +5,7 @@ import bank.loans.Loan;
 import manager.customers.CustomerDTO;
 import manager.customers.CustomersDTO;
 import manager.loans.LoanDTO;
+import manager.loans.LoansDTO;
 import manager.transactions.TransactionDTO;
 
 
@@ -82,6 +83,12 @@ public class PrintUtils {
                 break;
         }
 
+    }
+
+    public static void printAllLoans(LoansDTO loans) throws DataNotFoundException {
+        for(LoanDTO loan : loans.getLoansList()) {
+            printLoan((loan));
+        }
     }
 
 }

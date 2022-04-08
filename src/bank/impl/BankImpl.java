@@ -70,11 +70,6 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public void printLoans() {
-        loanHandler.printAllLoans();
-    }
-
-    @Override
     public void advanceOneYaz() throws DataNotFoundException, NonPositiveAmountException {
         timeHandler.advanceTime();
         loanHandler.oneCycle();
@@ -265,6 +260,15 @@ public class BankImpl implements Bank {
         ActiveLoanDTO activeLoanDTO = new ActiveLoanDTO(loan.getAmountToActive(),loan.getDeriskAmount(),loan.getMissingCycles());
         YazDTO yazDTO = new YazDTO(loan.getStartedYaz(),loan.getFinishedYaz());
         return new LoanDTO(loanDetailsDTO,interestDTO,yazDTO,loanPaymentDTO,activeLoanDTO);
+    }
+
+    @Override
+    public LoansDTO getAllLoansDTO() {
+        List<LoanDTO> allLoans = new ArrayList<>();
+        for(Pair<Loan,Integer> loanPair : loans.getAllPairs()) {
+            allLoans.add(getLoanDTO(loanPair.getKey()));
+        }
+        return new LoansDTO(allLoans);
     }
 
     @Override
