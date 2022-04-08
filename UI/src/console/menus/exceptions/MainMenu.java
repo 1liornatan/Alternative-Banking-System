@@ -178,11 +178,11 @@ public class MainMenu {
 
         if(!hasValidData)
             throw new XmlNotLoadedException();
-        YazSystemDTO yazSystemDTO= bankInstance.getYazSystemDTO();
-        int currYaz = yazSystemDTO.getCurrentYaz();
-        System.out.println("Advancing from Yaz " + currYaz + " to Yaz " + (currYaz + 1) + ".");
         try {
             bankInstance.advanceOneYaz();
+            YazSystemDTO yazSystemDTO = bankInstance.getYazSystemDTO();
+            int currYaz = yazSystemDTO.getCurrentYaz();
+            System.out.println("Advancing from Yaz " + yazSystemDTO.getPreviousYaz() + " to Yaz " + currYaz + ".");
         } catch (DataNotFoundException | NonPositiveAmountException e) {
             System.out.println(e.getMessage());
         }
