@@ -1,8 +1,9 @@
 package bank.loans.impl.builder;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class LoanBuilder {
+public class LoanBuilder implements Serializable {
     private final String ownerId;
     private final String category, idName;
 

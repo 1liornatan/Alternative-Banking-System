@@ -48,6 +48,30 @@ public class BankImpl implements Bank {
     private BankLoanHandler loanHandler;
     private TimeHandler timeHandler;
 
+    @Override
+    public DataStorage<Account> getCustomersAccounts() {
+        return customersAccounts;
+    }
+
+    @Override
+    public DataStorage<Account> getLoanAccounts() {
+        return loanAccounts;
+    }
+
+    @Override
+    public DataStorage<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    @Override
+    public DataStorage<Loan> getLoans() {
+        return loans;
+    }
+
+    @Override
+    public TimeHandler getTimeHandler() {
+        return timeHandler;
+    }
 
 
     @Override
@@ -157,7 +181,12 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public CategoriesDTO getCategories() {
+    public Set<String> getCategories() {
+        return categories;
+    }
+
+    @Override
+    public CategoriesDTO getCategoriesDTO() {
         CategoriesDTO categoriesDTO = new CategoriesDTO(categories);
 
         return categoriesDTO;

@@ -5,6 +5,8 @@ import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
+import files.saver.Saver;
+import files.saver.SystemSaver;
 import files.xmls.exceptions.*;
 import manager.customers.CustomerDTO;
 import manager.time.YazSystemDTO;
@@ -32,11 +34,24 @@ public class MainMenu {
     public MainMenu() {
         bankInstance = new BankImpl();
         hasValidData = false;
+
     }
     public static void main(String[] args) {
         MainMenu a = new MainMenu();
 
         a.printMenu();
+        a.save();
+
+    }
+    public void save() {
+        Saver saver = new SystemSaver(bankInstance);
+        saver.saveToFile("test.bin");
+
+        System.out.println("saved");
+
+        saver.loadFile("test.bin");
+
+        System.out.println("loaded");
     }
     public void readXml() {
         System.out.println("Enter an XML file's full path:");

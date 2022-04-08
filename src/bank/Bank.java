@@ -3,11 +3,12 @@ package bank;
 import bank.accounts.Account;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
+import bank.data.storage.DataStorage;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
+import bank.time.TimeHandler;
 import bank.transactions.Transaction;
 import files.xmls.exceptions.*;
-import javafx.util.Pair;
 import manager.customers.CustomerDTO;
 import manager.customers.CustomersDTO;
 import manager.investments.InvestDTO;
@@ -20,9 +21,19 @@ import manager.transactions.TransactionDTO;
 import manager.transactions.TransactionsDTO;
 
 import java.io.FileNotFoundException;
-import java.util.Collection;
+import java.util.Set;
 
 public interface Bank {
+    DataStorage<Account> getCustomersAccounts();
+
+    DataStorage<Account> getLoanAccounts();
+
+    DataStorage<Transaction> getTransactions();
+
+    DataStorage<Loan> getLoans();
+
+    TimeHandler getTimeHandler();
+
     void loadData(String filename) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException, XmlNotFoundException, DataNotFoundException;
 
     void advanceOneYaz() throws DataNotFoundException, NonPositiveAmountException;
@@ -48,7 +59,10 @@ public interface Bank {
     CustomerDTO getCustomerDTO(String id) throws DataNotFoundException;
 
     LoanDTO getLoanDTO(Loan loan);
-    CategoriesDTO getCategories();
+
+    Set<String> getCategories();
+
+    CategoriesDTO getCategoriesDTO();
 
     LoansDTO getAllLoansDTO();
 

@@ -1,5 +1,7 @@
 package bank.data;
 
-public interface Singular {
+import java.io.Serializable;
+
+public interface Singular extends Serializable {
     String getId();
 }

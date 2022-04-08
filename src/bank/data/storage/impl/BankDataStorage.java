@@ -6,13 +6,14 @@ import bank.impl.exceptions.DataNotFoundException;
 import bank.time.TimeHandler;
 import javafx.util.Pair;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class BankDataStorage<E extends Singular> implements DataStorage<E> {
+public class BankDataStorage<E extends Singular> implements DataStorage<E>, Serializable {
     private final Map<String, F> container;
     private final TimeHandler timeHandler;
 
-    public class F {
+    public class F implements Serializable {
         E data;
         int time;
 
