@@ -24,8 +24,6 @@ import java.util.Collection;
 public interface Bank {
     void loadData(String filename) throws FileNotFoundException, NotXmlException, XmlNoLoanOwnerException, XmlNoCategoryException, XmlPaymentsException, XmlAccountExistsException, XmlNotFoundException, DataNotFoundException;
 
-    void printLoans();
-
     void advanceOneYaz() throws DataNotFoundException, NonPositiveAmountException;
 
     int getCurrentYaz();
@@ -50,6 +48,8 @@ public interface Bank {
 
     LoanDTO getLoanDTO(Loan loan);
     CategoriesDTO getCategories();
+
+    LoansDTO getAllLoansDTO();
 
     TransactionDTO getTransactionDTO(Transaction transaction) throws DataNotFoundException;
 
