@@ -43,11 +43,11 @@ public class PrintUtils {
     public static void printLoansList(List<LoanDTO> loanList, String message) throws DataNotFoundException {
         if(loanList.isEmpty())
         {
-            System.out.println("No " + message);
+            System.out.println("No " + message + ".");
             return;
         }
 
-        System.out.println("All account`s " + message);
+        System.out.println("All account`s " + message + ":");
         for(LoanDTO loan : loanList) {
             printLoan(loan);
         }
@@ -60,8 +60,9 @@ public class PrintUtils {
             System.out.println("Balance: " + customer.getAccount().getBalance());
 
             printTransactions(customer.getAccount().getTransactionsDTO());
-            printLoansList(customer.getRequestedLoans().getLoansList(),"requested loans:");
-            printLoansList(customer.getInvestedLoans().getLoansList(), "invested loans:");
+            printLoansList(customer.getRequestedLoans().getLoansList(),"requested loans");
+            printLoansList(customer.getInvestedLoans().getLoansList(), "invested loans");
+            System.out.println();
         }
     }
 
