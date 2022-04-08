@@ -49,11 +49,11 @@ public class MainMenu {
         }
     }
 
-    public void printLoans() throws XmlNotLoadedException {
+    public void printLoans() throws XmlNotLoadedException, DataNotFoundException {
         if(!hasValidData)
             throw new XmlNotLoadedException();
 
-        bankInstance.printLoans();//TODO: FIX
+        PrintUtils.printAllLoans(bankInstance.getAllLoansDTO());
     }
 
     public void printCustomers() throws XmlNotLoadedException {

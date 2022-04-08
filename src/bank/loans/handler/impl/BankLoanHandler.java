@@ -176,9 +176,4 @@ public class BankLoanHandler implements LoanHandler {
         }
     }
 
-    @Override
-    public void printAllLoans() {
-        System.out.println(loans);
-    }
-
 }
