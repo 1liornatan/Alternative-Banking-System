@@ -6,8 +6,8 @@ import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import files.xmls.exceptions.*;
-import manager.customers.CustomersDTO;
-import utils.impl;
+import manager.customers.CustomerDTO;
+import utils.PrintUtils;
 
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -72,7 +72,7 @@ public class MainMenu {
         if(!hasValidData)
             throw new XmlNotLoadedException();
 
-        impl.printCustomersNames(bankInstance.getCustomersDTO());
+        PrintUtils.printCustomersNames(bankInstance.getCustomersDTO());
         System.out.println("Enter a customer name:");
         Scanner scanner = new Scanner(System.in);
         String customerName = scanner.nextLine();
@@ -93,7 +93,7 @@ public class MainMenu {
         if(!hasValidData)
             throw new XmlNotLoadedException();
 
-        impl.printCustomersNames(bankInstance.getCustomersDTO());
+        PrintUtils.printCustomersNames(bankInstance.getCustomersDTO());
 
         System.out.println("Enter a customer name:");
         Scanner scanner = new Scanner(System.in);
@@ -139,7 +139,6 @@ public class MainMenu {
                         break;
                     case 6:
                         setLoan();
-
                         break;
                     case 7:
                         advanceTime();
@@ -156,17 +155,19 @@ public class MainMenu {
         }
     }
 
-    private void setLoan() {
+    private void setLoan() throws DataNotFoundException {
 
+        PrintUtils.printCustomersNames(bankInstance.getCustomersDTO());
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Choose a customer:");
         String customerName = scanner.nextLine();
 
-        System.out.println("Choose amount to invest:");
-        Integer amount = scanner.nextInt();
+        CustomerDTO customerDTO = bankInstance.getCustomerDTO(customerName);
 
-        System.out.println();
+        SetLoanMenu loanMenu = new SetLoanMenu(bankInstance, customerDTO);
+
+        loanMenu.printMenu();
 
     }
     public void advanceTime() throws XmlNotLoadedException {

@@ -63,4 +63,6 @@ public interface Loan extends Singular {
     String getOwnerId();
 
     int getDeriskAmount();
+
+    boolean isInvestible();
 }
