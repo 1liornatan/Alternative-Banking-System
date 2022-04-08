@@ -15,6 +15,7 @@ import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.categories.CategoriesDTO;
 import manager.loans.LoansDTO;
+import manager.time.YazSystemDTO;
 import manager.transactions.TransactionDTO;
 import manager.transactions.TransactionsDTO;
 
@@ -54,4 +55,6 @@ public interface Bank {
     TransactionDTO getTransactionDTO(Transaction transaction) throws DataNotFoundException;
 
     TransactionsDTO getTransactionsDTO(Account account) throws DataNotFoundException;
+
+    YazSystemDTO getYazSystemDTO();
 }

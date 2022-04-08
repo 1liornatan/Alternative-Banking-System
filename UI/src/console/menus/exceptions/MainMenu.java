@@ -7,6 +7,7 @@ import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import files.xmls.exceptions.*;
 import manager.customers.CustomerDTO;
+import manager.time.YazSystemDTO;
 import utils.PrintUtils;
 
 import java.io.FileNotFoundException;
@@ -177,8 +178,8 @@ public class MainMenu {
 
         if(!hasValidData)
             throw new XmlNotLoadedException();
-
-        int currYaz = bankInstance.getCurrentYaz();//TODO: FIX
+        YazSystemDTO yazSystemDTO= bankInstance.getYazSystemDTO();
+        int currYaz = yazSystemDTO.getCurrentYaz();
         System.out.println("Advancing from Yaz " + currYaz + " to Yaz " + (currYaz + 1) + ".");
         try {
             bankInstance.advanceOneYaz();
