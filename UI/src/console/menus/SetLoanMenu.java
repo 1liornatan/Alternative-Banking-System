@@ -1,9 +1,12 @@
-package console.menus.exceptions;
+package console.menus;
 
 import bank.Bank;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.exceptions.DataNotFoundException;
+import bank.loans.interest.exceptions.InvalidPercentException;
+import console.menus.exceptions.NoAmountSetException;
+import console.menus.exceptions.NoOptionException;
 import manager.categories.CategoriesDTO;
 import manager.customers.CustomerDTO;
 import manager.investments.InvestDTO;
@@ -67,13 +70,13 @@ public class SetLoanMenu {
                     default:
                         throw new NoOptionException();
                 }
-            } catch (NoMoneyException | DataNotFoundException | NoOptionException | NonPositiveAmountException | NoAmountSetException e) {
+            } catch (NoMoneyException | DataNotFoundException | NoOptionException | NonPositiveAmountException | NoAmountSetException | InvalidPercentException e) {
                 System.out.println(e.getMessage());
             }
         } while (option != 9);
     }
 
-    private void requestInvestment() throws DataNotFoundException, NoMoneyException, NonPositiveAmountException, NoAmountSetException {
+    private void requestInvestment() throws DataNotFoundException, NoMoneyException, NonPositiveAmountException, NoAmountSetException, InvalidPercentException {
         if(amount == 0)
             throw new NoAmountSetException();
 
@@ -151,7 +154,7 @@ public class SetLoanMenu {
         line = line.replaceAll("[^-?0-9]+", " ");
         System.out.println();
 
-        for(String numStr : Arrays.asList(line.trim().split(" "))) {
+        for(String numStr : line.trim().split(" ")) {
             int index = Integer.parseInt(numStr) - 1;
             chosenLoans.add(loanDTOList.get(index));
         }
@@ -170,7 +173,7 @@ public class SetLoanMenu {
         line = line.replaceAll("[^-?0-9]+", " ");
         System.out.println();
 
-        for(String numStr : Arrays.asList(line.trim().split(" "))) {
+        for(String numStr : line.trim().split(" ")) {
             int index = Integer.parseInt(numStr) - 1;
             chosenCategories.add(allCategories.get(index));
         }

@@ -1,7 +1,26 @@
 package files.saver;
 
-public interface Saver {
-    void saveToFile(String path);
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
-    void loadFile(String path);
+public interface Saver {
+    int getPrevYaz();
+
+    int getCurrYaz();
+
+    Object getCategories();
+
+    Object getCustomers();
+
+    Object getLoanAccounts();
+
+    Object getLoans();
+
+    Object getTransactions();
+
+    void saveToFile(String path) throws IOException;
+
+    void loadFile(String path) throws IOException, ClassNotFoundException;
+
+    boolean isValid();
 }
