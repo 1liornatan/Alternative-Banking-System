@@ -37,10 +37,7 @@ import manager.transactions.TransactionDTO;
 import manager.transactions.TransactionsDTO;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BankImpl implements Bank {
@@ -51,6 +48,16 @@ public class BankImpl implements Bank {
     private Set<String> categories;
     private BankLoanHandler loanHandler;
     private TimeHandler timeHandler;
+
+    public BankImpl() {
+        timeHandler = new BankTimeHandler();
+        customersAccounts = new BankDataStorage<>(timeHandler);
+        loanAccounts = new BankDataStorage<>(timeHandler);
+        transactions = new BankDataStorage<>(timeHandler);
+        loans = new BankDataStorage<>(timeHandler);
+        loanHandler = new BankLoanHandler(transactions, loans, customersAccounts, timeHandler);
+        categories = new HashSet<>();
+    }
 
     @Override
     public DataStorage<Account> getCustomersAccounts() {

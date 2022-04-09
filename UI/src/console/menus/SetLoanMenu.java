@@ -74,7 +74,7 @@ public class SetLoanMenu {
         } while (option != 9);
     }
 
-    private void requestInvestment() throws DataNotFoundException, NoMoneyException, NonPositiveAmountException, NoAmountSetException, InvalidPercentException {
+    private void requestInvestment() throws DataNotFoundException, NoMoneyException, NonPositiveAmountException, NoAmountSetException, InvalidPercentException, NoOptionException {
         if(amount == 0)
             throw new NoAmountSetException();
 
@@ -99,7 +99,7 @@ public class SetLoanMenu {
             List<LoanDTO> chosenLoans = getChosenLoans(loanDTOList);
             int amountLeft = amount;
             int minAmount, loansAmount;
-            int avgAmount = amountLeft / chosenLoans.size();
+            int avgAmount = (int) Math.ceil(amountLeft * 1.0 / chosenLoans.size());
             boolean averageSplit = false;
 
             chosenLoans.sort(Comparator.comparingInt(p -> p.getActiveLoanDTO().getAmountToActive()));
@@ -133,15 +133,19 @@ public class SetLoanMenu {
             }
 
             for(LoanDTO loan : chosenLoans) {
-                InvestDTO investDTO = new InvestDTO(requesterName, loan.getDetails().getName(), avgAmount);
-                bankInstance.createInvestment(investDTO);
-                amountLeft -= avgAmount;
+                if(avgAmount <= amountLeft) {
+                    InvestDTO investDTO = new InvestDTO(requesterName, loan.getDetails().getName(), avgAmount);
+                    bankInstance.createInvestment(investDTO);
+                    amountLeft -= avgAmount;
+                }
+                else
+                    break;
             }
-
+            System.out.println("Investment/s successfully made.");
         }
     }
 
-    private List<LoanDTO> getChosenLoans(List<LoanDTO> loanDTOList) {
+    private List<LoanDTO> getChosenLoans(List<LoanDTO> loanDTOList) throws NoOptionException {
 
         List<LoanDTO> chosenLoans = new ArrayList<>();
         System.out.println("Choose the loans you want to invest in:");
@@ -152,15 +156,21 @@ public class SetLoanMenu {
         line = line.replaceAll("[^-?0-9]+", " ");
         System.out.println();
 
+        int size = loanDTOList.size();
+
         for(String numStr : line.trim().split(" ")) {
             int index = Integer.parseInt(numStr) - 1;
+
+            if(index >= size || index < 0)
+                throw new NoOptionException();
+
             chosenLoans.add(loanDTOList.get(index));
         }
 
         return chosenLoans;
     }
 
-    private List<String> getChosenCategories(List<String> allCategories) {
+    private List<String> getChosenCategories(List<String> allCategories) throws NoOptionException {
 
         List<String> chosenCategories = new ArrayList<>();
         System.out.println("Choose the categories:");
@@ -171,8 +181,14 @@ public class SetLoanMenu {
         line = line.replaceAll("[^-?0-9]+", " ");
         System.out.println();
 
+        int size = allCategories.size();
+
         for(String numStr : line.trim().split(" ")) {
             int index = Integer.parseInt(numStr) - 1;
+
+            if(index >= size || index < 0)
+                throw new NoOptionException();
+
             chosenCategories.add(allCategories.get(index));
         }
 
@@ -192,7 +208,11 @@ public class SetLoanMenu {
 
         categories.clear();
 
-        categories.addAll(getChosenCategories(categoryList));
+        try {
+            categories.addAll(getChosenCategories(categoryList));
+        } catch (NoOptionException e) {
+            System.out.println("Invalid choice of categories. (Index was wrong)");
+        }
     }
 
     private void setAllCategories() {
@@ -219,7 +239,7 @@ public class SetLoanMenu {
         if(investAmount > balance)
             throw new NoMoneyException();
 
-        if(investAmount <= 0)
+        if(investAmount < 0)
             throw new NonPositiveAmountException();
 
         amount = investAmount;

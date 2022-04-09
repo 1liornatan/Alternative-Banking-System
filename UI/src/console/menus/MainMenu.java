@@ -5,10 +5,9 @@ import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
+import bank.impl.holder.BooleanHolder;
 import console.menus.exceptions.NoOptionException;
 import console.menus.exceptions.XmlNotLoadedException;
-import files.saver.Saver;
-import files.saver.SystemSaver;
 import files.xmls.exceptions.*;
 import manager.customers.CustomerDTO;
 import manager.time.YazSystemDTO;
@@ -20,7 +19,8 @@ import java.util.Scanner;
 
 public class MainMenu {
     private final Bank bankInstance;
-    private boolean hasValidData;
+    private final BooleanHolder hasValidData;
+
     private static final String MENU_MESSAGE = "Bank Actions:\n" +
             "1.Read system data from XML.\n" +
             "2.Show loans details.\n" +
@@ -34,14 +34,12 @@ public class MainMenu {
 
     public MainMenu() {
         bankInstance = new BankImpl();
-        hasValidData = false;
-
+        hasValidData = new BooleanHolder(false);
     }
     public static void main(String[] args) {
         MainMenu a = new MainMenu();
 
         a.printMenu();
-
     }
 
     public void readXml() {
@@ -50,7 +48,7 @@ public class MainMenu {
         String fileName = scanner.nextLine();
         try {
             bankInstance.loadData(fileName);
-            hasValidData = true;
+            hasValidData.setaBoolean(true);
             System.out.println("Loaded XML Successfully.");
         } catch (NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException | FileNotFoundException | XmlNotFoundException | DataNotFoundException e) {
             System.out.println(e.getMessage());
@@ -58,14 +56,14 @@ public class MainMenu {
     }
 
     public void printLoans() throws XmlNotLoadedException, DataNotFoundException {
-        if(!hasValidData)
+        if(!hasValidData.value())
             throw new XmlNotLoadedException();
 
         PrintUtils.printAllLoans(bankInstance.getAllLoansDTO());
     }
 
     public void printCustomers() throws XmlNotLoadedException {
-        if(!hasValidData)
+        if(!hasValidData.value())
             throw new XmlNotLoadedException();
 
         try {
@@ -77,7 +75,7 @@ public class MainMenu {
 
     public void withdraw () throws XmlNotLoadedException, DataNotFoundException {
 
-        if(!hasValidData)
+        if(!hasValidData.value())
             throw new XmlNotLoadedException();
 
         PrintUtils.printCustomersNames(bankInstance.getCustomersDTO());
@@ -98,7 +96,7 @@ public class MainMenu {
 
     public void deposit () throws XmlNotLoadedException, DataNotFoundException {
 
-        if(!hasValidData)
+        if(!hasValidData.value())
             throw new XmlNotLoadedException();
 
         PrintUtils.printCustomersNames(bankInstance.getCustomersDTO());
@@ -169,10 +167,8 @@ public class MainMenu {
     }
 
     private void bonusMenu() throws XmlNotLoadedException {
-        if(!hasValidData)
-            throw new XmlNotLoadedException();
 
-        BonusMenu menu = new BonusMenu(bankInstance);
+        BonusMenu menu = new BonusMenu(bankInstance, hasValidData);
 
         menu.printMenu();
     }
@@ -194,7 +190,7 @@ public class MainMenu {
     }
     public void advanceTime() throws XmlNotLoadedException {
 
-        if(!hasValidData)
+        if(!hasValidData.value())
             throw new XmlNotLoadedException();
         try {
             bankInstance.advanceOneYaz();

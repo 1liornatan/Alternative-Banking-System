@@ -1,7 +1,9 @@
 package console.menus;
 
 import bank.Bank;
+import bank.impl.holder.BooleanHolder;
 import console.menus.exceptions.NoOptionException;
+import console.menus.exceptions.XmlNotLoadedException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,12 +13,14 @@ import java.util.Scanner;
 public class BonusMenu {
 
     private final Bank bank;
+    private final BooleanHolder isValid;
 
-    public BonusMenu(Bank bank) {
+    public BonusMenu(Bank bank, BooleanHolder isValid) {
         this.bank = bank;
+        this.isValid = isValid;
     }
 
-    public void printMenu() {
+    public void printMenu() throws XmlNotLoadedException {
         int option = 0;
         Scanner scanner = new Scanner(System.in);
         do {
@@ -46,7 +50,10 @@ public class BonusMenu {
         }
         while(option != 9);
     }
-    private void saveData() {
+    private void saveData() throws XmlNotLoadedException {
+        if(!isValid.value())
+            throw new XmlNotLoadedException();
+
         System.out.println("Enter a file name or path");
         Scanner scanner = new Scanner(System.in);
 
@@ -70,6 +77,7 @@ public class BonusMenu {
             String file = scanner.nextLine();
             bank.loadFromFile(file);
 
+            isValid.setaBoolean(true);
             System.out.println("System state was loaded successfully.");
         } catch (InputMismatchException e) {
             System.out.println("Please enter a valid file name.");
