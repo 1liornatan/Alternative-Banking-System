@@ -6,6 +6,7 @@ import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.storage.DataStorage;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
+import bank.loans.interest.exceptions.InvalidPercentException;
 import bank.time.TimeHandler;
 import bank.transactions.Transaction;
 import files.xmls.exceptions.*;
@@ -21,6 +22,7 @@ import manager.transactions.TransactionDTO;
 import manager.transactions.TransactionsDTO;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Set;
 
 public interface Bank {
@@ -51,7 +53,7 @@ public interface Bank {
 
     void createInvestment(InvestDTO investDetails) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
 
-    LoansDTO loanAssignmentRequest(RequestDTO requestDTO);
+    LoansDTO loanAssignmentRequest(RequestDTO requestDTO) throws InvalidPercentException;
 
 
     CustomersDTO getCustomersDTO() throws DataNotFoundException;
@@ -71,4 +73,8 @@ public interface Bank {
     TransactionsDTO getTransactionsDTO(Account account) throws DataNotFoundException;
 
     YazSystemDTO getYazSystemDTO();
+
+    void saveToFile(String filePath) throws IOException;
+
+    void loadFromFile(String filePath) throws IOException, ClassNotFoundException;
 }

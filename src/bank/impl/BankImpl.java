@@ -11,12 +11,15 @@ import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
 import bank.loans.handler.impl.BankLoanHandler;
 import bank.loans.interest.Interest;
+import bank.loans.interest.exceptions.InvalidPercentException;
 import bank.loans.interest.impl.BasicInterest;
 import bank.loans.investments.Investment;
 import bank.loans.investments.impl.LoanInvestment;
 import bank.time.TimeHandler;
 import bank.time.handler.BankTimeHandler;
 import bank.transactions.Transaction;
+import files.saver.Saver;
+import files.saver.SystemSaver;
 import files.xmls.XmlReader;
 import files.xmls.exceptions.*;
 import javafx.util.Pair;
@@ -33,6 +36,7 @@ import manager.time.YazSystemDTO;
 import manager.transactions.TransactionDTO;
 import manager.transactions.TransactionsDTO;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -155,12 +159,15 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public LoansDTO loanAssignmentRequest(RequestDTO requestDTO) {
+    public LoansDTO loanAssignmentRequest(RequestDTO requestDTO) throws InvalidPercentException {
         int amount = requestDTO.getAmount();
         String requesterName = requestDTO.getRequesterName();
         float minInterest = requestDTO.getMinInterest();
         List<String> categories = requestDTO.getCategoriesDTO().getCategories();
         int minDuration = requestDTO.getMinLoanDuration();
+
+        if(minInterest < 0 || minInterest > 100)
+            throw new InvalidPercentException();
 
         List<Pair<Loan, Integer>> relevantLoans = loans.getAllPairs().stream()
                 .filter(p -> !p.getKey().getOwnerId().equals(requesterName))
@@ -187,9 +194,8 @@ public class BankImpl implements Bank {
 
     @Override
     public CategoriesDTO getCategoriesDTO() {
-        CategoriesDTO categoriesDTO = new CategoriesDTO(categories);
 
-        return categoriesDTO;
+        return new CategoriesDTO(categories);
     }
 
     @Override
@@ -251,7 +257,7 @@ public class BankImpl implements Bank {
 
     @Override
     public TransactionsDTO getTransactionsDTO(Account account) throws DataNotFoundException {
-        List<TransactionDTO> transactionsList = new ArrayList<TransactionDTO>();
+        List<TransactionDTO> transactionsList = new ArrayList<>();
         List<Transaction> accountTransactions = account.getTransactions();
 
         for(Transaction transaction : accountTransactions) {
@@ -263,5 +269,31 @@ public class BankImpl implements Bank {
     @Override
     public YazSystemDTO getYazSystemDTO() {
         return new YazSystemDTO(timeHandler.getCurrentTime(),timeHandler.getPreviousTime());
+    }
+
+    @Override
+    public void saveToFile(String filePath) throws IOException {
+        Saver saver = new SystemSaver(this);
+
+        saver.saveToFile(filePath);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void loadFromFile(String filePath) throws IOException, ClassNotFoundException {
+        Saver saver = new SystemSaver(this);
+
+        saver.loadFile(filePath);
+
+        if(saver.isValid()) {
+            timeHandler.setPreviousTime(saver.getPrevYaz());
+            timeHandler.setCurrentTime(saver.getCurrYaz());
+
+            categories = (Set<String>) saver.getCategories();
+            customersAccounts = (DataStorage<Account>) saver.getCustomers();
+            loanAccounts = (DataStorage<Account>) saver.getLoanAccounts();
+            loans = (DataStorage<Loan>)saver.getLoans();
+            transactions = (DataStorage<Transaction>) saver.getTransactions();
+        }
     }
 }

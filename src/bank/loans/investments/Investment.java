@@ -1,6 +1,8 @@
 package bank.loans.investments;
 
-public interface Investment {
+import java.io.Serializable;
+
+public interface Investment extends Serializable {
     String getInvestorId();
 
     int getPayment(int index);

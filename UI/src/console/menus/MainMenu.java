@@ -1,10 +1,12 @@
-package console.menus.exceptions;
+package console.menus;
 
 import bank.Bank;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
+import console.menus.exceptions.NoOptionException;
+import console.menus.exceptions.XmlNotLoadedException;
 import files.saver.Saver;
 import files.saver.SystemSaver;
 import files.xmls.exceptions.*;
@@ -15,8 +17,6 @@ import utils.PrintUtils;
 import java.io.FileNotFoundException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-
-import static utils.PrintUtils.printCustomersDetails;
 
 public class MainMenu {
     private final Bank bankInstance;
@@ -29,7 +29,8 @@ public class MainMenu {
             "5.Withdraw money from an account.\n" +
             "6.Loan integration.\n" +
             "7.Advance timeline.\n" +
-            "8.Exit System.";
+            "8.Bonus Features.\n\n" +
+            "9.Exit System.";
 
     public MainMenu() {
         bankInstance = new BankImpl();
@@ -40,19 +41,9 @@ public class MainMenu {
         MainMenu a = new MainMenu();
 
         a.printMenu();
-        a.save();
 
     }
-    public void save() {
-        Saver saver = new SystemSaver(bankInstance);
-        saver.saveToFile("test.bin");
 
-        System.out.println("saved");
-
-        saver.loadFile("test.bin");
-
-        System.out.println("loaded");
-    }
     public void readXml() {
         System.out.println("Enter an XML file's full path:");
         Scanner scanner = new Scanner(System.in);
@@ -161,6 +152,9 @@ public class MainMenu {
                         advanceTime();
                         break;
                     case 8:
+                        bonusMenu();
+                        break;
+                    case 9:
                         exit = true;
                         break;
                     default:
@@ -172,6 +166,15 @@ public class MainMenu {
                 System.out.println("Line entered is not matching what expected.");
             }
         }
+    }
+
+    private void bonusMenu() throws XmlNotLoadedException {
+        if(!hasValidData)
+            throw new XmlNotLoadedException();
+
+        BonusMenu menu = new BonusMenu(bankInstance);
+
+        menu.printMenu();
     }
 
     private void setLoan() throws DataNotFoundException {

@@ -12,6 +12,16 @@ public class BankTimeHandler implements TimeHandler {
     }
 
     @Override
+    public void setCurrentTime(int currentTime) {
+        this.currentTime = currentTime;
+    }
+
+    @Override
+    public void setPreviousTime(int previousTime) {
+        this.previousTime = previousTime;
+    }
+
+    @Override
     public int getCurrentTime() {
         return currentTime;
     }
