@@ -9,18 +9,36 @@ import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
-import bank.loans.LoanStatus;
 import bank.loans.handler.impl.BankLoanHandler;
+import bank.loans.interest.Interest;
+import bank.loans.interest.exceptions.InvalidPercentException;
+import bank.loans.interest.impl.BasicInterest;
+import bank.loans.investments.Investment;
+import bank.loans.investments.impl.LoanInvestment;
 import bank.time.TimeHandler;
 import bank.time.handler.BankTimeHandler;
 import bank.transactions.Transaction;
+import files.saver.Saver;
+import files.saver.SystemSaver;
 import files.xmls.XmlReader;
 import files.xmls.exceptions.*;
 import javafx.util.Pair;
+import manager.accounts.AccountDTO;
+import manager.customers.CustomerDTO;
+import manager.customers.CustomersDTO;
+import manager.investments.InvestDTO;
+import manager.investments.RequestDTO;
+import manager.loans.LoanDTO;
+import manager.loans.LoansDTO;
+import manager.loans.details.*;
 import manager.categories.CategoriesDTO;
+import manager.time.YazSystemDTO;
+import manager.transactions.TransactionDTO;
+import manager.transactions.TransactionsDTO;
 
-import java.util.Collection;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class BankImpl implements Bank {
     private DataStorage<Account> customersAccounts;
@@ -31,6 +49,40 @@ public class BankImpl implements Bank {
     private BankLoanHandler loanHandler;
     private TimeHandler timeHandler;
 
+    public BankImpl() {
+        timeHandler = new BankTimeHandler();
+        customersAccounts = new BankDataStorage<>(timeHandler);
+        loanAccounts = new BankDataStorage<>(timeHandler);
+        transactions = new BankDataStorage<>(timeHandler);
+        loans = new BankDataStorage<>(timeHandler);
+        loanHandler = new BankLoanHandler(transactions, loans, customersAccounts, timeHandler);
+        categories = new HashSet<>();
+    }
+
+    @Override
+    public DataStorage<Account> getCustomersAccounts() {
+        return customersAccounts;
+    }
+
+    @Override
+    public DataStorage<Account> getLoanAccounts() {
+        return loanAccounts;
+    }
+
+    @Override
+    public DataStorage<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    @Override
+    public DataStorage<Loan> getLoans() {
+        return loans;
+    }
+
+    @Override
+    public TimeHandler getTimeHandler() {
+        return timeHandler;
+    }
 
 
     @Override
@@ -47,15 +99,10 @@ public class BankImpl implements Bank {
             loanAccounts = new BankDataStorage<>(timeHandler);
             transactions = new BankDataStorage<>(timeHandler);
 
-            loanHandler = new BankLoanHandler(transactions, loans, customersAccounts);
+            loanHandler = new BankLoanHandler(transactions, loans, customersAccounts, timeHandler);
 
             this.timeHandler = timeHandler;
         }
-    }
-
-    @Override
-    public void printLoans() {
-        loanHandler.printAllLoans();
     }
 
     @Override
@@ -102,78 +149,158 @@ public class BankImpl implements Bank {
 
 
     @Override
-    public void printCustomers() throws DataNotFoundException {
-        Collection<Pair<Account, Integer>> allCustomers = customersAccounts.getAllPairs();
+    public void createInvestment(InvestDTO investDetails) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
+        Loan loan = loans.getDataById(investDetails.getLoanName());
+        String investor = investDetails.getInvestorName();
+        Account investingAccount = customersAccounts.getDataById(investor);
 
-        for(Pair<Account, Integer> pairOfAccount : allCustomers) {
-            Account currAccount = pairOfAccount.getKey();
-            System.out.println(currAccount.toString());
-            System.out.println("All account's transactions:");
-            for(Transaction transaction : currAccount.getTransactions()) {
-                Pair<Transaction, Integer> currTransaction = transactions.getDataPair(transaction.getId());
-                System.out.println("(" + currTransaction.getKey().toString() +
-                        ", Yaz made at: " + currTransaction.getValue() + ")");
-            }
+        float percent = loan.getInterestPercent();
+        int amountInvesting = investDetails.getAmount();
+        int cyclesPerPayment = loan.getCyclesPerPayment();
+        int duration = loan.getDuration();
 
-            System.out.println("All account's requested loans:");
-            for(Loan loan : currAccount.getLoansRequested()) {
-                printLoan(loan);
-            }
+        Interest interest = new BasicInterest(percent, amountInvesting, cyclesPerPayment, duration);
 
-            System.out.println("All account's invested loans:");
-            for(Loan loan : currAccount.getLoansInvested()) {
-                printLoan(loan);
-            }
-        }
+        Investment loanInvestment = new LoanInvestment(investor, interest);
+        loanHandler.addInvestment(loan, loanInvestment, investingAccount);
     }
 
-    private void printLoan(Loan loan) throws DataNotFoundException {
-        LoanStatus loanStatus = loan.getStatus();
+    @Override
+    public LoansDTO loanAssignmentRequest(RequestDTO requestDTO) throws InvalidPercentException {
+        int amount = requestDTO.getAmount();
+        String requesterName = requestDTO.getRequesterName();
+        float minInterest = requestDTO.getMinInterest();
+        List<String> categories = requestDTO.getCategoriesDTO().getCategories();
+        int minDuration = requestDTO.getMinLoanDuration();
 
-        System.out.println("Loan name: " + loan.getId() + ", Category: " + loan.getCategory() + ", Base amount: " +
-                loan.getBaseAmount() + ", Total amount: " + loan.getFinalAmount() + ", Pay Every: " +
-                loan.getCyclesPerPayment() + " Yaz, Interest percent: " +
-                loan.getInterestPercent() + "%, Status: " + loanStatus.toString());
+        if(minInterest < 0 || minInterest > 100)
+            throw new InvalidPercentException();
 
-        switch(loanStatus) {
-            case PENDING:
-                System.out.println("[Money left for becoming Active: " +
-                        (loan.getAmountToActive()) + "]");
-                break;
+        List<Pair<Loan, Integer>> relevantLoans = loans.getAllPairs().stream()
+                .filter(p -> !p.getKey().getOwnerId().equals(requesterName))
+                .filter(p -> p.getKey().isInvestible())
+                .filter(p -> p.getKey().getInterestPercent() >= minInterest)
+                .filter(p -> categories.contains(p.getKey().getCategory()))
+                .filter(p -> p.getKey().getDuration() >= minDuration)
+                .collect(Collectors.toList());
 
-            case ACTIVE:
-                int cyclesPerPayment = loan.getCyclesPerPayment();
-                int nextYaz = loan.getNextYaz();
-                System.out.println("[Next payment is in: " + nextYaz +
-                        "Yaz, Payment amount: " + loan.getPayment() + ".]");
-                break;
+        List<LoanDTO> loansDTOList = new ArrayList<>();
 
-            case FINISHED:
-                System.out.println("[Yaz Started: " + loan.getStartedYaz() + ", Yaz Finished: " + loan.getFinishedYaz() + ".]");
-                break;
-
-            case RISK:
-                int missingCycles = loan.getMissingCycles();
-                System.out.println("[Missing payments: " + missingCycles + ", Missing Amount: " + getDeriskAmount(loan) + ".]");
-                break;
+        for(Pair<Loan, Integer> loanPair : relevantLoans) {
+            loansDTOList.add(getLoanDTO(loanPair.getKey()));
         }
+
+        return new LoansDTO(loansDTOList);
 
     }
 
     @Override
-    public CategoriesDTO getCategories() {
-        CategoriesDTO categoriesDTO = new CategoriesDTO(categories);
-
-        return categoriesDTO;
+    public Set<String> getCategories() {
+        return categories;
     }
-    @Override
-    public void printCustomersNames() {
-        Collection<Pair<Account, Integer>> allPairs = customersAccounts.getAllPairs();
-        System.out.println("All customers names:");
 
-        for(Pair<Account,Integer> accountPair : allPairs) {
-            System.out.println(accountPair.getKey().getId());
+    @Override
+    public CategoriesDTO getCategoriesDTO() {
+
+        return new CategoriesDTO(categories);
+    }
+
+    @Override
+    public CustomersDTO getCustomersDTO() throws DataNotFoundException {
+        List<CustomerDTO> customersDTOList = new ArrayList<>();
+        Collection<Pair<Account, Integer>> customersList = customersAccounts.getAllPairs();
+
+        for(Pair<Account, Integer> account : customersList) {
+            customersDTOList.add(getCustomerDTO(account.getKey().getId()));
+        }
+
+        return new CustomersDTO(customersDTOList);
+    }
+
+    @Override
+    public CustomerDTO getCustomerDTO(String id) throws DataNotFoundException {
+        Account account = customersAccounts.getDataById(id);
+        List<LoanDTO> loansInvestedDTOList = new ArrayList<>();
+        List<LoanDTO> loansRequestedDTOList = new ArrayList<>();
+        List<Loan> loansInvested = account.getLoansInvested();
+        List<Loan> loansRequested = account.getLoansRequested();
+
+        for(Loan loan : loansInvested)
+            loansInvestedDTOList.add(getLoanDTO(loan));
+        for(Loan loan : loansRequested)
+            loansRequestedDTOList.add(getLoanDTO(loan));
+
+        TransactionsDTO transactions = getTransactionsDTO(account);
+        LoansDTO loansInvestedDTO = new LoansDTO(loansInvestedDTOList);
+        LoansDTO loansRequestedDTO = new LoansDTO(loansRequestedDTOList);
+        AccountDTO accountDTO = new AccountDTO(account.getId(),account.getBalance(),transactions);
+        return new CustomerDTO(loansInvestedDTO,loansRequestedDTO,accountDTO);
+    }
+
+    @Override
+    public LoanDTO getLoanDTO(Loan loan) {
+        InterestDTO interestDTO = new InterestDTO(loan.getBaseAmount(),loan.getFinalAmount(),loan.getInterestPercent());
+        LoanDetailsDTO loanDetailsDTO = new LoanDetailsDTO(loan.getId(),loan.getCategory(),loan.getStatus().name());
+        LoanPaymentDTO loanPaymentDTO = new LoanPaymentDTO(loan.getPayment(),loan.getNextYaz(),loan.getCyclesPerPayment());
+        ActiveLoanDTO activeLoanDTO = new ActiveLoanDTO(loan.getAmountToActive(),loan.getDeriskAmount(),loan.getMissingCycles());
+        YazDTO yazDTO = new YazDTO(loan.getStartedYaz(),loan.getFinishedYaz());
+        return new LoanDTO(loanDetailsDTO,interestDTO,yazDTO,loanPaymentDTO,activeLoanDTO);
+    }
+
+    @Override
+    public LoansDTO getAllLoansDTO() {
+        List<LoanDTO> allLoans = new ArrayList<>();
+        for(Pair<Loan,Integer> loanPair : loans.getAllPairs()) {
+            allLoans.add(getLoanDTO(loanPair.getKey()));
+        }
+        return new LoansDTO(allLoans);
+    }
+
+    @Override
+    public TransactionDTO getTransactionDTO(Transaction transaction) throws DataNotFoundException {
+        return new TransactionDTO(transaction.getDescription(),transaction.getAmount(),
+                    transaction.getPreviousBalance(),transactions.getDataPair(transaction.getId()).getValue());
+    }
+
+    @Override
+    public TransactionsDTO getTransactionsDTO(Account account) throws DataNotFoundException {
+        List<TransactionDTO> transactionsList = new ArrayList<>();
+        List<Transaction> accountTransactions = account.getTransactions();
+
+        for(Transaction transaction : accountTransactions) {
+            transactionsList.add(getTransactionDTO(transaction));
+        }
+        return new TransactionsDTO(transactionsList);
+    }
+
+    @Override
+    public YazSystemDTO getYazSystemDTO() {
+        return new YazSystemDTO(timeHandler.getCurrentTime(),timeHandler.getPreviousTime());
+    }
+
+    @Override
+    public void saveToFile(String filePath) throws IOException {
+        Saver saver = new SystemSaver(this);
+
+        saver.saveToFile(filePath);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void loadFromFile(String filePath) throws IOException, ClassNotFoundException {
+        Saver saver = new SystemSaver(this);
+
+        saver.loadFile(filePath);
+
+        if(saver.isValid()) {
+            timeHandler.setPreviousTime(saver.getPrevYaz());
+            timeHandler.setCurrentTime(saver.getCurrYaz());
+
+            categories = (Set<String>) saver.getCategories();
+            customersAccounts = (DataStorage<Account>) saver.getCustomers();
+            loanAccounts = (DataStorage<Account>) saver.getLoanAccounts();
+            loans = (DataStorage<Loan>)saver.getLoans();
+            transactions = (DataStorage<Transaction>) saver.getTransactions();
         }
     }
-
 }

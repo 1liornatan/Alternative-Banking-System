@@ -17,8 +17,6 @@ import utils.PrintUtils;
 
 import java.util.*;
 
-import static utils.impl.printLoan;
-
 public class SetLoanMenu {
     int amount;
     Set<String> categories;
