@@ -73,7 +73,7 @@ public class PrintUtils {
         System.out.println("Loan name: " + loan.getDetails().getName() + ", Category: " + loan.getDetails().getCategory() + ", Base amount: " +
                 loan.getInterest().getBaseAmount() + ", Total amount: " + loan.getInterest().getFinalAmount() + ", Pay Every: " +
                 loan.getPaymentDetails().getCyclesPerPayment() + " Yaz, Interest percent: " +
-                loan.getInterest().getPercent() + "%, Status: " + status);
+                loan.getInterest().getPercent() + "%,  Status: " + status);
 
         switch(loan.getDetails().getStatus()) {
             case "PENDING":
@@ -83,7 +83,7 @@ public class PrintUtils {
 
             case "ACTIVE":
                 int cyclesPerPayment = loan.getPaymentDetails().getCyclesPerPayment();
-                int nextYaz = loan.getPaymentDetails().getNextPaymentInYaz();//TODO: ?????????
+                int nextYaz = loan.getPaymentDetails().getNextPaymentInYaz();
                 System.out.println("[Next payment is in: " + nextYaz +
                         "Yaz, Payment amount: " + loan.getPaymentDetails().getNextPaymentAmount() + ".]");
                 break;

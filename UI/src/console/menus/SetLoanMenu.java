@@ -23,6 +23,7 @@ public class SetLoanMenu {
     float minInterest;
     int minLoanDuration;
     int balance;
+    int maxRequestedLoans;
     String requesterName;
     Bank bankInstance;
 
@@ -34,7 +35,7 @@ public class SetLoanMenu {
         minInterest = 0;
         minLoanDuration = 0;
         bankInstance = bank;
-
+        maxRequestedLoans = customerDTO.getRequestedLoans().getLoansList().size();
         setAllCategories();
     }
 
@@ -45,7 +46,8 @@ public class SetLoanMenu {
         do {
             System.out.println("Loan Investment requirements: \n1.Set Investment Amount [MUST].\n" +
                     "2.Set Loan Category.\n" + "3.Set Loan's Minimum Interest.\n" +
-                    "4.Set Loan's Minimum Duration.\n" + "5.Request Loan Investment.\n\n" + "9.Cancel Request.");
+                    "4.Set Loan's Minimum Duration.\n" + "5.Set Borrower`s Maximum Requested Loans.\n" +
+                    "7.Request Loan Investment.\n\n" + "9.Cancel Request.");
             option = scanner.nextInt();
             try {
                 switch (option) {
@@ -62,6 +64,9 @@ public class SetLoanMenu {
                         setDuration();
                         break;
                     case 5:
+                        setMaxRequestedLoans();
+                        break;
+                    case 7:
                         requestInvestment();
                         option = 9;
                         break;
@@ -79,7 +84,7 @@ public class SetLoanMenu {
             throw new NoAmountSetException();
 
         RequestDTO requestDTO = new RequestDTO(requesterName, amount, new CategoriesDTO(categories),
-                minInterest, minLoanDuration);
+                minInterest, minLoanDuration, maxRequestedLoans);
 
         LoansDTO loansDTO = bankInstance.loanAssignmentRequest(requestDTO);
         List<LoanDTO> loanDTOList = loansDTO.getLoansList();
@@ -243,5 +248,11 @@ public class SetLoanMenu {
             throw new NonPositiveAmountException();
 
         amount = investAmount;
+    }
+
+    private void setMaxRequestedLoans() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Type max requested loans related to the borrower");
+        maxRequestedLoans = scanner.nextInt();
     }
 }

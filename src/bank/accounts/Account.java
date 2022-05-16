@@ -27,4 +27,5 @@ public interface Account extends Singular {
 
     Transaction withdraw(int amount, String description) throws NonPositiveAmountException, NoMoneyException;
 
+
 }
