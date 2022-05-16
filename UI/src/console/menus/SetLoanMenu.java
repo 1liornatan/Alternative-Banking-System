@@ -47,7 +47,7 @@ public class SetLoanMenu {
             System.out.println("Loan Investment requirements: \n1.Set Investment Amount [MUST].\n" +
                     "2.Set Loan Category.\n" + "3.Set Loan's Minimum Interest.\n" +
                     "4.Set Loan's Minimum Duration.\n" + "5.Set Borrower`s Maximum Requested Loans.\n" +
-                    "7.Request Loan Investment.\n\n" + "9.Cancel Request.");
+                    "6.Request Loan Investment.\n\n" + "9.Cancel Request.");
             option = scanner.nextInt();
             try {
                 switch (option) {
@@ -66,7 +66,7 @@ public class SetLoanMenu {
                     case 5:
                         setMaxRequestedLoans();
                         break;
-                    case 7:
+                    case 6:
                         requestInvestment();
                         option = 9;
                         break;
