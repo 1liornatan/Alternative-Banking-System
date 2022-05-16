@@ -1,6 +1,7 @@
 package bank;
 
 import bank.accounts.Account;
+import bank.accounts.CustomerAccount;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.storage.DataStorage;
@@ -26,7 +27,7 @@ import java.io.IOException;
 import java.util.Set;
 
 public interface Bank {
-    DataStorage<Account> getCustomersAccounts();
+    DataStorage<CustomerAccount> getCustomersAccounts();
 
     DataStorage<Account> getLoanAccounts();
 

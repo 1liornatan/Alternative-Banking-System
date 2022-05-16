@@ -1,16 +1,14 @@
 package bank.accounts.impl;
 
-import bank.accounts.Account;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
-import bank.data.Singular;
 import bank.loans.Loan;
 import bank.transactions.Transaction;
 import bank.transactions.impl.BasicTransaction;
 
 import java.util.*;
 
-public class CustomerAccount implements Account, Singular {
+public class Customer extends LoanAccount implements bank.accounts.CustomerAccount {
     private final String name;
     private int balance;
     private final List<Transaction> transactions;
@@ -25,7 +23,7 @@ public class CustomerAccount implements Account, Singular {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CustomerAccount that = (CustomerAccount) o;
+        Customer that = (Customer) o;
         return Objects.equals(name, that.name);
     }
 
@@ -34,7 +32,7 @@ public class CustomerAccount implements Account, Singular {
         return Objects.hash(name);
     }
 
-    public CustomerAccount(String name, int balance) {
+    public Customer(String name, int balance) {
         this.name = name;
         this.balance = balance;
         this.transactions = new ArrayList<>();
@@ -47,7 +45,6 @@ public class CustomerAccount implements Account, Singular {
     public void addRequestedLoan(Loan loan) {
         loansRequested.add(loan);
     }
-
     @Override
     public void addInvestedLoan(Loan loan) {
         loansInvested.add(loan);
