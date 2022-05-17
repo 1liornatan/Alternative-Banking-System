@@ -177,7 +177,7 @@ public class BankImpl implements Bank {
 
         List<Pair<Loan, Integer>> relevantLoans = loans.getAllPairs().stream()
                 .filter(p -> !p.getKey().getOwnerId().equals(requesterName))
-                .filter(p -> p.getKey().isInvestible())
+                .filter(p -> p.getKey().isInvestable())
                 .filter(p -> p.getKey().getInterestPercent() >= minInterest)
                 .filter(p -> categories.contains(p.getKey().getCategory()))
                 .filter(p -> p.getKey().getDuration() >= minDuration)
