@@ -171,6 +171,7 @@ public class BankImpl implements Bank {
         float minInterest = requestDTO.getMinInterest();
         List<String> categories = requestDTO.getCategoriesDTO().getCategories();
         int minDuration = requestDTO.getMinLoanDuration();
+        int maxRelatedLoans = requestDTO.getMaxRelatedLoans();
 
         if(minInterest < 0 || minInterest > 100)
             throw new InvalidPercentException();
@@ -181,6 +182,7 @@ public class BankImpl implements Bank {
                 .filter(p -> p.getKey().getInterestPercent() >= minInterest)
                 .filter(p -> categories.contains(p.getKey().getCategory()))
                 .filter(p -> p.getKey().getDuration() >= minDuration)
+                .filter(p->p.getKey().getLoanAccount().getLoansRequested().size() <= maxRelatedLoans)
                 .collect(Collectors.toList());
 
         List<LoanDTO> loansDTOList = new ArrayList<>();

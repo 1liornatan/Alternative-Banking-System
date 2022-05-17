@@ -1,5 +1,6 @@
 package manager.loans;
 
+import manager.customers.CustomerDTO;
 import manager.loans.details.*;
 
 public class LoanDTO {
