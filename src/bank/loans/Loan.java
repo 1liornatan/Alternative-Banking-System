@@ -1,13 +1,8 @@
 package bank.loans;
 
 import bank.accounts.Account;
-import bank.accounts.impl.exceptions.NoMoneyException;
-import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.Singular;
-import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.investments.Investment;
-import manager.loans.LoanDTO;
-import manager.loans.LoansDTO;
 
 import java.util.List;
 
@@ -64,5 +59,5 @@ public interface Loan extends Singular {
 
     int getDeriskAmount();
 
-    boolean isInvestible();
+    boolean isInvestable();
 }

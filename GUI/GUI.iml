@@ -9,5 +9,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="DTOs" />
     <orderEntry type="module" module-name="Engine" />
+    <orderEntry type="library" name="controlsfx-8.40.14" level="project" />
+    <orderEntry type="library" name="cssfx-1.0.0" level="project" />
   </component>
 </module>
