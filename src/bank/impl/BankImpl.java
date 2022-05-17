@@ -28,6 +28,7 @@ import manager.customers.CustomersDTO;
 import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
+import manager.loans.LoanData;
 import manager.loans.LoansDTO;
 import manager.loans.details.*;
 import manager.categories.CategoriesDTO;
@@ -304,4 +305,25 @@ public class BankImpl implements Bank {
             transactions = (DataStorage<Transaction>) saver.getTransactions();
         }
     }
+
+    public LoanData getLoanData(Loan loan) throws DataNotFoundException {
+        LoanData loanData = new LoanData();
+        loanData.setAmountToActive(loan.getAmountToActive());
+        loanData.setBaseAmount(loan.getBaseAmount());
+        loanData.setCategory(loan.getCategory());
+        loanData.setDeriskAmount(loan.getDeriskAmount());
+        loanData.setFinalAmount(loan.getFinalAmount());
+        loanData.setFinishedYaz(loan.getFinishedYaz());
+        loanData.setInterest(loan.getInterestPercent());
+        loanData.setName(loan.getId());
+        loanData.setLoanRequester(customersAccounts.getDataById(loan.getOwnerId()).getId());
+        loanData.setStatus(loan.getStatus().name());
+        loanData.setNextPaymentAmount(loan.getPayment());
+        loanData.setCyclesPerPayment(loan.getCyclesPerPayment());
+        loanData.setMissingCycles(loan.getMissingCycles());
+        loanData.setNextPaymentInYaz(loan.getNextYaz());
+        loanData.setStartedYaz(loan.getStartedYaz());
+        return loanData;
+    }
+
 }
