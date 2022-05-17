@@ -1,9 +1,8 @@
 package screens.main;
 
+import bank.impl.BankImpl;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,24 +10,26 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import screens.admin.AdminController;
+import screens.customer.CustomerController;
 import screens.resources.BankScreenConsts;
-import sun.plugin.javascript.navig.Anchor;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
 public class MainPageController {
 
-    StringProperty filePathProperty;
-    BooleanProperty isFileSelected;
-    BooleanProperty isAdminScreen;
+    private BooleanProperty isFileSelected;
+    private BooleanProperty isAdminScreen;
 
     private BorderPane mainScreen;
     private AnchorPane adminScreen;
     private AnchorPane customerScreen;
+
+    private AdminController adminController;
+    private CustomerController customerController;
+
+    private BankImpl bankInstance;
 
     @FXML
     private ComboBox viewComboBox;
@@ -62,30 +63,30 @@ public class MainPageController {
     }
 
     public MainPageController() throws IOException {
-        filePathProperty = new SimpleStringProperty();
-        isFileSelected = new SimpleBooleanProperty();
         isAdminScreen = new SimpleBooleanProperty();
+        isFileSelected = new SimpleBooleanProperty();
 
         FXMLLoader loader = new FXMLLoader();
         FXMLLoader loader2 = new FXMLLoader();
 
-        // load main fxml
         URL customerFXML = getClass().getResource(BankScreenConsts.CUSTOMER_FXML_RESOURCE_IDENTIFIER);
         URL adminFXML = getClass().getResource(BankScreenConsts.ADMIN_FXML_RESOURCE_IDENTIFIER);
 
         loader.setLocation(customerFXML);
         customerScreen = loader.load();
+        customerController = loader.getController();
 
         loader2.setLocation(adminFXML);
         adminScreen = loader2.load();
+        adminController = loader2.getController();
 
+        bankInstance = new BankImpl();
     }
 
     @FXML
     void initialize() {
-
-        filePathTextField.textProperty().bind(filePathProperty);
-        isFileSelected.set(false);
+        filePathTextField.textProperty().bind(adminController.getFilePathProperty());
+        isFileSelected.bind(adminController.getFileSelectedProperty());
         viewComboBox.setItems(FXCollections.observableArrayList(new String("Admin"), new String("Menash")));
         viewComboBox.getSelectionModel().selectFirst();
         viewComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
@@ -99,7 +100,9 @@ public class MainPageController {
 
             updateScreenData();
         });
-
+        adminController.setBankInstance(bankInstance);
+        customerController.setBankInstance(bankInstance);
+        currYazTextField.textProperty().bind(adminController.getCurrYazProperty().asString());
     }
 
     private void updateScreenData() {

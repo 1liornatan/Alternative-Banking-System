@@ -1,20 +1,25 @@
 package screens.admin;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.StringProperty;
+import bank.impl.BankImpl;
+import bank.impl.exceptions.DataNotFoundException;
+import files.xmls.exceptions.*;
+import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class AdminController {
 
     BooleanProperty isFileSelected;
     StringProperty filePathProperty;
+    IntegerProperty currYazProperty;
+    private BankImpl bankInstance;
 
     @FXML
     private Button increaseYazButton;
@@ -46,37 +51,48 @@ public class AdminController {
         }
 
         String absolutePath = selectedFile.getAbsolutePath();
-        filePathProperty.set(absolutePath);
-        isFileSelected.set(true);
+
+        try {
+            bankInstance.loadData(absolutePath);
+            filePathProperty.set(absolutePath);
+            isFileSelected.set(true);
+            updateBankData();
+        } catch (NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException | XmlNotFoundException | DataNotFoundException e) {
+            System.out.println(e.getMessage());
+            Alert errorMessage = new Alert(Alert.AlertType.ERROR, e.getMessage());
+            errorMessage.show();
+        }
+    }
+
+    private void updateBankData() {
+
     }
 
     public AdminController() {
         isFileSelected = new SimpleBooleanProperty();
+        filePathProperty = new SimpleStringProperty();
+        currYazProperty = new SimpleIntegerProperty();
     }
 
-    public boolean isIsFileSelected() {
-        return isFileSelected.get();
-    }
-
-    public BooleanProperty isFileSelectedProperty() {
+    public BooleanProperty getFileSelectedProperty() {
         return isFileSelected;
     }
-
-    public void setIsFileSelected(boolean isFileSelected) {
-        this.isFileSelected.set(isFileSelected);
-    }
-
-    public String getFilePathProperty() {
-        return filePathProperty.get();
-    }
-
-    public StringProperty filePathPropertyProperty() {
+    public StringProperty getFilePathProperty() {
         return filePathProperty;
     }
+    public IntegerProperty getCurrYazProperty() { return currYazProperty; }
 
-    public void setFilePathProperty(String filePathProperty) {
-        this.filePathProperty.set(filePathProperty);
+    @FXML
+    void initialize() {
+        isFileSelected.set(false);
     }
 
+    public BankImpl getBankInstance() {
+        return bankInstance;
+    }
+
+    public void setBankInstance(BankImpl bankInstance) {
+        this.bankInstance = bankInstance;
+    }
 
 }
