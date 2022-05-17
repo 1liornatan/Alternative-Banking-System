@@ -28,9 +28,6 @@ public class Customer extends LoanAccount implements bank.accounts.CustomerAccou
     }
 
     @Override
-    public int getNumOfRelatedLoans() {return loansRequested.size();}
-
-    @Override
     public int hashCode() {
         return Objects.hash(name);
     }
