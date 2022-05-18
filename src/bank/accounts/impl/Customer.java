@@ -99,4 +99,22 @@ public class Customer extends LoanAccount implements bank.accounts.CustomerAccou
                 ", Current Balance: " + balance;
     }
 
+    public int getNumOfRequestedLoansByStatus(String status) {
+        int counter = 0;
+        for(Loan loan : loansRequested) {
+            if(loan.getStatus().name() == status)
+                counter++;
+        }
+        return counter;
+    }
+
+    public int getNumOfInvestedLoansByStatus(String status) {
+        int counter = 0;
+        for(Loan loan : loansInvested) {
+            if(loan.getStatus().name() == status)
+                counter++;
+        }
+        return counter;
+    }
+
 }

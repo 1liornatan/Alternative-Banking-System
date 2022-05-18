@@ -24,6 +24,7 @@ import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.accounts.AccountDTO;
 import manager.customers.CustomerDTO;
+import manager.customers.CustomerData;
 import manager.customers.CustomersDTO;
 import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
@@ -324,6 +325,21 @@ public class BankImpl implements Bank {
         loanData.setNextPaymentInYaz(loan.getNextYaz());
         loanData.setStartedYaz(loan.getStartedYaz());
         return loanData;
+    }
+
+    public CustomerData getCustomerData(Customer customer) throws DataNotFoundException {
+        CustomerData customerData = new CustomerData();
+        customerData.setBalance(customer.getBalance());
+        customerData.setName(customer.getId());
+        customerData.setNumOfActiveLoansInvested(customer.getNumOfRequestedLoansByStatus("Active"));
+        customerData.setNumOfPendingLoansInvested(customer.getNumOfRequestedLoansByStatus("Pending"));
+        customerData.setNumOfRiskLoansInvested(customer.getNumOfRequestedLoansByStatus("Risk"));
+        customerData.setNumOfFinishedLoansInvested(customer.getNumOfRequestedLoansByStatus("Finished"));
+        customerData.setNumOfActiveLoansRequested(customer.getNumOfInvestedLoansByStatus("Active"));
+        customerData.setNumOfPendingLoansRequested(customer.getNumOfInvestedLoansByStatus("Pending"));
+        customerData.setNumOfRiskLoansRequested(customer.getNumOfInvestedLoansByStatus("Risk"));
+        customerData.setNumOfFinishedLoansRequested(customer.getNumOfInvestedLoansByStatus("Finished"));
+        return customerData;
     }
 
 }
