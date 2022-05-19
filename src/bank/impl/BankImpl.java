@@ -8,6 +8,7 @@ import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
+import bank.loans.LoanStatus;
 import bank.loans.handler.impl.BankLoanHandler;
 import bank.loans.interest.Interest;
 import bank.loans.interest.exceptions.InvalidPercentException;
@@ -24,10 +25,12 @@ import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.accounts.AccountDTO;
 import manager.customers.CustomerDTO;
+import manager.customers.CustomerData;
 import manager.customers.CustomersDTO;
 import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
+import manager.loans.LoanData;
 import manager.loans.LoansDTO;
 import manager.loans.details.*;
 import manager.categories.CategoriesDTO;
@@ -171,6 +174,7 @@ public class BankImpl implements Bank {
         float minInterest = requestDTO.getMinInterest();
         List<String> categories = requestDTO.getCategoriesDTO().getCategories();
         int minDuration = requestDTO.getMinLoanDuration();
+        int maxRelatedLoans = requestDTO.getMaxRelatedLoans();
 
         if(minInterest < 0 || minInterest > 100)
             throw new InvalidPercentException();
@@ -181,6 +185,7 @@ public class BankImpl implements Bank {
                 .filter(p -> p.getKey().getInterestPercent() >= minInterest)
                 .filter(p -> categories.contains(p.getKey().getCategory()))
                 .filter(p -> p.getKey().getDuration() >= minDuration)
+                .filter(p->p.getKey().getLoanAccount().getLoansRequested().size() <= maxRelatedLoans)
                 .collect(Collectors.toList());
 
         List<LoanDTO> loansDTOList = new ArrayList<>();
@@ -302,4 +307,42 @@ public class BankImpl implements Bank {
             transactions = (DataStorage<Transaction>) saver.getTransactions();
         }
     }
+
+    public LoanData getLoanData(Loan loan) throws DataNotFoundException {
+        LoanData loanData = new LoanData();
+        loanData.setAmountToActive(loan.getAmountToActive());
+        loanData.setBaseAmount(loan.getBaseAmount());
+        loanData.setCategory(loan.getCategory());
+        loanData.setDeriskAmount(loan.getDeriskAmount());
+        loanData.setFinalAmount(loan.getFinalAmount());
+        loanData.setFinishedYaz(loan.getFinishedYaz());
+        loanData.setInterest(loan.getInterestPercent());
+        loanData.setName(loan.getId());
+        loanData.setLoanRequester(customersAccounts.getDataById(loan.getOwnerId()).getId());
+        loanData.setStatus(loan.getStatus().name());
+        loanData.setNextPaymentAmount(loan.getPayment());
+        loanData.setCyclesPerPayment(loan.getCyclesPerPayment());
+        loanData.setMissingCycles(loan.getMissingCycles());
+        loanData.setNextPaymentInYaz(loan.getNextYaz());
+        loanData.setStartedYaz(loan.getStartedYaz());
+        return loanData;
+    }
+
+    public CustomerData getCustomerData(Customer customer) throws DataNotFoundException {
+        CustomerData customerData = new CustomerData();
+        customerData.setBalance(customer.getBalance());
+        customerData.setName(customer.getId());
+        customerData.setNumOfActiveLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.ACTIVE));
+        customerData.setNumOfPendingLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.PENDING));
+        customerData.setNumOfRiskLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.RISK));
+        customerData.setNumOfFinishedLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.FINISHED));
+        customerData.setNumOfNewLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.NEW));
+        customerData.setNumOfActiveLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.ACTIVE));
+        customerData.setNumOfPendingLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.PENDING));
+        customerData.setNumOfRiskLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.RISK));
+        customerData.setNumOfFinishedLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.FINISHED));
+        customerData.setNumOfNewLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.NEW));
+        return customerData;
+    }
+
 }
