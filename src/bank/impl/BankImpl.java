@@ -337,16 +337,16 @@ public class BankImpl implements Bank {
         CustomerData customerData = new CustomerData();
         customerData.setBalance(customer.getBalance());
         customerData.setName(customer.getId());
-        customerData.setNumOfActiveLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.ACTIVE));
-        customerData.setNumOfPendingLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.PENDING));
-        customerData.setNumOfRiskLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.RISK));
-        customerData.setNumOfFinishedLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.FINISHED));
-        customerData.setNumOfNewLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.NEW));
-        customerData.setNumOfActiveLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.ACTIVE));
-        customerData.setNumOfPendingLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.PENDING));
-        customerData.setNumOfRiskLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.RISK));
-        customerData.setNumOfFinishedLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.FINISHED));
-        customerData.setNumOfNewLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.NEW));
+        customerData.setNumOfActiveLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.ACTIVE));
+        customerData.setNumOfPendingLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.PENDING));
+        customerData.setNumOfRiskLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.RISK));
+        customerData.setNumOfFinishedLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.FINISHED));
+        customerData.setNumOfNewLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.NEW));
+        customerData.setNumOfActiveLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.ACTIVE));
+        customerData.setNumOfPendingLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.PENDING));
+        customerData.setNumOfRiskLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.RISK));
+        customerData.setNumOfFinishedLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.FINISHED));
+        customerData.setNumOfNewLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.NEW));
         return customerData;
     }
 
@@ -359,8 +359,6 @@ public class BankImpl implements Bank {
         }
         customersData.setCustomers(customersList);
         return customersData;
-
-
     }
 
     @Override

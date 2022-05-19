@@ -1,5 +1,6 @@
 package screens.admin;
 
+import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import files.xmls.exceptions.*;
@@ -28,6 +29,7 @@ public class AdminController {
     BooleanProperty isFileSelected;
     StringProperty filePathProperty;
     IntegerProperty currYazProperty;
+
     private BankImpl bankInstance;
     private List<CustomerModel> customerModelList;
 
@@ -45,7 +47,17 @@ public class AdminController {
 
     @FXML
     void increaseYazButtonAction(ActionEvent event) {
-
+        Thread increaseYazThread = new Thread(() -> {
+            try {
+                bankInstance.advanceOneYaz();
+                updateBankData();
+                int currYaz = bankInstance.getCurrentYaz();
+                Platform.runLater(() -> currYazProperty.set(currYaz));
+            } catch (DataNotFoundException | NonPositiveAmountException e) {
+                e.printStackTrace();
+            }
+        });
+        increaseYazThread.start();
     }
 
     @FXML
@@ -62,16 +74,23 @@ public class AdminController {
 
         String absolutePath = selectedFile.getAbsolutePath();
 
-        try {
-            bankInstance.loadData(absolutePath);
-            filePathProperty.set(absolutePath);
-            isFileSelected.set(true);
-            updateBankData();
-        } catch (NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException | XmlNotFoundException | DataNotFoundException e) {
-            System.out.println(e.getMessage());
-            Alert errorMessage = new Alert(Alert.AlertType.ERROR, e.getMessage());
-            errorMessage.show();
-        }
+        Thread loadBankThread = new Thread(() -> {
+            try {
+                bankInstance.loadData(absolutePath);
+                isFileSelected.set(true);
+                updateBankData();
+                int currYaz = bankInstance.getCurrentYaz();
+                Platform.runLater(() -> {
+                    filePathProperty.set(absolutePath);
+                    currYazProperty.set(currYaz);
+                });
+            } catch (NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException | XmlNotFoundException | DataNotFoundException e) {
+                System.out.println(e.getMessage());
+                Alert errorMessage = new Alert(Alert.AlertType.ERROR, e.getMessage());
+                errorMessage.show();
+            }
+        });
+        loadBankThread.start();
     }
 
     private void updateBankData() {
@@ -130,12 +149,14 @@ public class AdminController {
             customer.setEmail(emailField.getText());
             param.toggleExpanded();
         });*/
-
+        expanderTable.setMinHeight(75);
+        expanderTable.setMaxHeight(75);
+        expander.setMinHeight(75);
+        expander.setMaxHeight(75);
         expander.addRow(0, expanderTable);
-
+        expander.getStylesheets().add(getClass().getResource("/screens/resources/adminStyle.css").toExternalForm());
         return expander;
     }
-
 
     private void setDataTables() {
         //TableRowExpanderColumn<LoanModel> loanExpanderColumn = new TableRowExpanderColumn<>(this::createLoanEditor);
@@ -181,10 +202,14 @@ public class AdminController {
     void initialize() {
         isFileSelected.set(false);
         setDataTables();
+        increaseYazButton.disableProperty().bind(isFileSelected.not());
     }
 
     public void updateCustomersData() {
-        Platform.runLater(() -> {
+        if(!isFileSelected.get())
+            return;
+
+        Thread updateThread = new Thread(() -> {
             try {
                 List<CustomerModel> tempCustomerModelList = new ArrayList<>();
                 List<CustomerData> customerDataList = bankInstance.getCustomersData().getCustomers();
@@ -207,11 +232,13 @@ public class AdminController {
                     tempCustomerModelList.add(customerModel);
                 }
                 customerModelList = tempCustomerModelList;
-                adminsCustomersTable.setItems(getCustomers());
+                Platform.runLater(() -> adminsCustomersTable.setItems(getCustomers()));
             } catch (DataNotFoundException e) {
                 e.printStackTrace();
             }
         });
+
+        updateThread.start();
     }
 
     public BankImpl getBankInstance() {

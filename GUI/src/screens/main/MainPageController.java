@@ -60,16 +60,6 @@ public class MainPageController {
     @FXML
     private Button loadFileButton;
 
-    @FXML
-    void increaseYazButtonAction(ActionEvent event) {
-
-    }
-
-    @FXML
-    void viewComboBoxAction(ActionEvent event) {
-
-    }
-
     public MainPageController() throws IOException {
         isAdminScreen = new SimpleBooleanProperty();
         isFileSelected = new SimpleBooleanProperty();
