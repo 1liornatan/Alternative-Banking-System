@@ -15,13 +15,11 @@
          <children>
             <TableView fx:id="adminLoansTable">
                <columns>
-                  <TableColumn prefWidth="111.0" text="C1" />
                   <TableColumn editable="false" maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" sortable="false" text="C2" />
                </columns>
             </TableView>
             <TableView fx:id="adminsCustomersTable">
                <columns>
-                  <TableColumn prefWidth="111.0" text="C1" />
                   <TableColumn maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" text="C2" />
                </columns>
             </TableView>
