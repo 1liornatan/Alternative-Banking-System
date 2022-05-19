@@ -3,6 +3,7 @@ package bank.accounts.impl;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.loans.Loan;
+import bank.loans.LoanStatus;
 import bank.transactions.Transaction;
 import bank.transactions.impl.BasicTransaction;
 
@@ -99,19 +100,19 @@ public class Customer extends LoanAccount implements bank.accounts.CustomerAccou
                 ", Current Balance: " + balance;
     }
 
-    public int getNumOfRequestedLoansByStatus(String status) {
+    public int getNumOfRequestedLoansByStatus(LoanStatus status) {
         int counter = 0;
         for(Loan loan : loansRequested) {
-            if(loan.getStatus().name() == status)
+            if(loan.getStatus() == status)
                 counter++;
         }
         return counter;
     }
 
-    public int getNumOfInvestedLoansByStatus(String status) {
+    public int getNumOfInvestedLoansByStatus(LoanStatus status) {
         int counter = 0;
         for(Loan loan : loansInvested) {
-            if(loan.getStatus().name() == status)
+            if(loan.getStatus() == status)
                 counter++;
         }
         return counter;

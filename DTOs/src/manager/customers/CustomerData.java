@@ -3,8 +3,8 @@ package manager.customers;
 public class CustomerData {
     String name;
     int balance;
-    int numOfPendingLoansRequested, numOfActiveLoansRequested, numOfRiskLoansRequested, numOfFinishedLoansRequested;
-    int numOfPendingLoansInvested, numOfActiveLoansInvested, numOfRiskLoansInvested, numOfFinishedLoansInvested;
+    int numOfPendingLoansRequested, numOfActiveLoansRequested, numOfRiskLoansRequested, numOfFinishedLoansRequested, numOfNewLoansRequested;
+    int numOfPendingLoansInvested, numOfActiveLoansInvested, numOfRiskLoansInvested, numOfFinishedLoansInvested, numOfNewLoansInvested;
 
     public String getName() {
         return name;
@@ -84,5 +84,21 @@ public class CustomerData {
 
     public void setNumOfFinishedLoansInvested(int numOfFinishedLoansInvested) {
         this.numOfFinishedLoansInvested = numOfFinishedLoansInvested;
+    }
+
+    public int getNumOfNewLoansRequested() {
+        return numOfNewLoansRequested;
+    }
+
+    public void setNumOfNewLoansRequested(int numOfNewLoansRequested) {
+        this.numOfNewLoansRequested = numOfNewLoansRequested;
+    }
+
+    public int getNumOfNewLoansInvested() {
+        return numOfNewLoansInvested;
+    }
+
+    public void setNumOfNewLoansInvested(int numOfNewLoansInvested) {
+        this.numOfNewLoansInvested = numOfNewLoansInvested;
     }
 }
