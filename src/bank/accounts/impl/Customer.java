@@ -28,10 +28,6 @@ public class Customer extends LoanAccount implements bank.accounts.CustomerAccou
     }
 
     @Override
-    public int getNumOfRelatedLoans() {return loansRequested.size();
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hash(name);
     }
@@ -101,6 +97,24 @@ public class Customer extends LoanAccount implements bank.accounts.CustomerAccou
     public String toString() {
         return "Account Name: " + name +
                 ", Current Balance: " + balance;
+    }
+
+    public int getNumOfRequestedLoansByStatus(String status) {
+        int counter = 0;
+        for(Loan loan : loansRequested) {
+            if(loan.getStatus().name() == status)
+                counter++;
+        }
+        return counter;
+    }
+
+    public int getNumOfInvestedLoansByStatus(String status) {
+        int counter = 0;
+        for(Loan loan : loansInvested) {
+            if(loan.getStatus().name() == status)
+                counter++;
+        }
+        return counter;
     }
 
 }
