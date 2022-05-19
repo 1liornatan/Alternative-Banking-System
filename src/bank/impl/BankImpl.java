@@ -1,6 +1,7 @@
 package bank.impl;
 
 import bank.Bank;
+import bank.accounts.CustomerAccount;
 import bank.accounts.impl.Customer;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
@@ -27,11 +28,13 @@ import manager.accounts.AccountDTO;
 import manager.customers.CustomerDTO;
 import manager.customers.CustomerData;
 import manager.customers.CustomersDTO;
+import manager.customers.CustomersData;
 import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoanData;
 import manager.loans.LoansDTO;
+import manager.loans.LoansData;
 import manager.loans.details.*;
 import manager.categories.CategoriesDTO;
 import manager.time.YazSystemDTO;
@@ -308,6 +311,7 @@ public class BankImpl implements Bank {
         }
     }
 
+    @Override
     public LoanData getLoanData(Loan loan) throws DataNotFoundException {
         LoanData loanData = new LoanData();
         loanData.setAmountToActive(loan.getAmountToActive());
@@ -328,7 +332,8 @@ public class BankImpl implements Bank {
         return loanData;
     }
 
-    public CustomerData getCustomerData(Customer customer) throws DataNotFoundException {
+    @Override
+    public CustomerData getCustomerData(CustomerAccount customer) throws DataNotFoundException {
         CustomerData customerData = new CustomerData();
         customerData.setBalance(customer.getBalance());
         customerData.setName(customer.getId());
@@ -345,4 +350,27 @@ public class BankImpl implements Bank {
         return customerData;
     }
 
+    @Override
+    public CustomersData getCustomersData() throws DataNotFoundException {
+        CustomersData customersData = new CustomersData();
+        List<CustomerData> customersList = new ArrayList<>();
+        for(Pair<CustomerAccount, Integer> customerPair : customersAccounts.getAllPairs()) {
+            customersList.add(getCustomerData(customerPair.getKey()));
+        }
+        customersData.setCustomers(customersList);
+        return customersData;
+
+
+    }
+
+    @Override
+    public LoansData getLoansData() throws DataNotFoundException {
+        LoansData loansData = new LoansData();
+        List<LoanData> loansList= new ArrayList<>();
+        for(Pair<Loan, Integer> loanPair : loans.getAllPairs()) {
+            loansList.add(getLoanData(loanPair.getKey()));
+        }
+        loansData.setLoans(loansList);
+        return loansData;
+    }
 }
