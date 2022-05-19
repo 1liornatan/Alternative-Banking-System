@@ -8,6 +8,7 @@ import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
+import bank.loans.LoanStatus;
 import bank.loans.handler.impl.BankLoanHandler;
 import bank.loans.interest.Interest;
 import bank.loans.interest.exceptions.InvalidPercentException;
@@ -331,14 +332,16 @@ public class BankImpl implements Bank {
         CustomerData customerData = new CustomerData();
         customerData.setBalance(customer.getBalance());
         customerData.setName(customer.getId());
-        customerData.setNumOfActiveLoansInvested(customer.getNumOfRequestedLoansByStatus("Active"));
-        customerData.setNumOfPendingLoansInvested(customer.getNumOfRequestedLoansByStatus("Pending"));
-        customerData.setNumOfRiskLoansInvested(customer.getNumOfRequestedLoansByStatus("Risk"));
-        customerData.setNumOfFinishedLoansInvested(customer.getNumOfRequestedLoansByStatus("Finished"));
-        customerData.setNumOfActiveLoansRequested(customer.getNumOfInvestedLoansByStatus("Active"));
-        customerData.setNumOfPendingLoansRequested(customer.getNumOfInvestedLoansByStatus("Pending"));
-        customerData.setNumOfRiskLoansRequested(customer.getNumOfInvestedLoansByStatus("Risk"));
-        customerData.setNumOfFinishedLoansRequested(customer.getNumOfInvestedLoansByStatus("Finished"));
+        customerData.setNumOfActiveLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.ACTIVE));
+        customerData.setNumOfPendingLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.PENDING));
+        customerData.setNumOfRiskLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.RISK));
+        customerData.setNumOfFinishedLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.FINISHED));
+        customerData.setNumOfNewLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.NEW));
+        customerData.setNumOfActiveLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.ACTIVE));
+        customerData.setNumOfPendingLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.PENDING));
+        customerData.setNumOfRiskLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.RISK));
+        customerData.setNumOfFinishedLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.FINISHED));
+        customerData.setNumOfNewLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.NEW));
         return customerData;
     }
 
