@@ -86,8 +86,10 @@ public class AdminController {
                 });
             } catch (NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException | XmlNotFoundException | DataNotFoundException e) {
                 System.out.println(e.getMessage());
-                Alert errorMessage = new Alert(Alert.AlertType.ERROR, e.getMessage());
-                errorMessage.show();
+                Platform.runLater(() -> {
+                    Alert errorMessage = new Alert(Alert.AlertType.ERROR, e.getMessage());
+                    errorMessage.show();
+                });
             }
         });
         loadBankThread.start();
