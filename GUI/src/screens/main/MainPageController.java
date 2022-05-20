@@ -18,6 +18,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import manager.customers.CustomerData;
+import manager.customers.CustomersNames;
 import manager.loans.LoanData;
 import models.CustomerModel;
 import models.LoanModel;
@@ -85,15 +86,17 @@ public class MainPageController {
     void initialize() {
         filePathTextField.textProperty().bind(adminController.getFilePathProperty());
         isFileSelected.bind(adminController.getFileSelectedProperty());
-        viewComboBox.setItems(FXCollections.observableArrayList(new String("Admin"), new String("Menash")));
+        viewComboBox.setItems(FXCollections.observableArrayList(new String("Admin")));
         viewComboBox.getSelectionModel().selectFirst();
         viewComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
 
-            if(oldVal.equals("Admin")) {
-                setCustomerScreen();
-            }
-            else if(oldVal.equals("Menash")) {
+            if(oldVal == null || newVal == null)
+                return;
+            else if(newVal.equals("Admin")) {
                 setAdminScreen();
+            }
+            else {
+                setCustomerScreen();
             }
 
             updateScreenData();
@@ -101,6 +104,21 @@ public class MainPageController {
         adminController.setBankInstance(bankInstance);
         customerController.setBankInstance(bankInstance);
         currYazTextField.textProperty().bind(adminController.getCurrYazProperty().asString());
+        adminController.getFilePathProperty().addListener((obs, oldVal, newVal) -> {
+            Thread customersNamesThread = new Thread(() -> {
+                CustomersNames names = bankInstance.getCustomersNames();
+                List<String> namesList = new ArrayList<>();
+
+                namesList.add("Admin");
+                for(String name : names.getNames())
+                    namesList.add(name);
+
+                Platform.runLater(() -> {
+                    viewComboBox.setItems(FXCollections.observableArrayList(namesList));
+                });
+            });
+            customersNamesThread.start();
+        });
     }
 
 

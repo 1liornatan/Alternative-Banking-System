@@ -25,10 +25,7 @@ import files.xmls.XmlReader;
 import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.accounts.AccountDTO;
-import manager.customers.CustomerDTO;
-import manager.customers.CustomerData;
-import manager.customers.CustomersDTO;
-import manager.customers.CustomersData;
+import manager.customers.*;
 import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
@@ -370,5 +367,14 @@ public class BankImpl implements Bank {
         }
         loansData.setLoans(loansList);
         return loansData;
+    }
+
+    @Override
+    public CustomersNames getCustomersNames() {
+        List<String> names = new ArrayList<>();
+        for(Pair<CustomerAccount, Integer> customerPair : customersAccounts.getAllPairs()) {
+            names.add(customerPair.getKey().getId());
+        }
+        return new CustomersNames(names);
     }
 }

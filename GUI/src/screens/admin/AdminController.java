@@ -203,6 +203,8 @@ public class AdminController {
         isFileSelected.set(false);
         setDataTables();
         increaseYazButton.disableProperty().bind(isFileSelected.not());
+        adminsCustomersTable.disableProperty().bind(isFileSelected.not());
+        adminLoansTable.disableProperty().bind(isFileSelected.not());
     }
 
     public void updateCustomersData() {

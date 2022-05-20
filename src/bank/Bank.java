@@ -11,10 +11,7 @@ import bank.loans.interest.exceptions.InvalidPercentException;
 import bank.time.TimeHandler;
 import bank.transactions.Transaction;
 import files.xmls.exceptions.*;
-import manager.customers.CustomerDTO;
-import manager.customers.CustomerData;
-import manager.customers.CustomersDTO;
-import manager.customers.CustomersData;
+import manager.customers.*;
 import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
@@ -90,4 +87,6 @@ public interface Bank {
     CustomersData getCustomersData() throws DataNotFoundException;
 
     LoansData getLoansData() throws DataNotFoundException;
+
+    CustomersNames getCustomersNames();
 }
