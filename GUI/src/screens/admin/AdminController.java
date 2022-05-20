@@ -16,7 +16,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import manager.customers.CustomerData;
+import manager.loans.LoanData;
 import models.CustomerModel;
+import models.LoanModel;
 import models.LoanStatusModel;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 
@@ -32,6 +34,7 @@ public class AdminController {
 
     private BankImpl bankInstance;
     private List<CustomerModel> customerModelList;
+    private List<LoanModel> loanModelList;
 
     @FXML
     private Button increaseYazButton;
@@ -40,7 +43,7 @@ public class AdminController {
     private Button loadFileButton;
 
     @FXML
-    private TableView<?> adminLoansTable;
+    private TableView<LoanModel> adminLoansTable;
 
     @FXML
     private TableView<CustomerModel> adminsCustomersTable;
@@ -97,6 +100,35 @@ public class AdminController {
 
     private void updateBankData() {
         updateCustomersData();
+        updateLoansData();
+    }
+
+    private void updateLoansData() {
+        if(!isFileSelected.get())
+            return;
+
+        Thread updateLoansThread = new Thread(() -> {
+            try {
+                List<LoanModel> tempLoanModelList = new ArrayList<>();
+                List<LoanData> loanDataList = bankInstance.getLoansData().getLoans();
+                for(LoanData loanData : loanDataList) {
+                    LoanModel loanModel = new LoanModel();
+
+                    loanModel.setId(loanData.getName());
+                    loanModel.setAmount(loanData.getBaseAmount());
+                    loanModel.setEndYaz(loanData.getFinishedYaz());
+                    loanModel.setStartYaz(loanData.getStartedYaz());
+
+                    tempLoanModelList.add(loanModel);
+                }
+                loanModelList = tempLoanModelList;
+                Platform.runLater(() -> adminLoansTable.setItems(getLoans()));
+            } catch (DataNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
+
+        updateLoansThread.start();
     }
 
 
@@ -160,9 +192,30 @@ public class AdminController {
         return expander;
     }
 
+    private GridPane createLoanExpander(TableRowExpanderColumn.TableRowDataFeatures<LoanModel> param) {
+        GridPane expander = new GridPane();
+        expander.setPadding(new Insets(10));
+        expander.setHgap(10);
+        expander.setVgap(5);
+
+        LoanModel loan = param.getValue();
+
+        TextField startYazField = new TextField(String.valueOf(loan.getStartYaz()));
+        TextField endYazField = new TextField(String.valueOf(loan.getEndYaz()));
+
+        startYazField.setEditable(false);
+        endYazField.setEditable(false);
+
+        expander.addRow(0, new Label("Start Yaz"), startYazField);
+        expander.addRow(0, new Label("Finished Yaz"), endYazField);
+
+        return expander;
+    }
+
     private void setDataTables() {
-        //TableRowExpanderColumn<LoanModel> loanExpanderColumn = new TableRowExpanderColumn<>(this::createLoanEditor);
+        TableRowExpanderColumn<LoanModel> loanExpanderColumn = new TableRowExpanderColumn<>(this::createLoanExpander);
         TableRowExpanderColumn<CustomerModel> customerExpanderColumn = new TableRowExpanderColumn<>(this::createCustomerExpander);
+        loanExpanderColumn.setText("Details");
         customerExpanderColumn.setText("Loans");
 
         TableColumn<CustomerModel, String> nameColumn = new TableColumn<>("Name");
@@ -171,14 +224,25 @@ public class AdminController {
         TableColumn<CustomerModel, Integer> balanceColumn = new TableColumn<>("Balance");
         balanceColumn.setCellValueFactory(new PropertyValueFactory<>("balance"));
 
-/*        TableColumn<Customer, Integer> investedColumn = new TableColumn<>("Email");
-        investedColumn.setCellValueFactory(new PropertyValueFactory<>("numOfInvested"));*/
 
         adminsCustomersTable.getColumns().addAll(nameColumn, balanceColumn, customerExpanderColumn);
 
-        updateCustomersData();
+        TableColumn<LoanModel, String> loanNameColumn = new TableColumn<>("Id");
+        loanNameColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+
+        TableColumn<LoanModel, Integer> amountColumn = new TableColumn<>("Amount");
+        amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+
+        adminLoansTable.getColumns().addAll(loanNameColumn, amountColumn, loanExpanderColumn);
+
+        updateBankData();
+        adminLoansTable.setItems(getLoans());
         adminsCustomersTable.setItems(getCustomers());
 
+    }
+
+    private ObservableList<LoanModel> getLoans() {
+        return FXCollections.observableArrayList(loanModelList);
     }
 
     private ObservableList<CustomerModel> getCustomers() {
@@ -190,6 +254,7 @@ public class AdminController {
         filePathProperty = new SimpleStringProperty();
         currYazProperty = new SimpleIntegerProperty();
         customerModelList = new ArrayList<>();
+        loanModelList = new ArrayList<>();
     }
 
     public BooleanProperty getFileSelectedProperty() {
