@@ -20,6 +20,7 @@ import manager.loans.LoanData;
 import models.CustomerModel;
 import models.LoanModel;
 import models.LoanStatusModel;
+import models.utils.LoanTable;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 
 import java.io.File;
@@ -192,30 +193,8 @@ public class AdminController {
         return expander;
     }
 
-    private GridPane createLoanExpander(TableRowExpanderColumn.TableRowDataFeatures<LoanModel> param) {
-        GridPane expander = new GridPane();
-        expander.setPadding(new Insets(10));
-        expander.setHgap(10);
-        expander.setVgap(5);
-
-        LoanModel loan = param.getValue();
-
-        TextField startYazField = new TextField(String.valueOf(loan.getStartYaz()));
-        TextField endYazField = new TextField(String.valueOf(loan.getEndYaz()));
-
-        startYazField.setEditable(false);
-        endYazField.setEditable(false);
-
-        expander.addRow(0, new Label("Start Yaz"), startYazField);
-        expander.addRow(0, new Label("Finished Yaz"), endYazField);
-
-        return expander;
-    }
-
     private void setDataTables() {
-        TableRowExpanderColumn<LoanModel> loanExpanderColumn = new TableRowExpanderColumn<>(this::createLoanExpander);
         TableRowExpanderColumn<CustomerModel> customerExpanderColumn = new TableRowExpanderColumn<>(this::createCustomerExpander);
-        loanExpanderColumn.setText("Details");
         customerExpanderColumn.setText("Loans");
 
         TableColumn<CustomerModel, String> nameColumn = new TableColumn<>("Name");
@@ -227,13 +206,7 @@ public class AdminController {
 
         adminsCustomersTable.getColumns().addAll(nameColumn, balanceColumn, customerExpanderColumn);
 
-        TableColumn<LoanModel, String> loanNameColumn = new TableColumn<>("Id");
-        loanNameColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-
-        TableColumn<LoanModel, Integer> amountColumn = new TableColumn<>("Amount");
-        amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
-
-        adminLoansTable.getColumns().addAll(loanNameColumn, amountColumn, loanExpanderColumn);
+        LoanTable.setDataTables(adminLoansTable);
 
         updateBankData();
         adminLoansTable.setItems(getLoans());
