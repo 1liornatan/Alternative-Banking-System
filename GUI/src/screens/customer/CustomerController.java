@@ -2,6 +2,8 @@ package screens.customer;
 
 import bank.impl.BankImpl;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,6 +21,8 @@ public class CustomerController {
     private BankImpl bankInstance;
     private List<LoanModel> loanerModelList;
     private List<LoanModel> lenderModelList;
+    private StringProperty customerId;
+
 
     @FXML
     private TableView<LoanModel> loanerLoansTable;
@@ -50,12 +54,27 @@ public class CustomerController {
         LoanTable.setDataTables(lenderLoansTable);
     }
 
+    public String getCustomerId() {
+        return customerId.get();
+    }
+
+    public StringProperty customerIdProperty() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId.set(customerId);
+    }
+
+    public CustomerController() {
+        customerId = new SimpleStringProperty();
+    }
     public void updateLoansData() {
         Thread updateThread = new Thread(() -> {
             List<LoanModel> tempLenderModelList = new ArrayList<>();
             List<LoanModel> tempLoanerModelList = new ArrayList<>();
-            List<LoanData>  loanerDataList = bankInstance.getLoanerData(customerId).getLoans();
-            List<LoanData>  lenderDataList = bankInstance.getLenderData(customerId).getLoans();
+            List<LoanData>  loanerDataList = bankInstance.getLoanerData(customerId.get()).getLoans();
+            List<LoanData>  lenderDataList = bankInstance.getLenderData(customerId.get()).getLoans();
 
             updateList(loanerDataList, tempLoanerModelList);
             updateList(lenderDataList, tempLenderModelList);

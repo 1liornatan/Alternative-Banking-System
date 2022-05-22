@@ -83,13 +83,13 @@ public class MainPageController {
             if(oldVal == null || newVal == null)
                 return;
             else if(newVal.equals("Admin")) {
+                updateScreenData();
                 setAdminScreen();
             }
             else {
+                customerController.updateLoansData();
                 setCustomerScreen();
             }
-
-            updateScreenData();
         });
         adminController.setBankInstance(bankInstance);
         customerController.setBankInstance(bankInstance);
@@ -109,6 +109,7 @@ public class MainPageController {
             });
             customersNamesThread.start();
         });
+        customerController.customerIdProperty().bind(viewComboBox.valueProperty());
     }
 
 

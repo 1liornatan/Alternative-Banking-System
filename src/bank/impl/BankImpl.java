@@ -377,4 +377,48 @@ public class BankImpl implements Bank {
         }
         return new CustomersNames(names);
     }
+
+    @Override
+    public LoansData getLoanerData(String customerId) {
+        List<LoanData> loanDataList = new ArrayList<>();
+        LoansData loansData = new LoansData();
+        try {
+            customersAccounts.getDataById(customerId)
+                    .getLoansInvested()
+                    .stream()
+                    .forEach(loan -> {
+                        try {
+                            loanDataList.add(getLoanData(loan));
+                        } catch (DataNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    });
+            loansData.setLoans(loanDataList);
+        } catch (DataNotFoundException e) {
+            e.printStackTrace();
+        }
+        return loansData;
+    }
+
+    @Override
+    public LoansData getLenderData(String customerId) {
+        List<LoanData> loanDataList = new ArrayList<>();
+        LoansData loansData = new LoansData();
+        try {
+            customersAccounts.getDataById(customerId)
+                    .getLoansRequested()
+                    .stream()
+                    .forEach(loan -> {
+                        try {
+                            loanDataList.add(getLoanData(loan));
+                        } catch (DataNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    });
+            loansData.setLoans(loanDataList);
+        } catch (DataNotFoundException e) {
+            e.printStackTrace();
+        }
+        return loansData;
+    }
 }

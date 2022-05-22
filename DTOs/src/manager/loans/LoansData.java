@@ -5,7 +5,6 @@ import java.util.List;
 public class LoansData {
     private List<LoanData> loans;
 
-
     public List<LoanData> getLoans() {
         return loans;
     }

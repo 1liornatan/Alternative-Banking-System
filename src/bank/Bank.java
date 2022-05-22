@@ -89,4 +89,8 @@ public interface Bank {
     LoansData getLoansData() throws DataNotFoundException;
 
     CustomersNames getCustomersNames();
+
+    LoansData getLoanerData(String customerId);
+
+    LoansData getLenderData(String customerId);
 }
