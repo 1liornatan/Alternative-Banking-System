@@ -36,7 +36,9 @@ import manager.loans.details.*;
 import manager.categories.CategoriesDTO;
 import manager.time.YazSystemDTO;
 import manager.transactions.TransactionDTO;
+import manager.transactions.TransactionData;
 import manager.transactions.TransactionsDTO;
+import manager.transactions.TransactionsData;
 
 import java.io.IOException;
 import java.util.*;
@@ -420,5 +422,34 @@ public class BankImpl implements Bank {
             e.printStackTrace();
         }
         return loansData;
+    }
+
+    @Override
+    public TransactionData getTransactionData(Transaction transaction) {
+        TransactionData transactionData = new TransactionData();
+        transactionData.setAmount(transaction.getAmount());
+        transactionData.setDescription(transaction.getDescription());
+        transactionData.setPreviousBalance(transaction.getPreviousBalance());
+        try {
+            transactionData.setYazMade(transactions.getDataPair(transaction.getId()).getValue());
+        } catch (DataNotFoundException e) {
+            e.printStackTrace();
+        }
+        return transactionData;
+    }
+
+    @Override
+    public TransactionsData getTransactionsData(String customerId) {
+        TransactionsData transactionsData = new TransactionsData();
+        List<TransactionData> transactionsDataList = new ArrayList<>();
+        try {
+            customersAccounts.getDataById(customerId).getTransactions()
+                    .stream()
+                    .forEach(transaction -> { transactionsDataList.add(getTransactionData(transaction));});
+        } catch (DataNotFoundException e) {
+            e.printStackTrace();
+        }
+        transactionsData.setTransactions(transactionsDataList);
+        return transactionsData;
     }
 }

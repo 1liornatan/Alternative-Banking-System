@@ -21,7 +21,9 @@ import manager.loans.LoansDTO;
 import manager.loans.LoansData;
 import manager.time.YazSystemDTO;
 import manager.transactions.TransactionDTO;
+import manager.transactions.TransactionData;
 import manager.transactions.TransactionsDTO;
+import manager.transactions.TransactionsData;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -93,4 +95,8 @@ public interface Bank {
     LoansData getLoanerData(String customerId);
 
     LoansData getLenderData(String customerId);
+
+    TransactionData getTransactionData(Transaction transaction);
+
+    TransactionsData getTransactionsData(String cutsomerId);
 }

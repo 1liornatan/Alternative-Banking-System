@@ -12,13 +12,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import manager.categories.CategoriesDTO;
 import manager.loans.LoanData;
+import manager.transactions.TransactionData;
 import models.LoanModel;
+import models.TransactionModel;
 import models.utils.LoanTable;
 import org.controlsfx.control.CheckComboBox;
 
@@ -33,6 +33,7 @@ public class CustomerController {
     private StringProperty customerId;
     private ObservableList<String> categoriesList;
     private BooleanProperty isFileSelected;
+    private List<TransactionModel> transactionModels;
 
 
     @FXML
@@ -42,7 +43,7 @@ public class CustomerController {
     private TableView<LoanModel> lenderLoansTable;
 
     @FXML
-    private TableView<?> transactionsTable;
+    private TableView<TransactionModel> transactionsTable;
 
     @FXML
     private Button chargeButton;
@@ -67,6 +68,7 @@ public class CustomerController {
         LoanTable.setDataTables(loanerLoansTable);
         LoanTable.setDataTables(lenderLoansTable);
         updateCategories();
+        setTransactionsTable();
         amountField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
@@ -182,6 +184,7 @@ public class CustomerController {
     public CustomerController() {
         customerId = new SimpleStringProperty();
         isFileSelected = new SimpleBooleanProperty();
+        transactionModels = new ArrayList<>();
     }
     public void updateLoansData() {
         Thread updateThread = new Thread(() -> {
@@ -260,6 +263,50 @@ public class CustomerController {
 
     public void setIsFileSelected(boolean isFileSelected) {
         this.isFileSelected.set(isFileSelected);
+    }
+
+    private ObservableList<TransactionModel> getTransactions() {
+        return FXCollections.observableArrayList(transactionModels);
+    }
+
+    private void updateTransactions() {
+        if(!isFileSelected.get())
+            return;
+        Thread updateTransactions = new Thread(() -> {
+            List<TransactionData> transactionsData = bankInstance.getTransactionsData(customerId.get()).getTransactions();
+            List<TransactionModel> tempTransactionModels = new ArrayList<>();
+            for(TransactionData data : transactionsData) {
+                tempTransactionModels.add(new TransactionModel.TransactionModelBuilder()
+                        .description(data.getDescription())
+                        .amount(data.getAmount())
+                        .previousBalance(data.getPreviousBalance())
+                        .yazMade(data.getYazMade())
+                        .build());
+            }
+            transactionModels = tempTransactionModels;
+            Platform.runLater(() -> transactionsTable.setItems(getTransactions()));
+        });
+        updateTransactions.start();
+    }
+
+    private void setTransactionsTable() {
+        TableColumn<TransactionModel, String> descriptionColumn = new TableColumn<>("Description");
+        descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+
+        TableColumn<TransactionModel, Integer> balanceColumn = new TableColumn<>("Amount");
+        balanceColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+
+        TableColumn<TransactionModel, Integer> previousBalanceColumn = new TableColumn<>("PreviousBalance");
+        previousBalanceColumn.setCellValueFactory(new PropertyValueFactory<>("previousBalance"));
+
+        TableColumn<TransactionModel, Integer> yazMadeColumn = new TableColumn<>("YazMade");
+        yazMadeColumn.setCellValueFactory(new PropertyValueFactory<>("yazMade"));
+
+        transactionsTable.getColumns().addAll(descriptionColumn, balanceColumn, previousBalanceColumn, yazMadeColumn);
+
+        updateTransactions();
+        transactionsTable.setItems(getTransactions());
+
     }
 }
 

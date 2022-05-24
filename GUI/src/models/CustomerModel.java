@@ -4,6 +4,8 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 public class CustomerModel {
 
@@ -170,4 +172,5 @@ public class CustomerModel {
     public void setNumOfNewLoansInvested(int numOfNewLoansInvested) {
         this.numOfNewLoansInvested.set(numOfNewLoansInvested);
     }
+
 }
