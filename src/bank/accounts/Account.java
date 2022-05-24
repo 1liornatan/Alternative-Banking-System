@@ -15,10 +15,6 @@ public interface Account extends Singular {
 
     List<Transaction> getTransactions();
 
-    void addRequestedLoan(Loan loan);
-
-    void addInvestedLoan(Loan loan);
-
     List<Loan> getLoansRequested();
 
     List<Loan> getLoansInvested();
@@ -30,5 +26,6 @@ public interface Account extends Singular {
     Transaction deposit(int amount, String description) throws NonPositiveAmountException;
 
     Transaction withdraw(int amount, String description) throws NonPositiveAmountException, NoMoneyException;
+
 
 }

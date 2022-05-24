@@ -9,14 +9,18 @@ public class RequestDTO {
     CategoriesDTO categoriesDTO;
     float minInterest;
     int minLoanDuration;
+    int maxRelatedLoans;
     String requesterName;
 
-    public RequestDTO(String requesterName, int amount, CategoriesDTO categories, float minInterest, int minLoanDuration) {
+
+
+    public RequestDTO(String requesterName, int amount, CategoriesDTO categories, float minInterest, int minLoanDuration, int maxRelatedLoans) {
         this.amount = amount;
         this.categoriesDTO = categories;
         this.minInterest = minInterest;
         this.minLoanDuration = minLoanDuration;
         this.requesterName = requesterName;
+        this.maxRelatedLoans = maxRelatedLoans;
     }
 
     public int getAmount() {
@@ -38,4 +42,8 @@ public class RequestDTO {
     public String getRequesterName() {
         return requesterName;
     }
+
+    public int getMaxRelatedLoans() { return maxRelatedLoans;
+    }
+
 }

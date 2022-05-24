@@ -8,9 +8,6 @@ import bank.loans.impl.builder.LoanBuilder;
 import bank.loans.interest.Interest;
 import bank.loans.investments.Investment;
 import bank.time.TimeHandler;
-import manager.loans.LoanDTO;
-import manager.loans.LoansDTO;
-import manager.loans.details.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +25,7 @@ public class BasicLoan implements Loan {
     private final Interest interest;
     private LoanStatus status;
     private final List<Investment> investments;
-    private List<Integer> payments;
+    private final List<Integer> payments;
     private final Account loanAccount;
     private final TimeHandler timeHandler;
 
@@ -247,7 +244,7 @@ public class BasicLoan implements Loan {
     }
 
     @Override
-    public boolean isInvestible() {
+    public boolean isInvestable() {
         return (status == LoanStatus.NEW || status == LoanStatus.PENDING);
     }
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="screens.admin.AdminController">
+   <children>
+      <Button fx:id="increaseYazButton" mnemonicParsing="false" onAction="#increaseYazButtonAction" prefHeight="25.0" prefWidth="127.0" text="Increase Yaz" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0" />
+      <Button fx:id="loadFileButton" mnemonicParsing="false" onAction="#loadFileButtonAction" prefHeight="25.0" prefWidth="127.0" text="Load File" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0" />
+      <VBox prefHeight="349.0" prefWidth="600.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="80.0">
+         <children>
+            <TableView fx:id="adminLoansTable">
+               <columns>
+                  <TableColumn editable="false" maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" sortable="false" text="C2" />
+               </columns>
+            </TableView>
+            <TableView fx:id="adminsCustomersTable">
+               <columns>
+                  <TableColumn maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" text="C2" />
+               </columns>
+            </TableView>
+         </children>
+         <padding>
+            <Insets bottom="15.0" />
+         </padding>
+      </VBox>
+   </children>
+</AnchorPane>

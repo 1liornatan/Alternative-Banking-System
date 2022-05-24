@@ -1,14 +1,15 @@
 package bank.impl;
 
 import bank.Bank;
-import bank.accounts.Account;
-import bank.accounts.impl.CustomerAccount;
+import bank.accounts.CustomerAccount;
+import bank.accounts.impl.Customer;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.Loan;
+import bank.loans.LoanStatus;
 import bank.loans.handler.impl.BankLoanHandler;
 import bank.loans.interest.Interest;
 import bank.loans.interest.exceptions.InvalidPercentException;
@@ -25,11 +26,15 @@ import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.accounts.AccountDTO;
 import manager.customers.CustomerDTO;
+import manager.customers.CustomerData;
 import manager.customers.CustomersDTO;
+import manager.customers.CustomersData;
 import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
+import manager.loans.LoanData;
 import manager.loans.LoansDTO;
+import manager.loans.LoansData;
 import manager.loans.details.*;
 import manager.categories.CategoriesDTO;
 import manager.time.YazSystemDTO;
@@ -41,8 +46,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BankImpl implements Bank {
-    private DataStorage<Account> customersAccounts;
-    private DataStorage<Account> loanAccounts;
+    private DataStorage<bank.accounts.CustomerAccount> customersAccounts;
+    private DataStorage<bank.accounts.Account> loanAccounts;
     private DataStorage<Transaction> transactions;
     private DataStorage<Loan> loans;
     private Set<String> categories;
@@ -60,12 +65,12 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public DataStorage<Account> getCustomersAccounts() {
+    public DataStorage<bank.accounts.CustomerAccount> getCustomersAccounts() {
         return customersAccounts;
     }
 
     @Override
-    public DataStorage<Account> getLoanAccounts() {
+    public DataStorage<bank.accounts.Account> getLoanAccounts() {
         return loanAccounts;
     }
 
@@ -118,21 +123,21 @@ public class BankImpl implements Bank {
 
     @Override
     public void withdraw(String accountId, int amount, String description) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
-        Account account = customersAccounts.getDataById(accountId);
+        bank.accounts.Account account = customersAccounts.getDataById(accountId);
         Transaction transaction = account.withdraw(amount, description);
         transactions.addData(transaction);
     }
 
     @Override
     public void deposit(String accountId, int amount, String description) throws NonPositiveAmountException, DataNotFoundException {
-        Account account = customersAccounts.getDataById(accountId);
+        bank.accounts.Account account = customersAccounts.getDataById(accountId);
         Transaction transaction = account.deposit(amount, description);
         transactions.addData(transaction);
     }
 
     @Override
     public void createAccount(String name, int balance) {
-        Account account = new CustomerAccount(name, balance);
+        bank.accounts.CustomerAccount account = new Customer(name, balance);
 
         customersAccounts.addData(account);
     }
@@ -152,7 +157,7 @@ public class BankImpl implements Bank {
     public void createInvestment(InvestDTO investDetails) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
         Loan loan = loans.getDataById(investDetails.getLoanName());
         String investor = investDetails.getInvestorName();
-        Account investingAccount = customersAccounts.getDataById(investor);
+        bank.accounts.CustomerAccount investingAccount = customersAccounts.getDataById(investor);
 
         float percent = loan.getInterestPercent();
         int amountInvesting = investDetails.getAmount();
@@ -172,16 +177,18 @@ public class BankImpl implements Bank {
         float minInterest = requestDTO.getMinInterest();
         List<String> categories = requestDTO.getCategoriesDTO().getCategories();
         int minDuration = requestDTO.getMinLoanDuration();
+        int maxRelatedLoans = requestDTO.getMaxRelatedLoans();
 
         if(minInterest < 0 || minInterest > 100)
             throw new InvalidPercentException();
 
         List<Pair<Loan, Integer>> relevantLoans = loans.getAllPairs().stream()
                 .filter(p -> !p.getKey().getOwnerId().equals(requesterName))
-                .filter(p -> p.getKey().isInvestible())
+                .filter(p -> p.getKey().isInvestable())
                 .filter(p -> p.getKey().getInterestPercent() >= minInterest)
                 .filter(p -> categories.contains(p.getKey().getCategory()))
                 .filter(p -> p.getKey().getDuration() >= minDuration)
+                .filter(p->p.getKey().getLoanAccount().getLoansRequested().size() <= maxRelatedLoans)
                 .collect(Collectors.toList());
 
         List<LoanDTO> loansDTOList = new ArrayList<>();
@@ -208,9 +215,9 @@ public class BankImpl implements Bank {
     @Override
     public CustomersDTO getCustomersDTO() throws DataNotFoundException {
         List<CustomerDTO> customersDTOList = new ArrayList<>();
-        Collection<Pair<Account, Integer>> customersList = customersAccounts.getAllPairs();
+        Collection<Pair<bank.accounts.CustomerAccount, Integer>> customersList = customersAccounts.getAllPairs();
 
-        for(Pair<Account, Integer> account : customersList) {
+        for(Pair<bank.accounts.CustomerAccount, Integer> account : customersList) {
             customersDTOList.add(getCustomerDTO(account.getKey().getId()));
         }
 
@@ -219,7 +226,7 @@ public class BankImpl implements Bank {
 
     @Override
     public CustomerDTO getCustomerDTO(String id) throws DataNotFoundException {
-        Account account = customersAccounts.getDataById(id);
+        bank.accounts.Account account = customersAccounts.getDataById(id);
         List<LoanDTO> loansInvestedDTOList = new ArrayList<>();
         List<LoanDTO> loansRequestedDTOList = new ArrayList<>();
         List<Loan> loansInvested = account.getLoansInvested();
@@ -263,7 +270,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public TransactionsDTO getTransactionsDTO(Account account) throws DataNotFoundException {
+    public TransactionsDTO getTransactionsDTO(bank.accounts.Account account) throws DataNotFoundException {
         List<TransactionDTO> transactionsList = new ArrayList<>();
         List<Transaction> accountTransactions = account.getTransactions();
 
@@ -297,10 +304,73 @@ public class BankImpl implements Bank {
             timeHandler.setCurrentTime(saver.getCurrYaz());
 
             categories = (Set<String>) saver.getCategories();
-            customersAccounts = (DataStorage<Account>) saver.getCustomers();
-            loanAccounts = (DataStorage<Account>) saver.getLoanAccounts();
+            customersAccounts = (DataStorage<bank.accounts.CustomerAccount>) saver.getCustomers();
+            loanAccounts = (DataStorage<bank.accounts.Account>) saver.getLoanAccounts();
             loans = (DataStorage<Loan>)saver.getLoans();
             transactions = (DataStorage<Transaction>) saver.getTransactions();
         }
+    }
+
+    @Override
+    public LoanData getLoanData(Loan loan) throws DataNotFoundException {
+        LoanData loanData = new LoanData();
+        loanData.setAmountToActive(loan.getAmountToActive());
+        loanData.setBaseAmount(loan.getBaseAmount());
+        loanData.setCategory(loan.getCategory());
+        loanData.setDeriskAmount(loan.getDeriskAmount());
+        loanData.setFinalAmount(loan.getFinalAmount());
+        loanData.setFinishedYaz(loan.getFinishedYaz());
+        loanData.setInterest(loan.getInterestPercent());
+        loanData.setName(loan.getId());
+        loanData.setLoanRequester(customersAccounts.getDataById(loan.getOwnerId()).getId());
+        loanData.setStatus(loan.getStatus().name());
+        loanData.setNextPaymentAmount(loan.getPayment());
+        loanData.setCyclesPerPayment(loan.getCyclesPerPayment());
+        loanData.setMissingCycles(loan.getMissingCycles());
+        loanData.setNextPaymentInYaz(loan.getNextYaz());
+        loanData.setStartedYaz(loan.getStartedYaz());
+        return loanData;
+    }
+
+    @Override
+    public CustomerData getCustomerData(CustomerAccount customer) throws DataNotFoundException {
+        CustomerData customerData = new CustomerData();
+        customerData.setBalance(customer.getBalance());
+        customerData.setName(customer.getId());
+        customerData.setNumOfActiveLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.ACTIVE));
+        customerData.setNumOfPendingLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.PENDING));
+        customerData.setNumOfRiskLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.RISK));
+        customerData.setNumOfFinishedLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.FINISHED));
+        customerData.setNumOfNewLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.NEW));
+        customerData.setNumOfActiveLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.ACTIVE));
+        customerData.setNumOfPendingLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.PENDING));
+        customerData.setNumOfRiskLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.RISK));
+        customerData.setNumOfFinishedLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.FINISHED));
+        customerData.setNumOfNewLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.NEW));
+        return customerData;
+    }
+
+    @Override
+    public CustomersData getCustomersData() throws DataNotFoundException {
+        CustomersData customersData = new CustomersData();
+        List<CustomerData> customersList = new ArrayList<>();
+        for(Pair<CustomerAccount, Integer> customerPair : customersAccounts.getAllPairs()) {
+            customersList.add(getCustomerData(customerPair.getKey()));
+        }
+        customersData.setCustomers(customersList);
+        return customersData;
+
+
+    }
+
+    @Override
+    public LoansData getLoansData() throws DataNotFoundException {
+        LoansData loansData = new LoansData();
+        List<LoanData> loansList= new ArrayList<>();
+        for(Pair<Loan, Integer> loanPair : loans.getAllPairs()) {
+            loansList.add(getLoanData(loanPair.getKey()));
+        }
+        loansData.setLoans(loansList);
+        return loansData;
     }
 }

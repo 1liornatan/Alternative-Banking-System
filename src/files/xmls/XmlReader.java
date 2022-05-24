@@ -8,8 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-import bank.accounts.Account;
-import bank.accounts.impl.CustomerAccount;
+import bank.accounts.impl.Customer;
 import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
 import bank.impl.exceptions.DataNotFoundException;
@@ -29,7 +28,7 @@ import javax.xml.bind.Unmarshaller;
 public class XmlReader {
     private static final String JAXB_XML_ABS_PACKAGE_NAME = "files.schema.generated";
     private Set<String> categoryNames;
-    private DataStorage<Account> customersDataStorage;
+    private DataStorage<bank.accounts.CustomerAccount> customersDataStorage;//TODO: ?????????
     private DataStorage<Loan> loansDataStorage;
     private boolean validation;
 
@@ -68,7 +67,7 @@ public class XmlReader {
                 if(customersDataStorage.isDataExists(currName))
                     throw new XmlAccountExistsException();
 
-                Account currCustomer = new CustomerAccount(currName, absCustomer.getAbsBalance());
+                bank.accounts.CustomerAccount currCustomer = new Customer(currName, absCustomer.getAbsBalance());//TODO: ????
                 customersDataStorage.addData(currCustomer);
             }
 
@@ -112,7 +111,7 @@ public class XmlReader {
         return categoryNames;
     }
 
-    public DataStorage<Account> getCustomersDataStorage() {
+    public DataStorage<bank.accounts.CustomerAccount> getCustomersDataStorage() {
         return customersDataStorage;
     }
 

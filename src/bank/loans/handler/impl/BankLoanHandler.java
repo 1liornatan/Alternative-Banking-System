@@ -1,6 +1,8 @@
 package bank.loans.handler.impl;
 
 import bank.accounts.Account;
+import bank.accounts.CustomerAccount;
+import bank.accounts.impl.Customer;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.storage.DataStorage;
@@ -12,9 +14,7 @@ import bank.loans.impl.BasicLoan;
 import bank.loans.impl.builder.LoanBuilder;
 import bank.loans.interest.Interest;
 import bank.loans.investments.Investment;
-import bank.loans.investments.impl.LoanInvestment;
 import bank.time.TimeHandler;
-import bank.time.handler.BankTimeHandler;
 import bank.transactions.Transaction;
 import javafx.util.Pair;
 
@@ -26,17 +26,17 @@ import java.util.stream.Collectors;
 public class BankLoanHandler implements LoanHandler {
     private final DataStorage<Transaction> transactions;
     private DataStorage<Loan> loans;
-    private DataStorage<Account> customers;
+    private DataStorage<CustomerAccount> customers;
     private TimeHandler timeHandler;
 
-    public BankLoanHandler(DataStorage<Transaction> transactions, DataStorage<Loan> loans, DataStorage<Account> customers, TimeHandler timeHandler) {
+    public BankLoanHandler(DataStorage<Transaction> transactions, DataStorage<Loan> loans, DataStorage<CustomerAccount> customers, TimeHandler timeHandler) {
         this.transactions = transactions;
         this.loans = loans;
         this.customers = customers;
         this.timeHandler = timeHandler;
     }
 
-    public BankLoanHandler(DataStorage<Transaction> transactions, DataStorage<Loan> loans, DataStorage<Account> customers) {
+    public BankLoanHandler(DataStorage<Transaction> transactions, DataStorage<Loan> loans, DataStorage<CustomerAccount> customers) {
         this.transactions = transactions;
         this.loans = loans;
         this.customers = customers;
@@ -52,7 +52,7 @@ public class BankLoanHandler implements LoanHandler {
     }
 
     @Override
-    public void addInvestment(Loan loan, Investment investment, Account srcAcc) throws NonPositiveAmountException, NoMoneyException, DataNotFoundException {
+    public void addInvestment(Loan loan, Investment investment, CustomerAccount srcAcc) throws NonPositiveAmountException, NoMoneyException, DataNotFoundException {
         int amount = investment.getBaseAmount();
         loan.addInvestment(investment);
         transactions.addData(loan.getLoanAccount().deposit(amount, "Loan"));

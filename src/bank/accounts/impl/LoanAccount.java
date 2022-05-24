@@ -38,16 +38,6 @@ public class LoanAccount implements Account, Singular {
     }
 
     @Override
-    public void addRequestedLoan(Loan loan) {
-
-    }
-
-    @Override
-    public void addInvestedLoan(Loan loan) {
-
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

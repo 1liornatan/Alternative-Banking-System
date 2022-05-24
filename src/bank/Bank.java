@@ -1,6 +1,7 @@
 package bank;
 
 import bank.accounts.Account;
+import bank.accounts.CustomerAccount;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.storage.DataStorage;
@@ -11,12 +12,16 @@ import bank.time.TimeHandler;
 import bank.transactions.Transaction;
 import files.xmls.exceptions.*;
 import manager.customers.CustomerDTO;
+import manager.customers.CustomerData;
 import manager.customers.CustomersDTO;
+import manager.customers.CustomersData;
 import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.categories.CategoriesDTO;
+import manager.loans.LoanData;
 import manager.loans.LoansDTO;
+import manager.loans.LoansData;
 import manager.time.YazSystemDTO;
 import manager.transactions.TransactionDTO;
 import manager.transactions.TransactionsDTO;
@@ -26,7 +31,7 @@ import java.io.IOException;
 import java.util.Set;
 
 public interface Bank {
-    DataStorage<Account> getCustomersAccounts();
+    DataStorage<CustomerAccount> getCustomersAccounts();
 
     DataStorage<Account> getLoanAccounts();
 
@@ -77,4 +82,12 @@ public interface Bank {
     void saveToFile(String filePath) throws IOException;
 
     void loadFromFile(String filePath) throws IOException, ClassNotFoundException;
+
+    LoanData getLoanData(Loan loan) throws DataNotFoundException;
+
+    CustomerData getCustomerData(CustomerAccount customer) throws DataNotFoundException;
+
+    CustomersData getCustomersData() throws DataNotFoundException;
+
+    LoansData getLoansData() throws DataNotFoundException;
 }
