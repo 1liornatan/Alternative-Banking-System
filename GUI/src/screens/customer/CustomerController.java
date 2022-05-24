@@ -2,16 +2,25 @@ package screens.customer;
 
 import bank.impl.BankImpl;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import manager.categories.CategoriesDTO;
 import manager.loans.LoanData;
 import models.LoanModel;
 import models.utils.LoanTable;
+import org.controlsfx.control.CheckComboBox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +31,8 @@ public class CustomerController {
     private List<LoanModel> loanerModelList;
     private List<LoanModel> lenderModelList;
     private StringProperty customerId;
+    private ObservableList<String> categoriesList;
+    private BooleanProperty isFileSelected;
 
 
     @FXML
@@ -40,6 +51,9 @@ public class CustomerController {
     private Button withdrawButton;
 
     @FXML
+    private Button searchLoansButton;
+
+    @FXML
     private TableView<?> loanerLoansPTable;
 
     @FXML
@@ -52,6 +66,105 @@ public class CustomerController {
     void initialize() {
         LoanTable.setDataTables(loanerLoansTable);
         LoanTable.setDataTables(lenderLoansTable);
+        updateCategories();
+        amountField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    amountField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+        minInterestField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    minInterestField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+        minYazField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    minYazField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+        maxLoanerLoansField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    maxLoanerLoansField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+        maxOwnershipField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    maxOwnershipField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+    }
+
+    @FXML
+    private TextField amountField;
+
+    @FXML
+    private TextField minInterestField;
+
+    @FXML
+    private TextField minYazField;
+
+    @FXML
+    private TextField maxLoanerLoansField;
+
+    @FXML
+    private TextField maxOwnershipField;
+
+    @FXML
+    private CheckComboBox<String> categoriesComboBox;
+
+    @FXML
+    private TableView<?> loansFoundTable;
+
+    @FXML
+    private TableView<?> loansChosenTable;
+
+    @FXML
+    private Button tablesRightButton;
+
+    @FXML
+    private Button tablesLeftButton;
+
+    @FXML
+    private Button investButton;
+
+    @FXML
+    void investButtonAction(ActionEvent event) {
+        updateCategories();
+    }
+
+    @FXML
+    void tablesLeftButtonAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void searchLoansButtonAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void tablesRightButtonAction(ActionEvent event) {
+
     }
 
     public String getCustomerId() {
@@ -68,6 +181,7 @@ public class CustomerController {
 
     public CustomerController() {
         customerId = new SimpleStringProperty();
+        isFileSelected = new SimpleBooleanProperty();
     }
     public void updateLoansData() {
         Thread updateThread = new Thread(() -> {
@@ -91,6 +205,22 @@ public class CustomerController {
         updateThread.start();
     }
 
+    public void updateCategories() {
+        if(!isFileSelected.get())
+            return;
+
+        Thread updateCategories = new Thread(() -> {
+            List<String> categories = bankInstance.getCategoriesDTO().getCategories();
+            ObservableList<String> tempCategoriesList = FXCollections.observableArrayList();
+            for(String category : categories) {
+                tempCategoriesList.add(category);
+            }
+            categoriesList = tempCategoriesList;
+            Platform.runLater(() -> categoriesComboBox.getItems().setAll(categoriesList));
+        });
+        updateCategories.start();
+    }
+
     private ObservableList<LoanModel> getLoans(List<LoanModel> modelList) {
         return FXCollections.observableArrayList(modelList);
     }
@@ -107,6 +237,11 @@ public class CustomerController {
             dest.add(loanModel);
         }
     }
+
+    private void searchLoans() {
+        Integer amount = Integer.valueOf(amountField.getText());
+    }
+
     public BankImpl getBankInstance() {
         return bankInstance;
     }
@@ -114,4 +249,17 @@ public class CustomerController {
     public void setBankInstance(BankImpl bankInstance) {
         this.bankInstance = bankInstance;
     }
+
+    public boolean isIsFileSelected() {
+        return isFileSelected.get();
+    }
+
+    public BooleanProperty isFileSelectedProperty() {
+        return isFileSelected;
+    }
+
+    public void setIsFileSelected(boolean isFileSelected) {
+        this.isFileSelected.set(isFileSelected);
+    }
 }
+

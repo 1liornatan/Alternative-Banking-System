@@ -57,7 +57,7 @@
                                           <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                              <children>
                                                 <Label alignment="CENTER" text="Amount to Invest" />
-                                                <TextField alignment="CENTER" />
+                                                <TextField fx:id="amountField" alignment="CENTER" />
                                              </children>
                                              <opaqueInsets>
                                                 <Insets />
@@ -66,7 +66,7 @@
                                           <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                              <children>
                                                 <Label alignment="CENTER" text="Minimum Interest" />
-                                                <TextField alignment="CENTER" />
+                                                <TextField fx:id="minInterestField" alignment="CENTER" />
                                              </children>
                                              <opaqueInsets>
                                                 <Insets />
@@ -75,7 +75,7 @@
                                           <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                              <children>
                                                 <Label alignment="CENTER" text="Minimum Yaz" />
-                                                <TextField alignment="CENTER" />
+                                                <TextField fx:id="minYazField" alignment="CENTER" />
                                              </children>
                                              <opaqueInsets>
                                                 <Insets />
@@ -84,7 +84,7 @@
                                           <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                              <children>
                                                 <Label alignment="CENTER" text="Max Loaner Loans" />
-                                                <TextField alignment="CENTER" />
+                                                <TextField fx:id="maxLoanerLoansField" alignment="CENTER" />
                                              </children>
                                              <opaqueInsets>
                                                 <Insets />
@@ -93,7 +93,7 @@
                                           <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                              <children>
                                                 <Label alignment="CENTER" prefWidth="120.0" text="Max Loan Ownership" />
-                                                <TextField alignment="CENTER" />
+                                                <TextField fx:id="maxOwnershipField" alignment="CENTER" />
                                              </children>
                                              <opaqueInsets>
                                                 <Insets />
@@ -113,7 +113,7 @@
                                     <VBox alignment="CENTER" layoutX="30.0" layoutY="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                        <children>
                                           <Label text="Categories" />
-                                          <CheckComboBox prefHeight="25.0" prefWidth="214.0" />
+                                          <CheckComboBox fx:id="categoriesComboBox" prefHeight="25.0" prefWidth="214.0" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -122,8 +122,30 @@
                            <bottom>
                               <BorderPane>
                                  <center>
-                                    <TableView prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                                    <BorderPane BorderPane.alignment="CENTER">
+                                       <left>
+                                          <TableView fx:id="loansFoundTable" prefHeight="150.0" prefWidth="249.0" BorderPane.alignment="CENTER" />
+                                       </left>
+                                       <right>
+                                          <TableView fx:id="loansChosenTable" prefHeight="150.0" prefWidth="249.0" BorderPane.alignment="CENTER" />
+                                       </right>
+                                       <center>
+                                          <VBox alignment="CENTER" prefHeight="85.0" prefWidth="82.0" spacing="20.0" BorderPane.alignment="CENTER">
+                                             <children>
+                                                <Button fx:id="tablesRightButton" mnemonicParsing="false" onAction="#tablesRightButtonAction" prefHeight="25.0" prefWidth="36.0" />
+                                                <Button fx:id="tablesLeftButton" mnemonicParsing="false" onAction="#tablesLeftButtonAction" prefHeight="25.0" prefWidth="36.0" />
+                                                <Button fx:id="investButton" mnemonicParsing="false" onAction="#investButtonAction" prefHeight="25.0" prefWidth="75.0" text="Invest" />
+                                             </children>
+                                          </VBox>
+                                       </center>
+                                    </BorderPane>
                                  </center>
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                                 <padding>
+                                    <Insets bottom="20.0" left="10.0" right="10.0" />
+                                 </padding>
                               </BorderPane>
                            </bottom>
                         </BorderPane>

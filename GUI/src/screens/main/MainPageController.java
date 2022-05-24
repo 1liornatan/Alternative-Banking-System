@@ -110,6 +110,7 @@ public class MainPageController {
             customersNamesThread.start();
         });
         customerController.customerIdProperty().bind(viewComboBox.valueProperty());
+        customerController.isFileSelectedProperty().bind(adminController.getFileSelectedProperty());
     }
 
 
