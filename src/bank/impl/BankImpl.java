@@ -25,10 +25,7 @@ import files.xmls.XmlReader;
 import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.accounts.AccountDTO;
-import manager.customers.CustomerDTO;
-import manager.customers.CustomerData;
-import manager.customers.CustomersDTO;
-import manager.customers.CustomersData;
+import manager.customers.*;
 import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
@@ -337,16 +334,16 @@ public class BankImpl implements Bank {
         CustomerData customerData = new CustomerData();
         customerData.setBalance(customer.getBalance());
         customerData.setName(customer.getId());
-        customerData.setNumOfActiveLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.ACTIVE));
-        customerData.setNumOfPendingLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.PENDING));
-        customerData.setNumOfRiskLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.RISK));
-        customerData.setNumOfFinishedLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.FINISHED));
-        customerData.setNumOfNewLoansInvested(customer.getNumOfRequestedLoansByStatus(LoanStatus.NEW));
-        customerData.setNumOfActiveLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.ACTIVE));
-        customerData.setNumOfPendingLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.PENDING));
-        customerData.setNumOfRiskLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.RISK));
-        customerData.setNumOfFinishedLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.FINISHED));
-        customerData.setNumOfNewLoansRequested(customer.getNumOfInvestedLoansByStatus(LoanStatus.NEW));
+        customerData.setNumOfActiveLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.ACTIVE));
+        customerData.setNumOfPendingLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.PENDING));
+        customerData.setNumOfRiskLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.RISK));
+        customerData.setNumOfFinishedLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.FINISHED));
+        customerData.setNumOfNewLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.NEW));
+        customerData.setNumOfActiveLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.ACTIVE));
+        customerData.setNumOfPendingLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.PENDING));
+        customerData.setNumOfRiskLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.RISK));
+        customerData.setNumOfFinishedLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.FINISHED));
+        customerData.setNumOfNewLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.NEW));
         return customerData;
     }
 
@@ -359,8 +356,6 @@ public class BankImpl implements Bank {
         }
         customersData.setCustomers(customersList);
         return customersData;
-
-
     }
 
     @Override
@@ -371,6 +366,59 @@ public class BankImpl implements Bank {
             loansList.add(getLoanData(loanPair.getKey()));
         }
         loansData.setLoans(loansList);
+        return loansData;
+    }
+
+    @Override
+    public CustomersNames getCustomersNames() {
+        List<String> names = new ArrayList<>();
+        for(Pair<CustomerAccount, Integer> customerPair : customersAccounts.getAllPairs()) {
+            names.add(customerPair.getKey().getId());
+        }
+        return new CustomersNames(names);
+    }
+
+    @Override
+    public LoansData getLoanerData(String customerId) {
+        List<LoanData> loanDataList = new ArrayList<>();
+        LoansData loansData = new LoansData();
+        try {
+            customersAccounts.getDataById(customerId)
+                    .getLoansInvested()
+                    .stream()
+                    .forEach(loan -> {
+                        try {
+                            loanDataList.add(getLoanData(loan));
+                        } catch (DataNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    });
+            loansData.setLoans(loanDataList);
+        } catch (DataNotFoundException e) {
+            e.printStackTrace();
+        }
+        return loansData;
+    }
+
+    @Override
+    public LoansData getLenderData(String customerId) {
+        List<LoanData> loanDataList = new ArrayList<>();
+        LoansData loansData = new LoansData();
+        try {
+            customersAccounts.getDataById(customerId)
+                    .getLoansRequested()
+                    .stream()
+                    .forEach(loan -> {
+                        try {
+                            loanDataList.add(getLoanData(loan));
+                        } catch (DataNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    });
+            loansData.setLoans(loanDataList);
+        } catch (DataNotFoundException e) {
+            e.printStackTrace();
+        }
         return loansData;
     }
 }

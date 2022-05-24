@@ -1,5 +1,6 @@
 package screens.admin;
 
+import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import files.xmls.exceptions.*;
@@ -15,8 +16,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import manager.customers.CustomerData;
+import manager.loans.LoanData;
 import models.CustomerModel;
+import models.LoanModel;
 import models.LoanStatusModel;
+import models.utils.LoanTable;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 
 import java.io.File;
@@ -28,8 +32,10 @@ public class AdminController {
     BooleanProperty isFileSelected;
     StringProperty filePathProperty;
     IntegerProperty currYazProperty;
+
     private BankImpl bankInstance;
     private List<CustomerModel> customerModelList;
+    private List<LoanModel> loanModelList;
 
     @FXML
     private Button increaseYazButton;
@@ -38,14 +44,24 @@ public class AdminController {
     private Button loadFileButton;
 
     @FXML
-    private TableView<?> adminLoansTable;
+    private TableView<LoanModel> adminLoansTable;
 
     @FXML
     private TableView<CustomerModel> adminsCustomersTable;
 
     @FXML
     void increaseYazButtonAction(ActionEvent event) {
-
+        Thread increaseYazThread = new Thread(() -> {
+            try {
+                bankInstance.advanceOneYaz();
+                updateBankData();
+                int currYaz = bankInstance.getCurrentYaz();
+                Platform.runLater(() -> currYazProperty.set(currYaz));
+            } catch (DataNotFoundException | NonPositiveAmountException e) {
+                e.printStackTrace();
+            }
+        });
+        increaseYazThread.start();
     }
 
     @FXML
@@ -62,20 +78,58 @@ public class AdminController {
 
         String absolutePath = selectedFile.getAbsolutePath();
 
-        try {
-            bankInstance.loadData(absolutePath);
-            filePathProperty.set(absolutePath);
-            isFileSelected.set(true);
-            updateBankData();
-        } catch (NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException | XmlNotFoundException | DataNotFoundException e) {
-            System.out.println(e.getMessage());
-            Alert errorMessage = new Alert(Alert.AlertType.ERROR, e.getMessage());
-            errorMessage.show();
-        }
+        Thread loadBankThread = new Thread(() -> {
+            try {
+                bankInstance.loadData(absolutePath);
+                isFileSelected.set(true);
+                updateBankData();
+                int currYaz = bankInstance.getCurrentYaz();
+                Platform.runLater(() -> {
+                    filePathProperty.set(absolutePath);
+                    currYazProperty.set(currYaz);
+                });
+            } catch (NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException | XmlNotFoundException | DataNotFoundException e) {
+                System.out.println(e.getMessage());
+                Platform.runLater(() -> {
+                    Alert errorMessage = new Alert(Alert.AlertType.ERROR, e.getMessage());
+                    errorMessage.show();
+                });
+            }
+        });
+        loadBankThread.start();
     }
 
     private void updateBankData() {
         updateCustomersData();
+        updateLoansData();
+    }
+
+    private void updateLoansData() {
+        if(!isFileSelected.get())
+            return;
+
+        Thread updateLoansThread = new Thread(() -> {
+            try {
+                List<LoanModel> tempLoanModelList = new ArrayList<>();
+                List<LoanData> loanDataList = bankInstance.getLoansData().getLoans();
+                for(LoanData loanData : loanDataList) {
+                    LoanModel loanModel = new LoanModel();
+
+                    loanModel.setId(loanData.getName());
+                    loanModel.setAmount(loanData.getBaseAmount());
+                    loanModel.setEndYaz(loanData.getFinishedYaz());
+                    loanModel.setStartYaz(loanData.getStartedYaz());
+
+                    tempLoanModelList.add(loanModel);
+                }
+                loanModelList = tempLoanModelList;
+                Platform.runLater(() -> adminLoansTable.setItems(getLoans()));
+            } catch (DataNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
+
+        updateLoansThread.start();
     }
 
 
@@ -130,15 +184,16 @@ public class AdminController {
             customer.setEmail(emailField.getText());
             param.toggleExpanded();
         });*/
-
+        expanderTable.setMinHeight(75);
+        expanderTable.setMaxHeight(75);
+        expander.setMinHeight(75);
+        expander.setMaxHeight(75);
         expander.addRow(0, expanderTable);
-
+        expander.getStylesheets().add(getClass().getResource("/screens/resources/adminStyle.css").toExternalForm());
         return expander;
     }
 
-
     private void setDataTables() {
-        //TableRowExpanderColumn<LoanModel> loanExpanderColumn = new TableRowExpanderColumn<>(this::createLoanEditor);
         TableRowExpanderColumn<CustomerModel> customerExpanderColumn = new TableRowExpanderColumn<>(this::createCustomerExpander);
         customerExpanderColumn.setText("Loans");
 
@@ -148,14 +203,19 @@ public class AdminController {
         TableColumn<CustomerModel, Integer> balanceColumn = new TableColumn<>("Balance");
         balanceColumn.setCellValueFactory(new PropertyValueFactory<>("balance"));
 
-/*        TableColumn<Customer, Integer> investedColumn = new TableColumn<>("Email");
-        investedColumn.setCellValueFactory(new PropertyValueFactory<>("numOfInvested"));*/
 
         adminsCustomersTable.getColumns().addAll(nameColumn, balanceColumn, customerExpanderColumn);
 
-        updateCustomersData();
+        LoanTable.setDataTables(adminLoansTable);
+
+        updateBankData();
+        adminLoansTable.setItems(getLoans());
         adminsCustomersTable.setItems(getCustomers());
 
+    }
+
+    private ObservableList<LoanModel> getLoans() {
+        return FXCollections.observableArrayList(loanModelList);
     }
 
     private ObservableList<CustomerModel> getCustomers() {
@@ -167,6 +227,7 @@ public class AdminController {
         filePathProperty = new SimpleStringProperty();
         currYazProperty = new SimpleIntegerProperty();
         customerModelList = new ArrayList<>();
+        loanModelList = new ArrayList<>();
     }
 
     public BooleanProperty getFileSelectedProperty() {
@@ -181,10 +242,16 @@ public class AdminController {
     void initialize() {
         isFileSelected.set(false);
         setDataTables();
+        increaseYazButton.disableProperty().bind(isFileSelected.not());
+        adminsCustomersTable.disableProperty().bind(isFileSelected.not());
+        adminLoansTable.disableProperty().bind(isFileSelected.not());
     }
 
     public void updateCustomersData() {
-        Platform.runLater(() -> {
+        if(!isFileSelected.get())
+            return;
+
+        Thread updateThread = new Thread(() -> {
             try {
                 List<CustomerModel> tempCustomerModelList = new ArrayList<>();
                 List<CustomerData> customerDataList = bankInstance.getCustomersData().getCustomers();
@@ -207,11 +274,13 @@ public class AdminController {
                     tempCustomerModelList.add(customerModel);
                 }
                 customerModelList = tempCustomerModelList;
-                adminsCustomersTable.setItems(getCustomers());
+                Platform.runLater(() -> adminsCustomersTable.setItems(getCustomers()));
             } catch (DataNotFoundException e) {
                 e.printStackTrace();
             }
         });
+
+        updateThread.start();
     }
 
     public BankImpl getBankInstance() {

@@ -15,7 +15,7 @@
                <children>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <ComboBox fx:id="viewComboBox" layoutX="18.0" onAction="#viewComboBoxAction" promptText="View By CB" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <ComboBox fx:id="viewComboBox" layoutX="18.0" promptText="View By CB" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <cursor>
                               <Cursor fx:constant="DEFAULT" />
                            </cursor>

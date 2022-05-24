@@ -1,27 +1,18 @@
 package screens.main;
 
-import bank.accounts.impl.Customer;
 import bank.impl.BankImpl;
-import bank.impl.exceptions.DataNotFoundException;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import manager.customers.CustomerData;
-import manager.loans.LoanData;
-import models.CustomerModel;
-import models.LoanModel;
-import org.controlsfx.control.table.TableRowExpanderColumn;
+import manager.customers.CustomersNames;
 import screens.admin.AdminController;
 import screens.customer.CustomerController;
 import screens.resources.BankScreenConsts;
@@ -60,16 +51,6 @@ public class MainPageController {
     @FXML
     private Button loadFileButton;
 
-    @FXML
-    void increaseYazButtonAction(ActionEvent event) {
-
-    }
-
-    @FXML
-    void viewComboBoxAction(ActionEvent event) {
-
-    }
-
     public MainPageController() throws IOException {
         isAdminScreen = new SimpleBooleanProperty();
         isFileSelected = new SimpleBooleanProperty();
@@ -95,22 +76,40 @@ public class MainPageController {
     void initialize() {
         filePathTextField.textProperty().bind(adminController.getFilePathProperty());
         isFileSelected.bind(adminController.getFileSelectedProperty());
-        viewComboBox.setItems(FXCollections.observableArrayList(new String("Admin"), new String("Menash")));
+        viewComboBox.setItems(FXCollections.observableArrayList(new String("Admin")));
         viewComboBox.getSelectionModel().selectFirst();
         viewComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
 
-            if(oldVal.equals("Admin")) {
-                setCustomerScreen();
-            }
-            else if(oldVal.equals("Menash")) {
+            if(oldVal == null || newVal == null)
+                return;
+            else if(newVal.equals("Admin")) {
+                updateScreenData();
                 setAdminScreen();
             }
-
-            updateScreenData();
+            else {
+                customerController.updateLoansData();
+                setCustomerScreen();
+            }
         });
         adminController.setBankInstance(bankInstance);
         customerController.setBankInstance(bankInstance);
         currYazTextField.textProperty().bind(adminController.getCurrYazProperty().asString());
+        adminController.getFilePathProperty().addListener((obs, oldVal, newVal) -> {
+            Thread customersNamesThread = new Thread(() -> {
+                CustomersNames names = bankInstance.getCustomersNames();
+                List<String> namesList = new ArrayList<>();
+
+                namesList.add("Admin");
+                for(String name : names.getNames())
+                    namesList.add(name);
+
+                Platform.runLater(() -> {
+                    viewComboBox.setItems(FXCollections.observableArrayList(namesList));
+                });
+            });
+            customersNamesThread.start();
+        });
+        customerController.customerIdProperty().bind(viewComboBox.valueProperty());
     }
 
 
