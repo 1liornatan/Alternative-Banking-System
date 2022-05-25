@@ -83,8 +83,14 @@ public class SetLoanMenu {
         if(amount == 0)
             throw new NoAmountSetException();
 
-        RequestDTO requestDTO = new RequestDTO(requesterName, amount, new CategoriesDTO(categories),
-                minInterest, minLoanDuration, maxRequestedLoans);
+        RequestDTO requestDTO = new RequestDTO.Builder(requesterName, amount)
+            .categories(categories)
+            .minInterest(minInterest)
+            .minDuration(minLoanDuration)
+            .maxLoans(maxRequestedLoans)
+            .build();
+
+
 
         LoansDTO loansDTO = bankInstance.loanAssignmentRequest(requestDTO);
         List<LoanDTO> loanDTOList = loansDTO.getLoansList();

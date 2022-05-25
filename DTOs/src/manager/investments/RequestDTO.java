@@ -2,6 +2,8 @@ package manager.investments;
 
 import manager.categories.CategoriesDTO;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 public class RequestDTO {
@@ -12,15 +14,13 @@ public class RequestDTO {
     int maxRelatedLoans;
     String requesterName;
 
-
-
-    public RequestDTO(String requesterName, int amount, CategoriesDTO categories, float minInterest, int minLoanDuration, int maxRelatedLoans) {
-        this.amount = amount;
-        this.categoriesDTO = categories;
-        this.minInterest = minInterest;
-        this.minLoanDuration = minLoanDuration;
-        this.requesterName = requesterName;
-        this.maxRelatedLoans = maxRelatedLoans;
+    public RequestDTO(Builder builder) {
+        this.amount = builder.amount;
+        this.categoriesDTO = builder.categoriesDTO;
+        this.minInterest = builder.minInterest;
+        this.minLoanDuration = builder.minLoanDuration;
+        this.requesterName = builder.requesterName;
+        this.maxRelatedLoans = builder.maxRelatedLoans;
     }
 
     public int getAmount() {
@@ -44,6 +44,48 @@ public class RequestDTO {
     }
 
     public int getMaxRelatedLoans() { return maxRelatedLoans;
+    }
+
+    public static class Builder {
+        int amount;
+        CategoriesDTO categoriesDTO;
+        float minInterest;
+        int minLoanDuration;
+        int maxRelatedLoans;
+        String requesterName;
+
+        public Builder(String requesterName, int amount) {
+            this.amount = amount;
+            this.minInterest = 0;
+            this.maxRelatedLoans = 100;
+            this.minLoanDuration = 0;
+            categoriesDTO = null;
+            this.requesterName = requesterName;
+        }
+
+        public Builder minInterest(float minInterest) {
+            this.minInterest = minInterest;
+            return this;
+        }
+
+        public Builder maxLoans(int maxLoans) {
+            this.maxRelatedLoans = maxLoans;
+            return this;
+        }
+
+        public Builder minDuration(int duration) {
+            this.minLoanDuration = duration;
+            return this;
+        }
+
+        public Builder categories(Set<String> categories) {
+            categoriesDTO = new CategoriesDTO(categories);
+            return this;
+        }
+
+        public RequestDTO build() {
+            return new RequestDTO(this);
+        }
     }
 
 }

@@ -174,7 +174,7 @@ public class BankImpl implements Bank {
         int amount = requestDTO.getAmount();
         String requesterName = requestDTO.getRequesterName();
         float minInterest = requestDTO.getMinInterest();
-        List<String> categories = requestDTO.getCategoriesDTO().getCategories();
+        Collection<String> categories = requestDTO.getCategoriesDTO().getCategories();
         int minDuration = requestDTO.getMinLoanDuration();
         int maxRelatedLoans = requestDTO.getMaxRelatedLoans();
 

@@ -1,6 +1,7 @@
 package screens.customer;
 
 import bank.impl.BankImpl;
+import bank.loans.interest.exceptions.InvalidPercentException;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -15,15 +16,18 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import manager.categories.CategoriesDTO;
+import manager.investments.RequestDTO;
+import manager.loans.LoanDTO;
 import manager.loans.LoanData;
+import manager.loans.LoansDTO;
 import manager.transactions.TransactionData;
 import models.LoanModel;
 import models.TransactionModel;
 import models.utils.LoanTable;
 import org.controlsfx.control.CheckComboBox;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class CustomerController {
 
@@ -62,6 +66,84 @@ public class CustomerController {
 
     @FXML
     private TableView<?> notificationsTable;
+
+
+    @FXML
+    private TextField amountField;
+
+    @FXML
+    private TextField minInterestField;
+
+    @FXML
+    private TextField minYazField;
+
+    @FXML
+    private TextField maxLoanerLoansField;
+
+    @FXML
+    private TextField maxOwnershipField;
+
+    @FXML
+    private CheckComboBox<String> categoriesComboBox;
+
+    @FXML
+    private TableView<?> loansFoundTable;
+
+    @FXML
+    private TableView<?> loansChosenTable;
+
+    @FXML
+    private Button tablesRightButton;
+
+    @FXML
+    private Button tablesLeftButton;
+
+    @FXML
+    private Button investButton;
+
+    @FXML
+    void investButtonAction(ActionEvent event) {
+        updateCategories();
+    }
+
+    @FXML
+    void tablesLeftButtonAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void searchLoansButtonAction(ActionEvent event) {
+        RequestDTO requestDTO = new RequestDTO
+            .Builder(customerId.get(), Integer.valueOf(amountField.getText()))
+            .categories(getSelectedCategories()) // TODO: apply optional options
+/*                .minInterest(Integer.value)
+            .minDuration(minLoanDuration)
+            .maxLoans(maxRequestedLoans)*/
+            .build();
+
+        try {
+            LoansDTO loansDTO = bankInstance.loanAssignmentRequest(requestDTO);
+            addFoundLoans(loansDTO.getLoansList());
+        } catch (InvalidPercentException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addFoundLoans(List<LoanDTO> loansList) {
+
+    }
+
+    private Set<String> getSelectedCategories() {
+
+        ObservableList<String> checkedItems = categoriesComboBox.getCheckModel().getCheckedItems();
+
+        return checkedItems.stream().collect(Collectors.toSet());
+    }
+
+    @FXML
+    void tablesRightButtonAction(ActionEvent event) {
+
+    }
 
     @FXML
     void initialize() {
@@ -116,58 +198,6 @@ public class CustomerController {
         });
     }
 
-    @FXML
-    private TextField amountField;
-
-    @FXML
-    private TextField minInterestField;
-
-    @FXML
-    private TextField minYazField;
-
-    @FXML
-    private TextField maxLoanerLoansField;
-
-    @FXML
-    private TextField maxOwnershipField;
-
-    @FXML
-    private CheckComboBox<String> categoriesComboBox;
-
-    @FXML
-    private TableView<?> loansFoundTable;
-
-    @FXML
-    private TableView<?> loansChosenTable;
-
-    @FXML
-    private Button tablesRightButton;
-
-    @FXML
-    private Button tablesLeftButton;
-
-    @FXML
-    private Button investButton;
-
-    @FXML
-    void investButtonAction(ActionEvent event) {
-        updateCategories();
-    }
-
-    @FXML
-    void tablesLeftButtonAction(ActionEvent event) {
-
-    }
-
-    @FXML
-    void searchLoansButtonAction(ActionEvent event) {
-
-    }
-
-    @FXML
-    void tablesRightButtonAction(ActionEvent event) {
-
-    }
 
     public String getCustomerId() {
         return customerId.get();
@@ -213,7 +243,7 @@ public class CustomerController {
             return;
 
         Thread updateCategories = new Thread(() -> {
-            List<String> categories = bankInstance.getCategoriesDTO().getCategories();
+            Collection<String> categories = bankInstance.getCategoriesDTO().getCategories();
             ObservableList<String> tempCategoriesList = FXCollections.observableArrayList();
             for(String category : categories) {
                 tempCategoriesList.add(category);
