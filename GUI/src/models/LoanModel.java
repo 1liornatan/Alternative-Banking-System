@@ -6,25 +6,25 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class LoanModel {
-    StringProperty id;
-    IntegerProperty amount, startYaz, endYaz;
+    private StringProperty id;
+    private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
 
-    public LoanModel() {
-        id = new SimpleStringProperty();
-        amount = new SimpleIntegerProperty();
-        startYaz = new SimpleIntegerProperty();
-        endYaz = new SimpleIntegerProperty();
+
+    private LoanModel(LoanModelBuilder builder) {
+        this.id = builder.id;
+        this.amount = builder.amount;
+        this.startYaz = builder.startYaz;
+        this.endYaz = builder.endYaz;
+        this.nextPaymentInYaz = builder.nextPaymentInYaz;
+        this.finalAmount = builder.finalAmount;
     }
+
     public String getId() {
         return id.get();
     }
 
     public StringProperty idProperty() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id.set(id);
     }
 
     public int getAmount() {
@@ -35,20 +35,12 @@ public class LoanModel {
         return amount;
     }
 
-    public void setAmount(int amount) {
-        this.amount.set(amount);
-    }
-
     public int getStartYaz() {
         return startYaz.get();
     }
 
     public IntegerProperty startYazProperty() {
         return startYaz;
-    }
-
-    public void setStartYaz(int startYaz) {
-        this.startYaz.set(startYaz);
     }
 
     public int getEndYaz() {
@@ -59,7 +51,70 @@ public class LoanModel {
         return endYaz;
     }
 
-    public void setEndYaz(int endYaz) {
-        this.endYaz.set(endYaz);
+    public int getNextPaymentInYaz() {
+        return nextPaymentInYaz.get();
     }
+
+    public IntegerProperty nextPaymentInYazProperty() {
+        return nextPaymentInYaz;
+    }
+
+    public int getFinalAmount() {
+        return finalAmount.get();
+    }
+
+    public IntegerProperty finalAmountProperty() {
+        return finalAmount;
+    }
+
+    public static class LoanModelBuilder {
+        private StringProperty id;
+        private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
+
+        public LoanModelBuilder() {
+            id = new SimpleStringProperty();
+            amount = new SimpleIntegerProperty();
+            startYaz = new SimpleIntegerProperty();
+            endYaz = new SimpleIntegerProperty();
+            nextPaymentInYaz = new SimpleIntegerProperty();
+            finalAmount = new SimpleIntegerProperty();
+        }
+
+        public LoanModelBuilder id(String id) {
+            this.id.set(id);
+            return this;
+        }
+
+        public LoanModelBuilder amount(int amount) {
+            this.amount.set(amount);
+            return this;
+        }
+
+        public LoanModelBuilder startYaz(int startYaz) {
+            this.startYaz.set(startYaz);
+            return this;
+        }
+
+        public LoanModelBuilder endYaz(int endYaz) {
+            this.endYaz.set(endYaz);
+            return this;
+        }
+
+        public LoanModelBuilder nextPaymentInYaz(int nextPaymentInYaz) {
+            this.nextPaymentInYaz.set(nextPaymentInYaz);
+            return this;
+        }
+
+        public LoanModelBuilder finalAmount(int finalAmount) {
+            this.finalAmount.set(finalAmount);
+            return this;
+        }
+
+        public LoanModel build() {
+            LoanModel loanModel = new LoanModel(this);
+            return loanModel;
+        }
+    }
+
+
 }
