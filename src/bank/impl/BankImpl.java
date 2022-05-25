@@ -16,6 +16,7 @@ import bank.loans.interest.exceptions.InvalidPercentException;
 import bank.loans.interest.impl.BasicInterest;
 import bank.loans.investments.Investment;
 import bank.loans.investments.impl.LoanInvestment;
+import bank.messages.Notification;
 import bank.time.TimeHandler;
 import bank.time.handler.BankTimeHandler;
 import bank.transactions.Transaction;
@@ -49,6 +50,7 @@ public class BankImpl implements Bank {
     private DataStorage<bank.accounts.Account> loanAccounts;
     private DataStorage<Transaction> transactions;
     private DataStorage<Loan> loans;
+    private DataStorage<Notification> notifications;
     private Set<String> categories;
     private BankLoanHandler loanHandler;
     private TimeHandler timeHandler;
@@ -61,6 +63,7 @@ public class BankImpl implements Bank {
         loans = new BankDataStorage<>(timeHandler);
         loanHandler = new BankLoanHandler(transactions, loans, customersAccounts, timeHandler);
         categories = new HashSet<>();
+        notifications = new BankDataStorage<>(timeHandler);
     }
 
     @Override
