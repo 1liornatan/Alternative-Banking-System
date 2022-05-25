@@ -6,6 +6,4 @@ public interface Notification {
     int getYazMade();
 
     String getMessage();
-
-    String getOwnerId();
 }

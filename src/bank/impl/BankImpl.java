@@ -127,10 +127,8 @@ public class BankImpl implements Bank {
         CustomerAccount account = customersAccounts.getDataById(accountId);
         Transaction transaction = account.withdraw(amount, description);
         transactions.addData(transaction);
-        account.addNotification(new BankNotification(accountId,
-                "Withdrew " + amount,
+        account.addNotification(new BankNotification("Withdrew " + amount,
                 timeHandler.getCurrentTime()));
-
     }
 
     @Override
@@ -138,10 +136,8 @@ public class BankImpl implements Bank {
         CustomerAccount account = customersAccounts.getDataById(accountId);
         Transaction transaction = account.deposit(amount, description);
         transactions.addData(transaction);
-        account.addNotification(new BankNotification(accountId,
-                "Deposited " + amount,
+        account.addNotification(new BankNotification("Deposited " + amount,
                 timeHandler.getCurrentTime()));
-
     }
 
     @Override
@@ -177,8 +173,7 @@ public class BankImpl implements Bank {
 
         Investment loanInvestment = new LoanInvestment(investor, interest);
         loanHandler.addInvestment(loan, loanInvestment, investingAccount);
-        investingAccount.addNotification(new BankNotification(investor,
-                "Invested " + amountInvesting + " in '" + loan.getId() + "'.",
+        investingAccount.addNotification(new BankNotification("Invested " + amountInvesting + " in '" + loan.getId() + "'.",
                 timeHandler.getCurrentTime()));
     }
 
