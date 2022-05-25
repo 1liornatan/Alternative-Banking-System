@@ -1,6 +1,7 @@
 package screens.customer;
 
 import bank.impl.BankImpl;
+import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.interest.exceptions.InvalidPercentException;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -39,6 +40,7 @@ public class CustomerController {
     private ObservableList<String> categoriesList;
     private BooleanProperty isFileSelected;
     private List<TransactionModel> transactionModels;
+    private List<LoanModel> loanModelList;
 
 
     @FXML
@@ -131,7 +133,38 @@ public class CustomerController {
     }
 
     private void addFoundLoans(List<LoanData> loansList) {
+        LoanTable.setDataTables(loansFoundTable);
+        updateLoansData();
+        loansFoundTable.setItems(getLoans(getLoans()));
+    }
 
+    private void updateLoansData() {
+        if(!isFileSelected.get())
+            return;
+
+        Thread updateLoansThread = new Thread(() -> {
+            try {
+                List<LoanModel> tempLoanModelList = new ArrayList<>();
+                List<LoanData> loanDataList = bankInstance.getLoansData().getLoans();
+                for(LoanData loanData : loanDataList) {
+                    LoanModel loanModel = new LoanModel.LoanModelBuilder()
+                            .id(loanData.getName())
+                            .amount(loanData.getBaseAmount())
+                            .endYaz(loanData.getFinishedYaz())
+                            .startYaz(loanData.getStartedYaz())
+                            .nextPaymentInYaz(loanData.getNextPaymentInYaz())
+                            .finalAmount(loanData.getFinalAmount()).build();
+
+                    tempLoanModelList.add(loanModel);
+                }
+                loanModelList = tempLoanModelList;
+                Platform.runLater(() -> loansFoundTable.setItems(getLoans()));
+            } catch (DataNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
+
+        updateLoansThread.start();
     }
 
     private Set<String> getSelectedCategories() {
@@ -216,27 +249,7 @@ public class CustomerController {
         customerId = new SimpleStringProperty();
         isFileSelected = new SimpleBooleanProperty();
         transactionModels = new ArrayList<>();
-    }
-    public void updateLoansData() {
-        Thread updateThread = new Thread(() -> {
-            List<LoanModel> tempLenderModelList = new ArrayList<>();
-            List<LoanModel> tempLoanerModelList = new ArrayList<>();
-            List<LoanData>  loanerDataList = bankInstance.getLoanerData(customerId.get()).getLoans();
-            List<LoanData>  lenderDataList = bankInstance.getLenderData(customerId.get()).getLoans();
-
-            updateList(loanerDataList, tempLoanerModelList);
-            updateList(lenderDataList, tempLenderModelList);
-
-            lenderModelList = tempLenderModelList;
-            loanerModelList = tempLoanerModelList;
-
-            Platform.runLater(() -> {
-                loanerLoansTable.setItems(getLoans(loanerModelList));
-                lenderLoansTable.setItems(getLoans(lenderModelList));
-            });
-        });
-
-        updateThread.start();
+        loanModelList = new ArrayList<>();
     }
 
     public void updateCategories() {
@@ -299,6 +312,10 @@ public class CustomerController {
 
     private ObservableList<TransactionModel> getTransactions() {
         return FXCollections.observableArrayList(transactionModels);
+    }
+
+    private ObservableList<LoanModel> getLoans() {
+        return FXCollections.observableArrayList();
     }
 
     private void updateTransactions() {
