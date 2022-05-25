@@ -6,4 +6,19 @@
     -fx-border-width: 0px;
 }
 
+#tablesRightButton {
+    -fx-background-image: url('/screens/resources/icons/rightArrow.png');
+    -fx-background-size: 32px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 100%;
+}
+
+#tablesLeftButton {
+    -fx-background-image: url('/screens/resources/icons/rightArrow.png');
+    -fx-background-size: 32px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: 100%;
+    -fx-rotate: 180;
+}
+
 
