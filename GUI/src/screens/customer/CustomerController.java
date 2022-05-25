@@ -260,6 +260,27 @@ public class CustomerController {
         return FXCollections.observableArrayList(modelList);
     }
 
+    public void updateLoansData() {
+        Thread updateThread = new Thread(() -> {
+            List<LoanModel> tempLenderModelList = new ArrayList<>();
+            List<LoanModel> tempLoanerModelList = new ArrayList<>();
+            List<LoanData>  loanerDataList = bankInstance.getLoanerData(customerId.get()).getLoans();
+            List<LoanData>  lenderDataList = bankInstance.getLenderData(customerId.get()).getLoans();
+
+            updateList(loanerDataList, tempLoanerModelList);
+            updateList(lenderDataList, tempLenderModelList);
+
+            lenderModelList = tempLenderModelList;
+            loanerModelList = tempLoanerModelList;
+
+            Platform.runLater(() -> {
+                loanerLoansTable.setItems(getLoans(loanerModelList));
+                lenderLoansTable.setItems(getLoans(lenderModelList));
+            });
+        });
+
+        updateThread.start();
+    }
     private void updateList(List<LoanData> src, List<LoanModel> dest) {
         for(LoanData loanData : src) {
             LoanModel loanModel = new LoanModel.LoanModelBuilder()
