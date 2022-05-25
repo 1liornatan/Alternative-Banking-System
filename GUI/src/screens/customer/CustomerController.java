@@ -93,7 +93,7 @@ public class CustomerController {
     private TableView<LoanModel> loansFoundTable;
 
     @FXML
-    private TableView<?> loansChosenTable;
+    private TableView<LoanModel> loansChosenTable;
 
     @FXML
     private Button tablesRightButton;
@@ -133,38 +133,24 @@ public class CustomerController {
     }
 
     private void addFoundLoans(List<LoanData> loansList) {
-        LoanTable.setDataTables(loansFoundTable);
-        updateLoansData();
-        loansFoundTable.setItems(getLoans(getLoans()));
+        loansFoundTable.setItems(FXCollections.observableArrayList(makeLoanModelList(loansList)));
     }
 
-    private void updateLoansData() {
-        if(!isFileSelected.get())
-            return;
 
-        Thread updateLoansThread = new Thread(() -> {
-            try {
-                List<LoanModel> tempLoanModelList = new ArrayList<>();
-                List<LoanData> loanDataList = bankInstance.getLoansData().getLoans();
-                for(LoanData loanData : loanDataList) {
-                    LoanModel loanModel = new LoanModel.LoanModelBuilder()
-                            .id(loanData.getName())
-                            .amount(loanData.getBaseAmount())
-                            .endYaz(loanData.getFinishedYaz())
-                            .startYaz(loanData.getStartedYaz())
-                            .nextPaymentInYaz(loanData.getNextPaymentInYaz())
-                            .finalAmount(loanData.getFinalAmount()).build();
+    private List<LoanModel> makeLoanModelList(List<LoanData> loanDataList) {
+        List<LoanModel> tempLoanModelList = new ArrayList<>();
+        for(LoanData loanData : loanDataList) {
+            LoanModel loanModel = new LoanModel.LoanModelBuilder()
+                    .id(loanData.getName())
+                    .amount(loanData.getBaseAmount())
+                    .endYaz(loanData.getFinishedYaz())
+                    .startYaz(loanData.getStartedYaz())
+                    .nextPaymentInYaz(loanData.getNextPaymentInYaz())
+                    .finalAmount(loanData.getFinalAmount()).build();
 
-                    tempLoanModelList.add(loanModel);
-                }
-                loanModelList = tempLoanModelList;
-                Platform.runLater(() -> loansFoundTable.setItems(getLoans()));
-            } catch (DataNotFoundException e) {
-                e.printStackTrace();
-            }
-        });
-
-        updateLoansThread.start();
+            tempLoanModelList.add(loanModel);
+        }
+        return tempLoanModelList;
     }
 
     private Set<String> getSelectedCategories() {
@@ -183,6 +169,8 @@ public class CustomerController {
     void initialize() {
         LoanTable.setDataTables(loanerLoansTable);
         LoanTable.setDataTables(lenderLoansTable);
+        LoanTable.setDataTables(loansFoundTable);
+        LoanTable.setDataTables((loansChosenTable));
         updateCategories();
         setTransactionsTable();
         amountField.textProperty().addListener(new ChangeListener<String>() {
