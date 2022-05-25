@@ -38,7 +38,7 @@ public class LoanTable {
 
         TableColumn<LoanModel, String> loanNameColumn = new TableColumn<>("Id");
         loanNameColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-
+        loanNameColumn.setPrefWidth(300);
         TableColumn<LoanModel, Integer> amountColumn = new TableColumn<>("Amount");
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 

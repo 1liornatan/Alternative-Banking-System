@@ -6,6 +6,14 @@
     -fx-border-width: 0px;
 }
 
+* {
+    -fx-font-family: Arial;
+}
+
+.table-view .table-column {
+    -fx-alignment: CENTER;
+}
+
 #tablesRightButton {
     -fx-background-image: url('/screens/resources/icons/rightArrow.png');
     -fx-background-size: 32px;

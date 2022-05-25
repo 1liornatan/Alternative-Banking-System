@@ -26,6 +26,7 @@ import models.LoanModel;
 import models.LoanStatusModel;
 import models.utils.LoanTable;
 import org.controlsfx.control.table.TableRowExpanderColumn;
+import screens.utils.GUIUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -132,6 +133,7 @@ public class AdminController {
                 loanModelList = tempLoanModelList;
                 Platform.runLater(() -> {
                     adminLoansTable.setItems(getLoans());
+//                    GUIUtils.autoFitTable(adminLoansTable); DOESNT WORK
 /*                    adminLoansTable.setRowFactory(tv -> {
                         TableRow<LoanModel> row = new TableRow<>();
 
