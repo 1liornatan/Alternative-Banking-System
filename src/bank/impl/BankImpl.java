@@ -170,7 +170,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public LoansDTO loanAssignmentRequest(RequestDTO requestDTO) throws InvalidPercentException {
+    public LoansData loanAssignmentRequest(RequestDTO requestDTO) throws InvalidPercentException {
         int amount = requestDTO.getAmount();
         String requesterName = requestDTO.getRequesterName();
         float minInterest = requestDTO.getMinInterest();
@@ -190,13 +190,19 @@ public class BankImpl implements Bank {
                 .filter(p->p.getKey().getLoanAccount().getLoansRequested().size() <= maxRelatedLoans)
                 .collect(Collectors.toList());
 
-        List<LoanDTO> loansDTOList = new ArrayList<>();
+        List<LoanData> loansDataList = new ArrayList<>();
 
         for(Pair<Loan, Integer> loanPair : relevantLoans) {
-            loansDTOList.add(getLoanDTO(loanPair.getKey()));
+            try {
+                loansDataList.add(getLoanData(loanPair.getKey()));
+            } catch (DataNotFoundException e) {
+                e.printStackTrace();
+            }
         }
 
-        return new LoansDTO(loansDTOList);
+        LoansData loansData = new LoansData();
+        loansData.setLoans(loansDataList);
+        return loansData;
 
     }
 

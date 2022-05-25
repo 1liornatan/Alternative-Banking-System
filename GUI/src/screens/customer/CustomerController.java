@@ -20,6 +20,7 @@ import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoanData;
 import manager.loans.LoansDTO;
+import manager.loans.LoansData;
 import manager.transactions.TransactionData;
 import models.LoanModel;
 import models.TransactionModel;
@@ -87,7 +88,7 @@ public class CustomerController {
     private CheckComboBox<String> categoriesComboBox;
 
     @FXML
-    private TableView<?> loansFoundTable;
+    private TableView<LoanModel> loansFoundTable;
 
     @FXML
     private TableView<?> loansChosenTable;
@@ -122,14 +123,14 @@ public class CustomerController {
             .build();
 
         try {
-            LoansDTO loansDTO = bankInstance.loanAssignmentRequest(requestDTO);
-            addFoundLoans(loansDTO.getLoansList());
+            LoansData loansData = bankInstance.loanAssignmentRequest(requestDTO);
+            addFoundLoans(loansData.getLoans());
         } catch (InvalidPercentException e) {
             e.printStackTrace();
         }
     }
 
-    private void addFoundLoans(List<LoanDTO> loansList) {
+    private void addFoundLoans(List<LoanData> loansList) {
 
     }
 

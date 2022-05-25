@@ -59,7 +59,7 @@ public class MainMenu {
         if(!hasValidData.value())
             throw new XmlNotLoadedException();
 
-        PrintUtils.printAllLoans(bankInstance.getAllLoansDTO());
+        PrintUtils.printAllLoans(bankInstance.getLoansData());
     }
 
     public void printCustomers() throws XmlNotLoadedException {
