@@ -1,12 +1,9 @@
 package bank.accounts.impl;
 
-import bank.accounts.impl.exceptions.NoMoneyException;
-import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.loans.Loan;
 import bank.loans.LoanStatus;
 import bank.messages.Notification;
 import bank.transactions.Transaction;
-import bank.transactions.impl.BasicTransaction;
 
 import java.util.*;
 
@@ -15,6 +12,7 @@ public class Customer extends LoanAccount implements bank.accounts.CustomerAccou
     private int balance;
     private final List<Transaction> transactions;
     private List<Loan> loansRequested, loansInvested;
+    private List<Notification> notificationList;
 
     @Override
     public List<Transaction> getTransactions() {
@@ -41,6 +39,17 @@ public class Customer extends LoanAccount implements bank.accounts.CustomerAccou
 
         loansRequested = new ArrayList<>();
         loansInvested = new ArrayList<>();
+        notificationList = new ArrayList<>();
+    }
+
+    @Override
+    public void addNotification(Notification notification) {
+        notificationList.add(notification);
+    }
+
+    @Override
+    public List<Notification> getNotificationList() {
+        return notificationList;
     }
 
     @Override
@@ -71,28 +80,6 @@ public class Customer extends LoanAccount implements bank.accounts.CustomerAccou
     @Override
     public int getBalance() {
         return balance;
-    }
-
-    @Override
-    public Transaction deposit(int amount, String description) throws NonPositiveAmountException {
-        if(amount <= 0) throw new NonPositiveAmountException();
-
-        Transaction transaction = new BasicTransaction(amount, description, balance);
-        transactions.add(transaction);
-        balance += amount;
-
-        return transaction;
-    }
-    @Override
-    public Transaction withdraw(int amount, String description) throws NonPositiveAmountException, NoMoneyException {
-        if(amount <= 0) throw new NonPositiveAmountException();
-        if(amount > balance) throw new NoMoneyException();
-
-        Transaction transaction = new BasicTransaction(amount  * (-1), description, balance);
-        transactions.add(transaction);
-        balance -= amount;
-
-        return transaction;
     }
 
     @Override

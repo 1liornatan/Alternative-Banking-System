@@ -1,6 +1,7 @@
 package bank.impl;
 
 import bank.Bank;
+import bank.accounts.Account;
 import bank.accounts.CustomerAccount;
 import bank.accounts.impl.Customer;
 import bank.accounts.impl.exceptions.NoMoneyException;
@@ -16,7 +17,7 @@ import bank.loans.interest.exceptions.InvalidPercentException;
 import bank.loans.interest.impl.BasicInterest;
 import bank.loans.investments.Investment;
 import bank.loans.investments.impl.LoanInvestment;
-import bank.messages.Notification;
+import bank.messages.impl.BankNotification;
 import bank.time.TimeHandler;
 import bank.time.handler.BankTimeHandler;
 import bank.transactions.Transaction;
@@ -46,11 +47,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BankImpl implements Bank {
-    private DataStorage<bank.accounts.CustomerAccount> customersAccounts;
-    private DataStorage<bank.accounts.Account> loanAccounts;
+    private DataStorage<CustomerAccount> customersAccounts;
+    private DataStorage<Account> loanAccounts;
     private DataStorage<Transaction> transactions;
     private DataStorage<Loan> loans;
-    private DataStorage<Notification> notifications;
     private Set<String> categories;
     private BankLoanHandler loanHandler;
     private TimeHandler timeHandler;
@@ -63,16 +63,15 @@ public class BankImpl implements Bank {
         loans = new BankDataStorage<>(timeHandler);
         loanHandler = new BankLoanHandler(transactions, loans, customersAccounts, timeHandler);
         categories = new HashSet<>();
-        notifications = new BankDataStorage<>(timeHandler);
     }
 
     @Override
-    public DataStorage<bank.accounts.CustomerAccount> getCustomersAccounts() {
+    public DataStorage<CustomerAccount> getCustomersAccounts() {
         return customersAccounts;
     }
 
     @Override
-    public DataStorage<bank.accounts.Account> getLoanAccounts() {
+    public DataStorage<Account> getLoanAccounts() {
         return loanAccounts;
     }
 
@@ -125,21 +124,29 @@ public class BankImpl implements Bank {
 
     @Override
     public void withdraw(String accountId, int amount, String description) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
-        bank.accounts.Account account = customersAccounts.getDataById(accountId);
+        CustomerAccount account = customersAccounts.getDataById(accountId);
         Transaction transaction = account.withdraw(amount, description);
         transactions.addData(transaction);
+        account.addNotification(new BankNotification(accountId,
+                "Withdrew " + amount,
+                timeHandler.getCurrentTime()));
+
     }
 
     @Override
     public void deposit(String accountId, int amount, String description) throws NonPositiveAmountException, DataNotFoundException {
-        bank.accounts.Account account = customersAccounts.getDataById(accountId);
+        CustomerAccount account = customersAccounts.getDataById(accountId);
         Transaction transaction = account.deposit(amount, description);
         transactions.addData(transaction);
+        account.addNotification(new BankNotification(accountId,
+                "Deposited " + amount,
+                timeHandler.getCurrentTime()));
+
     }
 
     @Override
     public void createAccount(String name, int balance) {
-        bank.accounts.CustomerAccount account = new Customer(name, balance);
+        CustomerAccount account = new Customer(name, balance);
 
         customersAccounts.addData(account);
     }
@@ -159,7 +166,7 @@ public class BankImpl implements Bank {
     public void createInvestment(InvestDTO investDetails) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
         Loan loan = loans.getDataById(investDetails.getLoanName());
         String investor = investDetails.getInvestorName();
-        bank.accounts.CustomerAccount investingAccount = customersAccounts.getDataById(investor);
+        CustomerAccount investingAccount = customersAccounts.getDataById(investor);
 
         float percent = loan.getInterestPercent();
         int amountInvesting = investDetails.getAmount();
@@ -170,6 +177,9 @@ public class BankImpl implements Bank {
 
         Investment loanInvestment = new LoanInvestment(investor, interest);
         loanHandler.addInvestment(loan, loanInvestment, investingAccount);
+        investingAccount.addNotification(new BankNotification(investor,
+                "Invested " + amountInvesting + " in '" + loan.getId() + "'.",
+                timeHandler.getCurrentTime()));
     }
 
     @Override
@@ -217,9 +227,9 @@ public class BankImpl implements Bank {
     @Override
     public CustomersDTO getCustomersDTO() throws DataNotFoundException {
         List<CustomerDTO> customersDTOList = new ArrayList<>();
-        Collection<Pair<bank.accounts.CustomerAccount, Integer>> customersList = customersAccounts.getAllPairs();
+        Collection<Pair<CustomerAccount, Integer>> customersList = customersAccounts.getAllPairs();
 
-        for(Pair<bank.accounts.CustomerAccount, Integer> account : customersList) {
+        for(Pair<CustomerAccount, Integer> account : customersList) {
             customersDTOList.add(getCustomerDTO(account.getKey().getId()));
         }
 
@@ -228,7 +238,7 @@ public class BankImpl implements Bank {
 
     @Override
     public CustomerDTO getCustomerDTO(String id) throws DataNotFoundException {
-        bank.accounts.Account account = customersAccounts.getDataById(id);
+        Account account = customersAccounts.getDataById(id);
         List<LoanDTO> loansInvestedDTOList = new ArrayList<>();
         List<LoanDTO> loansRequestedDTOList = new ArrayList<>();
         List<Loan> loansInvested = account.getLoansInvested();
@@ -272,7 +282,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public TransactionsDTO getTransactionsDTO(bank.accounts.Account account) throws DataNotFoundException {
+    public TransactionsDTO getTransactionsDTO(Account account) throws DataNotFoundException {
         List<TransactionDTO> transactionsList = new ArrayList<>();
         List<Transaction> accountTransactions = account.getTransactions();
 
@@ -306,8 +316,8 @@ public class BankImpl implements Bank {
             timeHandler.setCurrentTime(saver.getCurrYaz());
 
             categories = (Set<String>) saver.getCategories();
-            customersAccounts = (DataStorage<bank.accounts.CustomerAccount>) saver.getCustomers();
-            loanAccounts = (DataStorage<bank.accounts.Account>) saver.getLoanAccounts();
+            customersAccounts = (DataStorage<CustomerAccount>) saver.getCustomers();
+            loanAccounts = (DataStorage<Account>) saver.getLoanAccounts();
             loans = (DataStorage<Loan>)saver.getLoans();
             transactions = (DataStorage<Transaction>) saver.getTransactions();
         }
