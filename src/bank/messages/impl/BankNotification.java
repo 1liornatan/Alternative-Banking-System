@@ -4,20 +4,20 @@ import bank.messages.Notification;
 
 public class BankNotification implements Notification {
     final String message;
-    final String ownerId;
+    final int yazMade;
 
-    public BankNotification(String ownerId, String message) {
-        this.ownerId = ownerId;
+    public BankNotification(String message, int yazMade) {
         this.message = message;
+        this.yazMade = yazMade;
+    }
+
+    @Override
+    public int getYazMade() {
+        return yazMade;
     }
 
     @Override
     public String getMessage() {
         return message;
-    }
-
-    @Override
-    public String getId() {
-        return ownerId;
     }
 }

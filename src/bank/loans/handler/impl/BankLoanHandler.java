@@ -1,5 +1,6 @@
 package bank.loans.handler.impl;
 
+import bank.Bank;
 import bank.accounts.Account;
 import bank.accounts.CustomerAccount;
 import bank.accounts.impl.Customer;
@@ -14,6 +15,7 @@ import bank.loans.impl.BasicLoan;
 import bank.loans.impl.builder.LoanBuilder;
 import bank.loans.interest.Interest;
 import bank.loans.investments.Investment;
+import bank.messages.impl.BankNotification;
 import bank.time.TimeHandler;
 import bank.transactions.Transaction;
 import javafx.util.Pair;
@@ -96,7 +98,7 @@ public class BankLoanHandler implements LoanHandler {
     }
 
     private void makePayment(Loan loan) throws DataNotFoundException, NonPositiveAmountException {
-        Account srcAcc = customers.getDataById(loan.getOwnerId());
+        CustomerAccount srcAcc = customers.getDataById(loan.getOwnerId());
         int payment = loan.getPayment();
         try {
             transactions.addData(srcAcc.withdraw(payment, "Loan Cycle"));
@@ -121,9 +123,17 @@ public class BankLoanHandler implements LoanHandler {
             e.printStackTrace();
         } catch (NoMoneyException e) {
             loan.setStatus(LoanStatus.RISK);
+            addRiskedNotification(loan);
             partiallyPayment(loan);
         } finally {
             loan.nextPayment();
+        }
+    }
+
+    private void addRiskedNotification(Loan loan) throws DataNotFoundException {
+        for(Investment investment : loan.getInvestments()) {
+            customers.getDataById(investment.getInvestorId()).addNotification(new BankNotification("Loan '" +
+                    loan.getId() + "' is in Risk", timeHandler.getCurrentTime()));;
         }
     }
 

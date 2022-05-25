@@ -13,6 +13,10 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import manager.customers.CustomerData;
@@ -22,12 +26,15 @@ import models.LoanModel;
 import models.LoanStatusModel;
 import models.utils.LoanTable;
 import org.controlsfx.control.table.TableRowExpanderColumn;
+import screens.utils.GUIUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AdminController {
+
+    private static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
 
     BooleanProperty isFileSelected;
     StringProperty filePathProperty;
@@ -124,7 +131,45 @@ public class AdminController {
                     tempLoanModelList.add(loanModel);
                 }
                 loanModelList = tempLoanModelList;
-                Platform.runLater(() -> adminLoansTable.setItems(getLoans()));
+                Platform.runLater(() -> {
+                    adminLoansTable.setItems(getLoans());
+//                    GUIUtils.autoFitTable(adminLoansTable); DOESNT WORK
+/*                    adminLoansTable.setRowFactory(tv -> {
+                        TableRow<LoanModel> row = new TableRow<>();
+
+                        row.setOnDragDetected(event -> {
+                            if (! row.isEmpty()) {
+                                Integer index = row.getIndex();
+                                Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
+                                db.setDragView(row.snapshot(null, null));
+                                ClipboardContent cc = new ClipboardContent();
+                                cc.put(SERIALIZED_MIME_TYPE, index);
+                                db.setContent(cc);
+                                event.consume();
+                            }
+                        });
+
+                        row.setOnDragOver(event -> {
+                            Dragboard db = event.getDragboard();
+                            if (db.hasContent(SERIALIZED_MIME_TYPE)) {
+                                if (row.getIndex() != ((Integer)db.getContent(SERIALIZED_MIME_TYPE)).intValue()) {
+                                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                                    event.consume();
+                                }
+                            }
+                        });
+                        row.setOnDragDropped(event -> {
+                            Dragboard db = event.getDragboard();
+                            if(db.hasContent(SERIALIZED_MIME_TYPE)) {
+                                int draggedIndex = (Integer) db.getContent(SERIALIZED_MIME_TYPE);
+                                LoanModel draggedLoan = adminLoansTable.getItems().remove(draggedIndex);
+                                event.setDropCompleted(true);
+                                event.consume();
+                            }
+                        });
+                        return row;
+                    });*/
+                });
             } catch (DataNotFoundException e) {
                 e.printStackTrace();
             }
