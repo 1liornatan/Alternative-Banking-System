@@ -57,7 +57,7 @@ public interface Bank {
 
     void createInvestment(InvestDTO investDetails) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
 
-    LoansDTO loanAssignmentRequest(RequestDTO requestDTO) throws InvalidPercentException;
+    LoansData loanAssignmentRequest(RequestDTO requestDTO) throws InvalidPercentException;
 
 
     CustomersDTO getCustomersDTO() throws DataNotFoundException;

@@ -12,7 +12,9 @@ import manager.customers.CustomerDTO;
 import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
+import manager.loans.LoanData;
 import manager.loans.LoansDTO;
+import manager.loans.LoansData;
 import utils.PrintUtils;
 
 import java.util.*;
@@ -92,41 +94,41 @@ public class SetLoanMenu {
 
 
 
-        LoansDTO loansDTO = bankInstance.loanAssignmentRequest(requestDTO);
-        List<LoanDTO> loanDTOList = loansDTO.getLoansList();
-        int listSize = loanDTOList.size();
+        LoansData loansData = bankInstance.loanAssignmentRequest(requestDTO);
+        List<LoanData> loansDataList = loansData.getLoans();
+        int listSize = loansDataList.size();
 
         if(listSize == 0) {
             System.out.println("No relevant loans found.");
         } else {
             int i = 1;
-            System.out.println("Found " + loanDTOList.size() + " relevant loans:");
-            for(LoanDTO loan : loanDTOList) {
+            System.out.println("Found " + loansDataList.size() + " relevant loans:");
+            for(LoanData loan : loansDataList) {
                 System.out.println("Loan #" + i + " Details:");
                 i++;
                 PrintUtils.printLoan(loan);
             }
 
-            List<LoanDTO> chosenLoans = getChosenLoans(loanDTOList);
+            List<LoanData> chosenLoans = getChosenLoans(loansDataList);
             int amountLeft = amount;
             int minAmount, loansAmount;
             int avgAmount = (int) Math.ceil(amountLeft * 1.0 / chosenLoans.size());
             boolean averageSplit = false;
 
-            chosenLoans.sort(Comparator.comparingInt(p -> p.getActiveLoanDTO().getAmountToActive()));
-            minAmount = chosenLoans.get(0).getActiveLoanDTO().getAmountToActive();
+            chosenLoans.sort(Comparator.comparingInt(p -> p.getAmountToActive()));
+            minAmount = chosenLoans.get(0).getAmountToActive();
 
             while(avgAmount > minAmount) {
-                List<LoanDTO> tempList = new ArrayList<>();
+                List<LoanData> tempList = new ArrayList<>();
 
-                for (LoanDTO loan : chosenLoans) {
+                for (LoanData loan : chosenLoans) {
 
                     if (minAmount <= amountLeft) {
-                        InvestDTO investDTO = new InvestDTO(requesterName, loan.getDetails().getName(), minAmount);
+                        InvestDTO investDTO = new InvestDTO(requesterName, loan.getName(), minAmount);
                         bankInstance.createInvestment(investDTO);
 
                         amountLeft -= minAmount;
-                        if (loan.getActiveLoanDTO().getAmountToActive() != minAmount)
+                        if (loan.getAmountToActive() != minAmount)
                             tempList.add(loan);
                     }
                     else {
@@ -140,12 +142,12 @@ public class SetLoanMenu {
                     break;
 
                 avgAmount = amountLeft / chosenLoans.size();
-                minAmount = chosenLoans.get(0).getActiveLoanDTO().getAmountToActive();
+                minAmount = chosenLoans.get(0).getAmountToActive();
             }
 
-            for(LoanDTO loan : chosenLoans) {
+            for(LoanData loan : chosenLoans) {
                 if(avgAmount <= amountLeft) {
-                    InvestDTO investDTO = new InvestDTO(requesterName, loan.getDetails().getName(), avgAmount);
+                    InvestDTO investDTO = new InvestDTO(requesterName, loan.getName(), avgAmount);
                     bankInstance.createInvestment(investDTO);
                     amountLeft -= avgAmount;
                 }
@@ -156,9 +158,9 @@ public class SetLoanMenu {
         }
     }
 
-    private List<LoanDTO> getChosenLoans(List<LoanDTO> loanDTOList) throws NoOptionException {
+    private List<LoanData> getChosenLoans(List<LoanData> loansDataList) throws NoOptionException {
 
-        List<LoanDTO> chosenLoans = new ArrayList<>();
+        List<LoanData> chosenLoans = new ArrayList<>();
         System.out.println("Choose the loans you want to invest in:");
         System.out.println(("[for example: 1 3 5]"));
 
@@ -167,7 +169,7 @@ public class SetLoanMenu {
         line = line.replaceAll("[^-?0-9]+", " ");
         System.out.println();
 
-        int size = loanDTOList.size();
+        int size = loansDataList.size();
 
         for(String numStr : line.trim().split(" ")) {
             int index = Integer.parseInt(numStr) - 1;
@@ -175,7 +177,7 @@ public class SetLoanMenu {
             if(index >= size || index < 0)
                 throw new NoOptionException();
 
-            chosenLoans.add(loanDTOList.get(index));
+            chosenLoans.add(loansDataList.get(index));
         }
 
         return chosenLoans;
