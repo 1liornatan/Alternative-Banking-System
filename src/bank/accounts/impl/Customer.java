@@ -4,6 +4,7 @@ import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.loans.Loan;
 import bank.loans.LoanStatus;
+import bank.messages.Notification;
 import bank.transactions.Transaction;
 import bank.transactions.impl.BasicTransaction;
 
