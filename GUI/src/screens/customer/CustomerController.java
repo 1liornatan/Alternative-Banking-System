@@ -260,12 +260,13 @@ public class CustomerController {
 
     private void updateList(List<LoanData> src, List<LoanModel> dest) {
         for(LoanData loanData : src) {
-            LoanModel loanModel = new LoanModel();
-
-            loanModel.setId(loanData.getName());
-            loanModel.setAmount(loanData.getBaseAmount());
-            loanModel.setEndYaz(loanData.getFinishedYaz());
-            loanModel.setStartYaz(loanData.getStartedYaz());
+            LoanModel loanModel = new LoanModel.LoanModelBuilder()
+                    .id(loanData.getName())
+                    .amount(loanData.getBaseAmount())
+                    .endYaz(loanData.getFinishedYaz())
+                    .startYaz(loanData.getStartedYaz())
+                    .nextPaymentInYaz(loanData.getNextPaymentInYaz())
+                    .finalAmount(loanData.getFinalAmount()).build();;
 
             dest.add(loanModel);
         }
@@ -326,10 +327,10 @@ public class CustomerController {
         TableColumn<TransactionModel, Integer> balanceColumn = new TableColumn<>("Amount");
         balanceColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
-        TableColumn<TransactionModel, Integer> previousBalanceColumn = new TableColumn<>("PreviousBalance");
+        TableColumn<TransactionModel, Integer> previousBalanceColumn = new TableColumn<>("Previous Balance");
         previousBalanceColumn.setCellValueFactory(new PropertyValueFactory<>("previousBalance"));
 
-        TableColumn<TransactionModel, Integer> yazMadeColumn = new TableColumn<>("YazMade");
+        TableColumn<TransactionModel, Integer> yazMadeColumn = new TableColumn<>("Yaz Made");
         yazMadeColumn.setCellValueFactory(new PropertyValueFactory<>("yazMade"));
 
         transactionsTable.getColumns().addAll(descriptionColumn, balanceColumn, previousBalanceColumn, yazMadeColumn);

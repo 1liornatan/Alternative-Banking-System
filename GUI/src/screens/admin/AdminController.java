@@ -113,12 +113,13 @@ public class AdminController {
                 List<LoanModel> tempLoanModelList = new ArrayList<>();
                 List<LoanData> loanDataList = bankInstance.getLoansData().getLoans();
                 for(LoanData loanData : loanDataList) {
-                    LoanModel loanModel = new LoanModel();
-
-                    loanModel.setId(loanData.getName());
-                    loanModel.setAmount(loanData.getBaseAmount());
-                    loanModel.setEndYaz(loanData.getFinishedYaz());
-                    loanModel.setStartYaz(loanData.getStartedYaz());
+                    LoanModel loanModel = new LoanModel.LoanModelBuilder()
+                            .id(loanData.getName())
+                            .amount(loanData.getBaseAmount())
+                            .endYaz(loanData.getFinishedYaz())
+                            .startYaz(loanData.getStartedYaz())
+                            .nextPaymentInYaz(loanData.getNextPaymentInYaz())
+                            .finalAmount(loanData.getFinalAmount()).build();
 
                     tempLoanModelList.add(loanModel);
                 }

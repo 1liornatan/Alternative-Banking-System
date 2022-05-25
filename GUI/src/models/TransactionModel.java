@@ -6,8 +6,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class TransactionModel {
-    private StringProperty description;
-    private IntegerProperty amount, previousBalance, yazMade;
+    private final StringProperty description;
+    private final IntegerProperty amount, previousBalance, yazMade;
 
     private TransactionModel(TransactionModelBuilder builder) {
         this.description = builder.description;
