@@ -58,7 +58,7 @@ public class CustomerController {
     private Button searchLoansButton;
 
     @FXML
-    private TableView<?> loanerLoansPTable;
+    private TableView<LoanModel> loanerLoansPTable;
 
     @FXML
     private TableView<?> paymentControls;
@@ -149,6 +149,7 @@ public class CustomerController {
         return tempLoanModelList;
     }
 
+
     private Set<String> getSelectedCategories() {
 
         ObservableList<String> checkedItems = categoriesComboBox.getCheckModel().getCheckedItems();
@@ -167,6 +168,7 @@ public class CustomerController {
         LoanTable.setDataTables(lenderLoansTable);
         LoanTable.setDataTables(loansFoundTable);
         LoanTable.setDataTables((loansChosenTable));
+        LoanTable.setDataTables(loanerLoansPTable);
         updateCategories();
         setTransactionsTable();
         amountField.textProperty().addListener(new ChangeListener<String>() {
@@ -272,11 +274,13 @@ public class CustomerController {
             Platform.runLater(() -> {
                 loanerLoansTable.setItems(getLoans(loanerModelList));
                 lenderLoansTable.setItems(getLoans(lenderModelList));
+                loanerLoansPTable.setItems(getLoans(loanerModelList));
             });
         });
 
         updateThread.start();
     }
+
     private void updateList(List<LoanData> src, List<LoanModel> dest) {
         for(LoanData loanData : src) {
             LoanModel loanModel = new LoanModel.LoanModelBuilder()
