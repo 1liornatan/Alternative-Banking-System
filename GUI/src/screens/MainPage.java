@@ -35,7 +35,7 @@ public class MainPage extends Application {
         // set stage
         primaryStage.setTitle("Alternative Banking System");
         Scene scene = new Scene(root, 1050, 600);
-        scene.getStylesheets().add(getClass().getResource("/screens/resources/style.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/screens/resources/mainStyle.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
     }

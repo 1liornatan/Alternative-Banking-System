@@ -395,7 +395,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public LoansData getLoanerData(String customerId) {
+    public LoansData getInvestorData(String customerId) {
         List<LoanData> loanDataList = new ArrayList<>();
         LoansData loansData = new LoansData();
         try {
@@ -417,7 +417,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public LoansData getLenderData(String customerId) {
+    public LoansData getLoanerData(String customerId) {
         List<LoanData> loanDataList = new ArrayList<>();
         LoansData loansData = new LoansData();
         try {
