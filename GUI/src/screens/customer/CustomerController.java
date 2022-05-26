@@ -1,7 +1,6 @@
 package screens.customer;
 
 import bank.impl.BankImpl;
-import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.interest.exceptions.InvalidPercentException;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -16,11 +15,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import manager.categories.CategoriesDTO;
 import manager.investments.RequestDTO;
-import manager.loans.LoanDTO;
 import manager.loans.LoanData;
-import manager.loans.LoansDTO;
 import manager.loans.LoansData;
 import manager.transactions.TransactionData;
 import models.LoanModel;
@@ -267,7 +263,7 @@ public class CustomerController {
             List<LoanModel> tempLenderModelList = new ArrayList<>();
             List<LoanModel> tempLoanerModelList = new ArrayList<>();
             List<LoanData>  loanerDataList = bankInstance.getLoanerData(customerId.get()).getLoans();
-            List<LoanData>  lenderDataList = bankInstance.getLenderData(customerId.get()).getLoans();
+            List<LoanData>  lenderDataList = bankInstance.getInvestorData(customerId.get()).getLoans();
 
             updateList(loanerDataList, tempLoanerModelList);
             updateList(lenderDataList, tempLenderModelList);

@@ -20,16 +20,30 @@ public class LoanTable {
 
         LoanModel loan = param.getValue();
 
+        setFields(expander, loan);
+
+        return expander;
+    }
+
+    private static void setFields(GridPane expander, LoanModel loan) {
         TextField startYazField = new TextField(String.valueOf(loan.getStartYaz()));
         TextField endYazField = new TextField(String.valueOf(loan.getEndYaz()));
+        TextField nextPaymentInField = new TextField(String.valueOf(loan.getNextPaymentInYaz()));
 
         startYazField.setEditable(false);
         endYazField.setEditable(false);
+        nextPaymentInField.setEditable(false);
 
-        expander.addRow(0, new Label("Start Yaz"), startYazField);
+        startYazField.prefColumnCountProperty().bind(startYazField.textProperty().length());
+        endYazField.prefColumnCountProperty().bind(endYazField.textProperty().length());
+        nextPaymentInField.prefColumnCountProperty().bind(endYazField.textProperty().length());
+
+        String loanStatus = loan.getStatus();
+
+        expander.addRow(0, new Label("Started Yaz"), startYazField);
         expander.addRow(0, new Label("Finished Yaz"), endYazField);
+        expander.addRow(1, new Label("Next Payment in"), nextPaymentInField);
 
-        return expander;
     }
 
     public static void setDataTables(TableView<LoanModel> dataTable) {

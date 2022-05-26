@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class LoanModel {
-    private StringProperty id;
+    private StringProperty id, status;
     private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
 
 
@@ -17,6 +17,7 @@ public class LoanModel {
         this.endYaz = builder.endYaz;
         this.nextPaymentInYaz = builder.nextPaymentInYaz;
         this.finalAmount = builder.finalAmount;
+        this.status = builder.status;
     }
 
     public String getId() {
@@ -67,8 +68,16 @@ public class LoanModel {
         return finalAmount;
     }
 
+    public String getStatus() {
+        return status.get();
+    }
+
+    public StringProperty statusProperty() {
+        return status;
+    }
+
     public static class LoanModelBuilder {
-        private StringProperty id;
+        private StringProperty id, status;
         private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
 
         public LoanModelBuilder() {
@@ -78,6 +87,7 @@ public class LoanModel {
             endYaz = new SimpleIntegerProperty();
             nextPaymentInYaz = new SimpleIntegerProperty();
             finalAmount = new SimpleIntegerProperty();
+            status = new SimpleStringProperty();
         }
 
         public LoanModelBuilder id(String id) {
@@ -87,6 +97,11 @@ public class LoanModel {
 
         public LoanModelBuilder amount(int amount) {
             this.amount.set(amount);
+            return this;
+        }
+
+        public LoanModelBuilder status(String status) {
+            this.status.set(status);
             return this;
         }
 

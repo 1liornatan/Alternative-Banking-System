@@ -94,7 +94,7 @@ public interface Bank {
 
     LoansData getLoanerData(String customerId);
 
-    LoansData getLenderData(String customerId);
+    LoansData getInvestorData(String customerId);
 
     TransactionData getTransactionData(Transaction transaction);
 
