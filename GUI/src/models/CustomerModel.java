@@ -173,4 +173,6 @@ public class CustomerModel {
         this.numOfNewLoansInvested.set(numOfNewLoansInvested);
     }
 
+
+
 }
