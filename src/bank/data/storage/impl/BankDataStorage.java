@@ -49,11 +49,7 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
 
     @Override
     public Pair<E, Integer> getDataPair(String id) throws DataNotFoundException {
-        F dataBox;
-        synchronized (this) {
-            dataBox = container.get(id);
-        }
-
+        F dataBox = container.get(id);
         if(dataBox == null)
             throw new DataNotFoundException(id);
 
@@ -62,10 +58,8 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
 
     @Override
     public E getDataById(String id) throws DataNotFoundException {
-        F dataBox;
-        synchronized (this) {
-            dataBox = container.get(id);
-        }
+        F dataBox = container.get(id);
+
         if(dataBox == null)
             throw new DataNotFoundException(id);
 
@@ -75,16 +69,12 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
     @Override
     public Collection<Pair<E, Integer>> getAllPairs() {
         Collection<Pair<E, Integer>> dataCollection = new ArrayList<>();
-        Collection<F> values;
-        synchronized (this) {
-            values = container.values();
-        }
-        if(values == null)
-            return null;
+        Collection<F> values = container.values();
 
-        for (F value : values) {
+        for(F value : values) {
             dataCollection.add(new Pair<>(value.getData(), value.getTime()));
         }
+
         return dataCollection;
     }
 
@@ -93,10 +83,8 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
         Collection<E> data = new HashSet<>();
 
         for(String currId : ids) {
-            F dataToAdd;
-            synchronized (this) {
-                dataToAdd = container.get(currId);
-            }
+            F dataToAdd = container.get(currId);
+
             if(dataToAdd == null)
                 throw new DataNotFoundException(currId);
 
@@ -108,22 +96,13 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
 
     @Override
     public void addData(E data) {
-        F pairData = new F(data);
-        String id = data.getId();
-
-        synchronized (this) {
-            container.put(id, pairData);
-        }
+        container.put(data.getId(), new F(data));
     }
 
     @Override
     public void addDataSet(Collection<E> dataSet) {
         for(E data : dataSet) {
-            String id = data.getId();
-            F f = new F(data);
-            synchronized (this) {
-                container.put(id, f);
-            }
+            container.put(data.getId(), new F(data));
         }
     }
 
