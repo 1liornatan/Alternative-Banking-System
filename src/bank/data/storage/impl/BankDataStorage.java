@@ -79,8 +79,6 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
         synchronized (this) {
             values = container.values();
         }
-        if(values == null)
-            return null;
 
         for (F value : values) {
             dataCollection.add(new Pair<>(value.getData(), value.getTime()));
