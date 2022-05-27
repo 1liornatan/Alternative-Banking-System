@@ -19,6 +19,7 @@ import manager.categories.CategoriesDTO;
 import manager.loans.LoanData;
 import manager.loans.LoansDTO;
 import manager.loans.LoansData;
+import manager.messages.NotificationsData;
 import manager.time.YazSystemDTO;
 import manager.transactions.TransactionDTO;
 import manager.transactions.TransactionData;
@@ -99,4 +100,6 @@ public interface Bank {
     TransactionData getTransactionData(Transaction transaction);
 
     TransactionsData getTransactionsData(String cutsomerId);
+
+    NotificationsData getNotificationsData(String customerId) throws DataNotFoundException;
 }

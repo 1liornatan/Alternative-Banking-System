@@ -36,6 +36,8 @@ import manager.loans.LoansDTO;
 import manager.loans.LoansData;
 import manager.loans.details.*;
 import manager.categories.CategoriesDTO;
+import manager.messages.NotificationData;
+import manager.messages.NotificationsData;
 import manager.time.YazSystemDTO;
 import manager.transactions.TransactionDTO;
 import manager.transactions.TransactionData;
@@ -465,5 +467,18 @@ public class BankImpl implements Bank {
         }
         transactionsData.setTransactions(transactionsDataList);
         return transactionsData;
+    }
+
+    @Override
+    public NotificationsData getNotificationsData(String customerId) throws DataNotFoundException {
+        NotificationsData notificationsData = new NotificationsData();
+        List<NotificationData> notificationDataList = new ArrayList<>();
+        customersAccounts.getDataById(customerId).getNotificationList().stream()
+                .forEach(notification -> {notificationDataList.add(new NotificationData.NotificationDataBuilder()
+                        .message(notification.getMessage())
+                        .yazMade(notification.getYazMade())
+                        .build());});
+        notificationsData.setMessagesList(notificationDataList);
+        return notificationsData;
     }
 }
