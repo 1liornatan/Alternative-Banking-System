@@ -87,7 +87,7 @@ public class MainPageController {
                 setAdminScreen();
             }
             else {
-                customerController.updateLoansData();
+                customerController.updateData();
                 setCustomerScreen();
             }
         });
