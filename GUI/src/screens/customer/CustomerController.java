@@ -197,6 +197,7 @@ public class CustomerController {
     public void updateData() {
         updateLoansData();
         updateTransactions();
+        updateNotifications();
     }
 
     private Set<String> getSelectedCategories() {
