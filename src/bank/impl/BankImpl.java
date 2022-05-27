@@ -275,7 +275,8 @@ public class BankImpl implements Bank {
     public List<LoanData> getUnFinishedLoans(String customerId) throws DataNotFoundException {
             List<LoanData> loansList= new ArrayList<>();
             for(Pair<Loan, Integer> loanPair : loans.getAllPairs()) {
-                if(!loanPair.getKey().getStatus().equals("Finished"))
+                LoanStatus status = loanPair.getKey().getStatus();
+                if(status.equals("Pending") || status.equals("Active") || status.equals("Risk"))
                     loansList.add(getLoanData(loanPair.getKey()));
             }
             return loansList;
