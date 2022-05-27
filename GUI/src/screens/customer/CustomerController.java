@@ -414,6 +414,7 @@ public class CustomerController {
         Thread updateTransactions = new Thread(() -> {
             try {
                 int balance = bankInstance.getCustomerDTO(customerId.get()).getAccount().getBalance();
+                balanceProperty.set(balance);
                 List<TransactionData> transactionsData = bankInstance.getTransactionsData(customerId.get()).getTransactions();
                 List<TransactionModel> tempTransactionModels = new ArrayList<>();
                 for (TransactionData data : transactionsData) {
