@@ -17,6 +17,7 @@ import bank.loans.interest.exceptions.InvalidPercentException;
 import bank.loans.interest.impl.BasicInterest;
 import bank.loans.investments.Investment;
 import bank.loans.investments.impl.LoanInvestment;
+import bank.messages.Notification;
 import bank.messages.impl.BankNotification;
 import bank.time.TimeHandler;
 import bank.time.handler.BankTimeHandler;
@@ -478,7 +479,7 @@ public class BankImpl implements Bank {
                         .message(notification.getMessage())
                         .yazMade(notification.getYazMade())
                         .build());});
-        notificationsData.setMessagesList(notificationDataList);
+        notificationsData.setNotificationsList(notificationDataList);
         return notificationsData;
     }
 }
