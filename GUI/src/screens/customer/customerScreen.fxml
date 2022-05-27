@@ -183,7 +183,13 @@
                               <VBox prefHeight="341.0" prefWidth="359.0" spacing="10.0" BorderPane.alignment="CENTER">
                                  <children>
                                     <TableView fx:id="loanerLoansPTable" />
-                                    <TableView fx:id="paymentControls" prefWidth="267.0" />
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
+                                       <children>
+                                          <Button fx:id="payCycleButton" mnemonicParsing="false" onAction="#payCycleButtonAction" prefWidth="80.0" text="Pay Cycle" />
+                                          <Button fx:id="closeLoanButton" mnemonicParsing="false" onAction="#closeLoanButtonAction" prefWidth="80.0" text="Close Loan" />
+                                          <Button fx:id="payDebtButton" mnemonicParsing="false" onAction="#payDebtButtonAction" prefWidth="80.0" text="Pay Debt" />
+                                       </children>
+                                    </HBox>
                                  </children>
                               </VBox>
                            </left>
