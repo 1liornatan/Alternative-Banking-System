@@ -17,7 +17,6 @@ import bank.loans.interest.exceptions.InvalidPercentException;
 import bank.loans.interest.impl.BasicInterest;
 import bank.loans.investments.Investment;
 import bank.loans.investments.impl.LoanInvestment;
-import bank.messages.Notification;
 import bank.messages.impl.BankNotification;
 import bank.time.TimeHandler;
 import bank.time.handler.BankTimeHandler;
@@ -271,6 +270,15 @@ public class BankImpl implements Bank {
         loansData.setLoans(loansDataList);
         return loansData;
 
+    }
+    @Override
+    public List<LoanData> getUnFinishedLoans(String customerId) throws DataNotFoundException {
+            List<LoanData> loansList= new ArrayList<>();
+            for(Pair<Loan, Integer> loanPair : loans.getAllPairs()) {
+                if(!loanPair.getKey().getStatus().equals("Finished"))
+                    loansList.add(getLoanData(loanPair.getKey()));
+            }
+            return loansList;
     }
 
     @Override

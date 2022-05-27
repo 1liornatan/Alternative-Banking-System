@@ -196,6 +196,7 @@ public class CustomerController {
 
     public void updateData() {
         updateLoansData();
+        updatePaymentLoansData();
         updateTransactions();
         updateNotifications();
     }
@@ -334,6 +335,28 @@ public class CustomerController {
         updateThread.start();
     }
 
+    public void updatePaymentLoansData() {
+        Thread updatePaymentLoanThread = new Thread(() -> {
+            List<LoanModel> tempLoanerModelList = new ArrayList<>();
+            List<LoanData>  loanerDataList = null;
+            try {
+                loanerDataList = bankInstance.getUnFinishedLoans(customerId.get());
+            } catch (DataNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            updateList(loanerDataList, tempLoanerModelList);
+
+            loanerModelList = tempLoanerModelList;
+
+            Platform.runLater(() -> {
+                loanerLoansPTable.setItems(getLoans(loanerModelList));
+            });
+        });
+
+        updatePaymentLoanThread.start();
+    }
+
     private void updateList(List<LoanData> src, List<LoanModel> dest) {
         for(LoanData loanData : src) {
             LoanModel loanModel = new LoanModel.LoanModelBuilder()
@@ -451,6 +474,28 @@ public class CustomerController {
             Platform.runLater(() -> notificationsTable.setItems(getNotiications()));
         });
         updateNotifications.start();
+    }
+
+    public void createWithdraw(int amount) {
+        Thread withdrawThread = new Thread(() -> {
+            try {
+                bankInstance.withdraw(customerId.get(), amount,"Withdraw");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        withdrawThread.start();
+    }
+
+    public void createDeposit(int amount) {
+        Thread depositThread = new Thread(() -> {
+            try {
+                bankInstance.deposit(customerId.get(), amount,"Deposit");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        depositThread.start();
     }
 }
 
