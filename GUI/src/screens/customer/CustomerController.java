@@ -19,6 +19,7 @@ import manager.investments.InvestmentsData;
 import manager.investments.RequestDTO;
 import manager.loans.LoanData;
 import manager.loans.LoansData;
+import manager.messages.NotificationData;
 import manager.transactions.TransactionData;
 import models.LoanModel;
 import models.NotificationModel;
@@ -40,6 +41,7 @@ public class CustomerController {
     private BooleanProperty isFileSelected;
     private List<TransactionModel> transactionModels;
     private List<LoanModel> loanModelList;
+    private List<NotificationModel> notificationModels;
 
     @FXML
     private TableView<LoanModel> loanerLoansTable;
@@ -369,6 +371,10 @@ public class CustomerController {
         return FXCollections.observableArrayList(transactionModels);
     }
 
+    private ObservableList<NotificationModel> getNotiications() {
+        return FXCollections.observableArrayList(notificationModels);
+    }
+
     private ObservableList<LoanModel> getLoans() {
         return FXCollections.observableArrayList();
     }
@@ -421,6 +427,29 @@ public class CustomerController {
         yazMadeColumn.setCellValueFactory(new PropertyValueFactory<>("yazMade"));
 
         notificationsTable.getColumns().addAll(notificationMessageColumn, yazMadeColumn);
+    }
+
+    private void updateNotifications() {
+        if(!isFileSelected.get())
+            return;
+        Thread updateNotifications = new Thread(() -> {
+            List<NotificationData> notificationsData = null;
+            try {
+                notificationsData = bankInstance.getNotificationsData(customerId.get()).getNotificationsList();
+            } catch (DataNotFoundException e) {
+                e.printStackTrace();
+            }
+            List<NotificationModel> tempNotificationModels = new ArrayList<>();
+            for(NotificationData data : notificationsData) {
+                tempNotificationModels.add(new NotificationModel.NotificationModelBuilder()
+                        .message(data.getMessage())
+                        .yazMade(data.getYazMade())
+                        .build());
+            }
+            notificationModels = tempNotificationModels;
+            Platform.runLater(() -> notificationsTable.setItems(getNotiications()));
+        });
+        updateNotifications.start();
     }
 }
 

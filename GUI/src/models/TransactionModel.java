@@ -17,8 +17,8 @@ public class TransactionModel {
     }
 
     public static class TransactionModelBuilder {
-        private StringProperty description;
-        private IntegerProperty amount, previousBalance, yazMade;
+        private final StringProperty description;
+        private final IntegerProperty amount, previousBalance, yazMade;
 
         public TransactionModelBuilder() {
             description = new SimpleStringProperty();
