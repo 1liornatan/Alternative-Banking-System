@@ -20,6 +20,7 @@ import manager.loans.LoanData;
 import manager.loans.LoansData;
 import manager.transactions.TransactionData;
 import models.LoanModel;
+import models.NotificationModel;
 import models.TransactionModel;
 import models.utils.LoanTable;
 import org.controlsfx.control.CheckComboBox;
@@ -64,7 +65,7 @@ public class CustomerController {
     private TableView<?> paymentControls;
 
     @FXML
-    private TableView<?> notificationsTable;
+    private TableView<NotificationModel> notificationsTable;
 
 
     @FXML
@@ -169,6 +170,7 @@ public class CustomerController {
         LoanTable.setDataTables(loansFoundTable);
         LoanTable.setDataTables((loansChosenTable));
         LoanTable.setDataTables(loanerLoansPTable);
+        setNotificationsTable();
         updateCategories();
         setTransactionsTable();
         amountField.textProperty().addListener(new ChangeListener<String>() {
@@ -365,6 +367,16 @@ public class CustomerController {
         updateTransactions();
         transactionsTable.setItems(getTransactions());
 
+    }
+
+    private void setNotificationsTable() {
+        TableColumn<NotificationModel, String> notificationMessageColumn = new TableColumn<>("Message");
+        notificationMessageColumn.setCellValueFactory(new PropertyValueFactory<>("message"));
+        notificationMessageColumn.setPrefWidth(300);
+        TableColumn<NotificationModel, Integer> yazMadeColumn = new TableColumn<>("Made In Yaz");
+        yazMadeColumn.setCellValueFactory(new PropertyValueFactory<>("yazMade"));
+
+        notificationsTable.getColumns().addAll(notificationMessageColumn, yazMadeColumn);
     }
 }
 
