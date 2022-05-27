@@ -110,50 +110,7 @@ public class SetLoanMenu {
             }
 
             List<LoanData> chosenLoans = getChosenLoans(loansDataList);
-            int amountLeft = amount;
-            int minAmount, loansAmount;
-            int avgAmount = (int) Math.ceil(amountLeft * 1.0 / chosenLoans.size());
-            boolean averageSplit = false;
-
-            chosenLoans.sort(Comparator.comparingInt(p -> p.getAmountToActive()));
-            minAmount = chosenLoans.get(0).getAmountToActive();
-
-            while(avgAmount > minAmount) {
-                List<LoanData> tempList = new ArrayList<>();
-
-                for (LoanData loan : chosenLoans) {
-
-                    if (minAmount <= amountLeft) {
-                        InvestDTO investDTO = new InvestDTO(requesterName, loan.getName(), minAmount);
-                        bankInstance.createInvestment(investDTO);
-
-                        amountLeft -= minAmount;
-                        if (loan.getAmountToActive() != minAmount)
-                            tempList.add(loan);
-                    }
-                    else {
-                        break;
-                    }
-                }
-
-                chosenLoans = tempList;
-
-                if(chosenLoans.size() == 0)
-                    break;
-
-                avgAmount = amountLeft / chosenLoans.size();
-                minAmount = chosenLoans.get(0).getAmountToActive();
-            }
-
-            for(LoanData loan : chosenLoans) {
-                if(avgAmount <= amountLeft) {
-                    InvestDTO investDTO = new InvestDTO(requesterName, loan.getName(), avgAmount);
-                    bankInstance.createInvestment(investDTO);
-                    amountLeft -= avgAmount;
-                }
-                else
-                    break;
-            }
+            // TODO: ADD LOANS TO InvestmentsData AND USE BANKIMPL.SETINVESTMENTS
             System.out.println("Investment/s successfully made.");
         }
     }

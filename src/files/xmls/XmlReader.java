@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+import bank.accounts.CustomerAccount;
 import bank.accounts.impl.Customer;
 import bank.data.storage.DataStorage;
 import bank.data.storage.impl.BankDataStorage;
@@ -67,7 +68,8 @@ public class XmlReader {
                 if(customersDataStorage.isDataExists(currName))
                     throw new XmlAccountExistsException();
 
-                bank.accounts.CustomerAccount currCustomer = new Customer(currName, absCustomer.getAbsBalance());//TODO: ????
+                int absBalance = absCustomer.getAbsBalance();
+                CustomerAccount currCustomer = new Customer(currName, absBalance);//TODO: ????
                 customersDataStorage.addData(currCustomer);
             }
 

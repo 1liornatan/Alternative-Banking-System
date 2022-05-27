@@ -9,15 +9,8 @@ import java.util.*;
 
 public class Customer extends LoanAccount implements bank.accounts.CustomerAccount {
     private final String name;
-    private int balance;
-    private final List<Transaction> transactions;
     private List<Loan> loansRequested, loansInvested;
     private List<Notification> notificationList;
-
-    @Override
-    public List<Transaction> getTransactions() {
-        return transactions;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -33,9 +26,8 @@ public class Customer extends LoanAccount implements bank.accounts.CustomerAccou
     }
 
     public Customer(String name, int balance) {
+        super(balance);
         this.name = name;
-        this.balance = balance;
-        this.transactions = new ArrayList<>();
 
         loansRequested = new ArrayList<>();
         loansInvested = new ArrayList<>();
@@ -78,14 +70,9 @@ public class Customer extends LoanAccount implements bank.accounts.CustomerAccou
 
 
     @Override
-    public int getBalance() {
-        return balance;
-    }
-
-    @Override
     public String toString() {
         return "Account Name: " + name +
-                ", Current Balance: " + balance;
+                "'" + super.toString();
     }
 
     public int getNumOfRequestedLoansByStatus(LoanStatus status) {

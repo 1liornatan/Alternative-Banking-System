@@ -28,7 +28,7 @@ import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.accounts.AccountDTO;
 import manager.customers.*;
-import manager.investments.InvestDTO;
+import manager.investments.InvestmentsData;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoanData;
@@ -160,14 +160,25 @@ public class BankImpl implements Bank {
     }
 
 
+
+    public void setInvestmentsData(InvestmentsData investmentsData) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
+        List<String> loansIds = investmentsData.getLoansIds();
+        List<Loan> loansList = new ArrayList<>();
+        for(String loanId : loansIds) {
+            loansList.add(loans.getDataById(loanId));
+        }
+        setInvestments(investmentsData.getInvestorId(),
+                loansList,
+                investmentsData.getAmount()
+        );
+    }
     @Override
-    public void createInvestment(InvestDTO investDetails) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
-        Loan loan = loans.getDataById(investDetails.getLoanName());
-        String investor = investDetails.getInvestorName();
+    public void createInvestment(String investor, String loanId, int amount) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
+        Loan loan = loans.getDataById(loanId);
         CustomerAccount investingAccount = customersAccounts.getDataById(investor);
 
         float percent = loan.getInterestPercent();
-        int amountInvesting = investDetails.getAmount();
+        int amountInvesting = amount;
         int cyclesPerPayment = loan.getCyclesPerPayment();
         int duration = loan.getDuration();
 
@@ -179,6 +190,51 @@ public class BankImpl implements Bank {
                 timeHandler.getCurrentTime()));
     }
 
+    @Override
+    public void setInvestments(String requesterName, List<Loan> loanDataList, int amount) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
+        int amountLeft = amount;
+        int minAmount, loansAmount;
+        int avgAmount = (int) Math.ceil(amountLeft * 1.0 / loanDataList.size());
+        boolean averageSplit = false;
+
+        loanDataList.sort(Comparator.comparingInt(p -> p.getAmountToActive()));
+        minAmount = loanDataList.get(0).getAmountToActive();
+
+        while(avgAmount > minAmount) {
+            List<Loan> tempList = new ArrayList<>();
+
+            for (Loan loan : loanDataList) {
+
+                if (minAmount <= amountLeft) {
+                    createInvestment(requesterName, loan.getId(), minAmount);
+
+                    amountLeft -= minAmount;
+                    if (loan.getAmountToActive() != minAmount)
+                        tempList.add(loan);
+                }
+                else {
+                    break;
+                }
+            }
+
+            loanDataList = tempList;
+
+            if(loanDataList.size() == 0)
+                break;
+
+            avgAmount = amountLeft / loanDataList.size();
+            minAmount = loanDataList.get(0).getAmountToActive();
+        }
+
+        for(Loan loan : loanDataList) {
+            if(avgAmount <= amountLeft) {
+                createInvestment(requesterName, loan.getId(), avgAmount);
+                amountLeft -= avgAmount;
+            }
+            else
+                break;
+        }
+    }
     @Override
     public LoansData loanAssignmentRequest(RequestDTO requestDTO) throws InvalidPercentException {
         int amount = requestDTO.getAmount();

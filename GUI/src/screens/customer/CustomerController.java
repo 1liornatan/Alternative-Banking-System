@@ -1,12 +1,12 @@
 package screens.customer;
 
+import bank.accounts.impl.exceptions.NoMoneyException;
+import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
+import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.interest.exceptions.InvalidPercentException;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -15,6 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import manager.investments.InvestmentsData;
 import manager.investments.RequestDTO;
 import manager.loans.LoanData;
 import manager.loans.LoansData;
@@ -34,6 +35,7 @@ public class CustomerController {
     private List<LoanModel> loanerModelList;
     private List<LoanModel> lenderModelList;
     private StringProperty customerId;
+    private IntegerProperty investAmount;
     private ObservableList<String> categoriesList;
     private BooleanProperty isFileSelected;
     private List<TransactionModel> transactionModels;
@@ -102,7 +104,44 @@ public class CustomerController {
 
     @FXML
     void investButtonAction(ActionEvent event) {
-        updateCategories();
+        setInvestmentsChosen();
+    }
+
+    private void setInvestmentsChosen() {
+        Thread setInvestmentsThread = new Thread(() -> {
+            int amount = investAmount.get();
+            List<String> selectedLoansIds = new ArrayList<>();
+            loansChosenTable.getItems().stream().forEach(loanModel -> {
+                selectedLoansIds.add(loanModel.getId());
+            });
+            InvestmentsData investmentsData = new InvestmentsData.InvestmentsBuilder()
+                    .Name(customerId.get())
+                    .Amount(amount)
+                    .Loans(selectedLoansIds)
+                    .Build();
+
+            try {
+                bankInstance.setInvestmentsData(investmentsData);
+                Platform.runLater(() -> {
+                    clearAllFields();
+                });
+                // TODO: LABEL WITH STATUS & ERROR MESSAGE
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                System.out.println(e.getStackTrace());
+            }
+            finally {
+                updateData();
+            }
+        });
+        setInvestmentsThread.start();
+    }
+
+    private void clearAllFields() {
+        loansChosenTable.setItems(FXCollections.observableArrayList());
+        loansFoundTable.setItems(FXCollections.observableArrayList());
+        amountField.setText("0");
+        categoriesComboBox.getCheckModel().clearChecks();
     }
 
     @FXML
@@ -114,8 +153,9 @@ public class CustomerController {
 
     @FXML
     void searchLoansButtonAction(ActionEvent event) {
+        investAmount.set(Integer.valueOf(amountField.getText()));
         RequestDTO requestDTO = new RequestDTO
-            .Builder(customerId.get(), Integer.valueOf(amountField.getText()))
+            .Builder(customerId.get(),investAmount.get())
             .categories(getSelectedCategories()) // TODO: apply optional options
 /*                .minInterest(Integer.value)
             .minDuration(minLoanDuration)
@@ -124,6 +164,7 @@ public class CustomerController {
 
         try {
             LoansData loansData = bankInstance.loanAssignmentRequest(requestDTO);
+            clearAllFields();
             addFoundLoans(loansData.getLoans());
         } catch (InvalidPercentException e) {
             e.printStackTrace();
@@ -151,6 +192,10 @@ public class CustomerController {
         return tempLoanModelList;
     }
 
+    public void updateData() {
+        updateLoansData();
+        updateTransactions();
+    }
 
     private Set<String> getSelectedCategories() {
 
@@ -240,6 +285,7 @@ public class CustomerController {
         isFileSelected = new SimpleBooleanProperty();
         transactionModels = new ArrayList<>();
         loanModelList = new ArrayList<>();
+        investAmount = new SimpleIntegerProperty();
     }
 
     public void updateCategories() {
@@ -297,10 +343,6 @@ public class CustomerController {
 
             dest.add(loanModel);
         }
-    }
-
-    private void searchLoans() {
-        Integer amount = Integer.valueOf(amountField.getText());
     }
 
     public BankImpl getBankInstance() {

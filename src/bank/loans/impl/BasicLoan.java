@@ -88,7 +88,7 @@ public class BasicLoan implements Loan {
         this.loanDetails = loanDetails;
         this.interest = interest;
         this.status = LoanStatus.NEW;
-        loanAccount = new LoanAccount();
+        loanAccount = new LoanAccount(0);
         id = loanDetails.getIdName();
 
         investments = new ArrayList<>();

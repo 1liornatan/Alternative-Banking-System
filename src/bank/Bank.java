@@ -28,6 +28,7 @@ import manager.transactions.TransactionsData;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 public interface Bank {
@@ -56,7 +57,9 @@ public interface Bank {
 
     int getDeriskAmount(Loan loan);
 
-    void createInvestment(InvestDTO investDetails) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
+    void createInvestment(String investor, String loanId, int amount) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
+
+    void setInvestments(String requesterName, List<Loan> loanDataList, int amount) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
 
     LoansData loanAssignmentRequest(RequestDTO requestDTO) throws InvalidPercentException;
 

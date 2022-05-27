@@ -8,7 +8,6 @@ import bank.loans.Loan;
 import bank.transactions.Transaction;
 import bank.transactions.impl.BasicTransaction;
 
-import java.sql.Array;
 import java.util.*;
 
 public class LoanAccount implements Account, Singular {
@@ -17,9 +16,9 @@ public class LoanAccount implements Account, Singular {
     private int balance;
     private final List<Transaction> transactions;
 
-    public LoanAccount() {
+    public LoanAccount(int balance) {
         id = (idGenerator++).toString();
-        balance = 0;
+        this.balance = balance;
         transactions = new ArrayList<>();
     }
 
