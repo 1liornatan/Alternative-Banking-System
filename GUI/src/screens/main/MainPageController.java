@@ -103,6 +103,7 @@ public class MainPageController {
                 for(String name : names.getNames())
                     namesList.add(name);
 
+                customerController.updateCategories();
                 Platform.runLater(() -> {
                     viewComboBox.setItems(FXCollections.observableArrayList(namesList));
                 });

@@ -39,7 +39,6 @@ public class CustomerController {
     private List<TransactionModel> transactionModels;
     private List<LoanModel> loanModelList;
 
-
     @FXML
     private TableView<LoanModel> loanerLoansTable;
 
@@ -108,7 +107,9 @@ public class CustomerController {
 
     @FXML
     void tablesLeftButtonAction(ActionEvent event) {
-
+        ObservableList<LoanModel> selectedItems = loansChosenTable.getSelectionModel().getSelectedItems();
+        loansFoundTable.getItems().addAll(selectedItems);
+        loansChosenTable.getItems().removeAll(selectedItems);
     }
 
     @FXML
@@ -160,7 +161,9 @@ public class CustomerController {
 
     @FXML
     void tablesRightButtonAction(ActionEvent event) {
-
+        ObservableList<LoanModel> selectedItems = loansFoundTable.getSelectionModel().getSelectedItems();
+        loansChosenTable.getItems().addAll(selectedItems);
+        loansFoundTable.getItems().removeAll(selectedItems);
     }
 
     @FXML
@@ -171,7 +174,6 @@ public class CustomerController {
         LoanTable.setDataTables((loansChosenTable));
         LoanTable.setDataTables(loanerLoansPTable);
         setNotificationsTable();
-        updateCategories();
         setTransactionsTable();
         amountField.textProperty().addListener(new ChangeListener<String>() {
             @Override
