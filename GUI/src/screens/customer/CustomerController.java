@@ -37,6 +37,7 @@ public class CustomerController {
     private List<LoanModel> lenderModelList;
     private StringProperty customerId;
     private IntegerProperty investAmount;
+    private IntegerProperty balanceProperty;
     private ObservableList<String> categoriesList;
     private BooleanProperty isFileSelected;
     private List<TransactionModel> transactionModels;
@@ -65,11 +66,7 @@ public class CustomerController {
     private TableView<LoanModel> loanerLoansPTable;
 
     @FXML
-    private TableView<?> paymentControls;
-
-    @FXML
     private TableView<NotificationModel> notificationsTable;
-
 
     @FXML
     private TextField amountField;
@@ -103,6 +100,15 @@ public class CustomerController {
 
     @FXML
     private Button investButton;
+
+    @FXML
+    private Button payCycleButton;
+
+    @FXML
+    private Button closeLoanButton;
+
+    @FXML
+    private Button payDebtButton;
 
     @FXML
     void investButtonAction(ActionEvent event) {
@@ -215,6 +221,21 @@ public class CustomerController {
     }
 
     @FXML
+    void closeLoanButtonAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void payCycleButtonAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void payDebtButtonAction(ActionEvent event) {
+
+    }
+
+    @FXML
     void initialize() {
         LoanTable.setDataTables(loanerLoansTable);
         LoanTable.setDataTables(lenderLoansTable);
@@ -229,6 +250,9 @@ public class CustomerController {
                                 String newValue) {
                 if (!newValue.matches("\\d*")) {
                     amountField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+                else if(Integer.valueOf(newValue) > balanceProperty.get()) {
+                    amountField.setText(String.valueOf(balanceProperty.get()));
                 }
             }
         });
@@ -289,6 +313,7 @@ public class CustomerController {
         transactionModels = new ArrayList<>();
         loanModelList = new ArrayList<>();
         investAmount = new SimpleIntegerProperty();
+        balanceProperty = new SimpleIntegerProperty();
     }
 
     public void updateCategories() {
@@ -302,7 +327,10 @@ public class CustomerController {
                 tempCategoriesList.add(category);
             }
             categoriesList = tempCategoriesList;
-            Platform.runLater(() -> categoriesComboBox.getItems().setAll(categoriesList));
+            Platform.runLater(() -> {
+                categoriesComboBox.getItems().setAll(categoriesList);
+                categoriesComboBox.getCheckModel().checkAll();
+            });
         });
         updateCategories.start();
     }
@@ -384,17 +412,21 @@ public class CustomerController {
         if(!isFileSelected.get())
             return;
         Thread updateTransactions = new Thread(() -> {
-            List<TransactionData> transactionsData = bankInstance.getTransactionsData(customerId.get()).getTransactions();
-            List<TransactionModel> tempTransactionModels = new ArrayList<>();
-            for(TransactionData data : transactionsData) {
-                tempTransactionModels.add(new TransactionModel.TransactionModelBuilder()
-                        .description(data.getDescription())
-                        .amount(data.getAmount())
-                        .previousBalance(data.getPreviousBalance())
-                        .yazMade(data.getYazMade())
-                        .build());
+            try {
+                int balance = bankInstance.getCustomerDTO(customerId.get()).getAccount().getBalance();
+                List<TransactionData> transactionsData = bankInstance.getTransactionsData(customerId.get()).getTransactions();
+                List<TransactionModel> tempTransactionModels = new ArrayList<>();
+                for (TransactionData data : transactionsData) {
+                    tempTransactionModels.add(new TransactionModel.TransactionModelBuilder()
+                            .description(data.getDescription())
+                            .amount(data.getAmount())
+                            .previousBalance(data.getPreviousBalance())
+                            .yazMade(data.getYazMade())
+                            .build());
+                }
+                transactionModels = tempTransactionModels;
             }
-            transactionModels = tempTransactionModels;
+            catch(Exception e) {}
             Platform.runLater(() -> transactionsTable.setItems(getTransactions()));
         });
         updateTransactions.start();
