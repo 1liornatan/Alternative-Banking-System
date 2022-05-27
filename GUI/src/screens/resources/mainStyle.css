@@ -28,4 +28,13 @@
     -fx-rotate: 180;
 }
 
+#loansFoundLabel {
+    -fx-font-size: 14;
+    -fx-font-weight: BOLD;
+}
+
+#loansChosenLabel {
+    -fx-font-size: 14;
+    -fx-font-weight: BOLD;
+}
 
