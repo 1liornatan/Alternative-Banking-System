@@ -114,8 +114,12 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public void advanceOneYaz() throws DataNotFoundException, NonPositiveAmountException {
+    public void advanceOneYaz() {
         timeHandler.advanceTime();
+    }
+
+    @Override
+    public void advanceOneCycle() throws DataNotFoundException, NonPositiveAmountException {
         loanHandler.oneCycle();
     }
 
@@ -152,6 +156,15 @@ public class BankImpl implements Bank {
     @Override
     public void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
         loanHandler.deriskLoan(loan);
+    }
+
+    @Override
+    public void deriskLoanRequest(String loanId) throws NoMoneyException, NonPositiveAmountException {
+        try {
+            deriskLoan(loans.getDataById(loanId));
+        } catch (DataNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

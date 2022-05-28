@@ -1,5 +1,7 @@
 package screens.customer;
 
+import bank.accounts.impl.exceptions.NoMoneyException;
+import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.interest.exceptions.InvalidPercentException;
@@ -259,12 +261,24 @@ public class CustomerController {
 
     @FXML
     void payCycleButtonAction(ActionEvent event) {
-
+        LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
+        try {
+            bankInstance.advanceOneCycle();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        updateData();
     }
 
     @FXML
     void payDebtButtonAction(ActionEvent event) {
-
+      LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
+        try {
+            bankInstance.deriskLoanRequest(selectedLoan.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        updateData();
     }
 
     @FXML

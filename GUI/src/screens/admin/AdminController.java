@@ -59,14 +59,14 @@ public class AdminController {
     @FXML
     void increaseYazButtonAction(ActionEvent event) {
         Thread increaseYazThread = new Thread(() -> {
-            try {
+           // try {
                 bankInstance.advanceOneYaz();
                 updateBankData();
                 int currYaz = bankInstance.getCurrentYaz();
                 Platform.runLater(() -> currYazProperty.set(currYaz));
-            } catch (DataNotFoundException | NonPositiveAmountException e) {
+           /* } catch (DataNotFoundException | NonPositiveAmountException e) {
                 e.printStackTrace();
-            }
+            }*/
         });
         increaseYazThread.start();
     }
