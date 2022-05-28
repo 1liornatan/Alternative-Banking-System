@@ -274,11 +274,16 @@ public class BankImpl implements Bank {
     @Override
     public List<LoanData> getUnFinishedLoans(String customerId) throws DataNotFoundException {
             List<LoanData> loansList= new ArrayList<>();
-            for(Pair<Loan, Integer> loanPair : loans.getAllPairs()) {
-                LoanStatus status = loanPair.getKey().getStatus();
-                if(status.equals("Pending") || status.equals("Active") || status.equals("Risk"))
-                    loansList.add(getLoanData(loanPair.getKey()));
-            }
+            customersAccounts.getDataById(customerId).getLoansRequested().stream()
+                    .filter(loan -> !loan.getStatus().equals("Finished"))
+                    .filter(loan -> !loan.getStatus().equals("New"))
+                    .forEach(loan -> {
+                        try {
+                            loansList.add(getLoanData(loan));
+                        } catch (DataNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    });
             return loansList;
     }
 
