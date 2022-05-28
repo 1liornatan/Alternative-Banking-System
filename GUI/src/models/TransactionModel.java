@@ -9,6 +9,38 @@ public class TransactionModel {
     private final StringProperty description;
     private final IntegerProperty amount, previousBalance, yazMade;
 
+    public String getDescription() {
+        return description.get();
+    }
+
+    public StringProperty descriptionProperty() {
+        return description;
+    }
+
+    public int getAmount() {
+        return amount.get();
+    }
+
+    public IntegerProperty amountProperty() {
+        return amount;
+    }
+
+    public int getPreviousBalance() {
+        return previousBalance.get();
+    }
+
+    public IntegerProperty previousBalanceProperty() {
+        return previousBalance;
+    }
+
+    public int getYazMade() {
+        return yazMade.get();
+    }
+
+    public IntegerProperty yazMadeProperty() {
+        return yazMade;
+    }
+
     private TransactionModel(TransactionModelBuilder builder) {
         this.description = builder.description;
         this.amount = builder.amount;

@@ -70,6 +70,8 @@ public interface Bank {
 
     LoanDTO getLoanDTO(Loan loan);
 
+    List<LoanData> getUnFinishedLoans(String customerId) throws DataNotFoundException;
+
     Set<String> getCategories();
 
     CategoriesDTO getCategoriesDTO();

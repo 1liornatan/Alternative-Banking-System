@@ -13,9 +13,19 @@ public class NotificationModel {
         this.message = builder.message;
         this.yazMade = builder.yazMade;
     }
+
+    public String getMessage() {
+        return message.get();
+    }
+
     public StringProperty messageProperty() {
         return message;
     }
+
+    public int getYazMade() {
+        return yazMade.get();
+    }
+
     public IntegerProperty yazMadeProperty() {
         return yazMade;
     }
