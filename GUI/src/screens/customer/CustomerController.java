@@ -149,7 +149,7 @@ public class CustomerController {
         loansChosenTable.setItems(FXCollections.observableArrayList());
         loansFoundTable.setItems(FXCollections.observableArrayList());
         amountField.setText("0");
-        categoriesComboBox.getCheckModel().clearChecks();
+        categoriesComboBox.getCheckModel().checkAll();
     }
 
     @FXML
@@ -162,6 +162,8 @@ public class CustomerController {
     @FXML
     void searchLoansButtonAction(ActionEvent event) {
         investAmount.set(Integer.valueOf(amountField.getText()));
+        if(investAmount.get() <= 0)
+            return;
         RequestDTO requestDTO = new RequestDTO
             .Builder(customerId.get(),investAmount.get())
             .categories(getSelectedCategories()) // TODO: apply optional options
@@ -252,8 +254,9 @@ public class CustomerController {
                 if (!newValue.matches("\\d*")) {
                     amountField.setText(newValue.replaceAll("[^\\d]", ""));
                 }
-                else if(newValue.isEmpty())
+                else if(newValue.isEmpty()) {
                     amountField.setText("0");
+                }
                 else if(Integer.valueOf(newValue) > balanceProperty.get()) {
                     amountField.setText(String.valueOf(balanceProperty.get()));
                 }
@@ -318,6 +321,7 @@ public class CustomerController {
         loanModelList = new ArrayList<>();
         investAmount = new SimpleIntegerProperty();
         balanceProperty = new SimpleIntegerProperty();
+
     }
 
     public void updateCategories() {
