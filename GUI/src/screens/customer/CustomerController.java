@@ -251,11 +251,14 @@ public class CustomerController {
                 if (!newValue.matches("\\d*")) {
                     amountField.setText(newValue.replaceAll("[^\\d]", ""));
                 }
+                else if(newValue.isEmpty())
+                    amountField.setText("0");
                 else if(Integer.valueOf(newValue) > balanceProperty.get()) {
                     amountField.setText(String.valueOf(balanceProperty.get()));
                 }
             }
         });
+        amountField.setText("0");
         minInterestField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
