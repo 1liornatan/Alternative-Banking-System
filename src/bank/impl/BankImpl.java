@@ -173,8 +173,7 @@ public class BankImpl implements Bank {
         );
     }
     @Override
-    public void createInvestment(String investor, String loanId, int amount) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
-        Loan loan = loans.getDataById(loanId);
+    public void createInvestment(String investor, Loan loan, int amount) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
         CustomerAccount investingAccount = customersAccounts.getDataById(investor);
 
         float percent = loan.getInterestPercent();
@@ -194,45 +193,56 @@ public class BankImpl implements Bank {
     public void setInvestments(String requesterName, List<Loan> loanDataList, int amount) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
         int amountLeft = amount;
         int minAmount, loansAmount;
-        int avgAmount = (int) Math.ceil(amountLeft * 1.0 / loanDataList.size());
-        boolean averageSplit = false;
+        int avgAmount;
+        List<Integer> amountInvestingArr = new ArrayList<>();
+        int lowestLoan = 0;
 
+        loansAmount = loanDataList.size();
         loanDataList.sort(Comparator.comparingInt(p -> p.getAmountToActive()));
         minAmount = loanDataList.get(0).getAmountToActive();
+        avgAmount = (int) Math.ceil (amountLeft / (loansAmount - lowestLoan));
+        loanDataList.stream().forEach(loan -> amountInvestingArr.add(0));
 
-        while(avgAmount > minAmount) {
-            List<Loan> tempList = new ArrayList<>();
 
+        if (minAmount > avgAmount) {
             for (Loan loan : loanDataList) {
+                createInvestment(requesterName, loan, avgAmount);
+            }
+        }
+        else
+        {
+            do {
+                int i = lowestLoan;
+                minAmount = loanDataList.get(i).getAmountToActive() - amountInvestingArr.get(i);
+                avgAmount = (int) Math.ceil (amountLeft / (loansAmount - lowestLoan));
 
-                if (minAmount <= amountLeft) {
-                    createInvestment(requesterName, loan.getId(), minAmount);
-
-                    amountLeft -= minAmount;
-                    if (loan.getAmountToActive() != minAmount)
-                        tempList.add(loan);
-                }
-                else {
+                if(minAmount > avgAmount) {
+                    for(; i < loansAmount; i++) {
+                        amountInvestingArr.set(i, amountInvestingArr.get(i) + avgAmount);
+                    }
                     break;
                 }
+
+                for (; i < loansAmount; i++) {
+                    if (minAmount <= amountLeft) {
+                        amountInvestingArr.set(i, amountInvestingArr.get(i) + minAmount);
+                        amountLeft -= minAmount;
+                        if(loanDataList.get(i).getAmountToActive() == amountInvestingArr.get(i)) {
+                            lowestLoan++;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if(lowestLoan == loansAmount)
+                    break;
             }
+            while (amountLeft > 0);
 
-            loanDataList = tempList;
-
-            if(loanDataList.size() == 0)
-                break;
-
-            avgAmount = amountLeft / loanDataList.size();
-            minAmount = loanDataList.get(0).getAmountToActive();
-        }
-
-        for(Loan loan : loanDataList) {
-            if(avgAmount <= amountLeft) {
-                createInvestment(requesterName, loan.getId(), avgAmount);
-                amountLeft -= avgAmount;
+            for (int i = 0; i < loansAmount; i++) {
+                createInvestment(requesterName, loanDataList.get(i), amountInvestingArr.get(i));
             }
-            else
-                break;
         }
     }
     @Override
