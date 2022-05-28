@@ -1,7 +1,5 @@
 package screens.customer;
 
-import bank.accounts.impl.exceptions.NoMoneyException;
-import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.interest.exceptions.InvalidPercentException;
@@ -41,7 +39,7 @@ public class CustomerController {
     private ObservableList<String> categoriesList;
     private BooleanProperty isFileSelected;
     private List<TransactionModel> transactionModels;
-    private List<LoanModel> loanModelList;
+    private List<LoanModel> loanPModelList;
     private List<NotificationModel> notificationModels;
 
     @FXML
@@ -312,7 +310,7 @@ public class CustomerController {
         customerId = new SimpleStringProperty();
         isFileSelected = new SimpleBooleanProperty();
         transactionModels = new ArrayList<>();
-        loanModelList = new ArrayList<>();
+        loanPModelList = new ArrayList<>();
         investAmount = new SimpleIntegerProperty();
         balanceProperty = new SimpleIntegerProperty();
     }
@@ -374,10 +372,10 @@ public class CustomerController {
 
             updateList(loanerDataList, tempLoanerModelList);
 
-            loanerModelList = tempLoanerModelList;
+            loanPModelList = tempLoanerModelList;
 
             Platform.runLater(() -> {
-                loanerLoansPTable.setItems(getLoans(loanerModelList));
+                loanerLoansPTable.setItems(getLoans(loanPModelList));
             });
         });
 
