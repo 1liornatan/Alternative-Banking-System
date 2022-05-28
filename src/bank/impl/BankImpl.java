@@ -114,8 +114,12 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public void advanceOneYaz() throws DataNotFoundException, NonPositiveAmountException {
+    public void advanceOneYaz() {
         timeHandler.advanceTime();
+    }
+
+    @Override
+    public void advanceOneCycle() throws DataNotFoundException, NonPositiveAmountException {
         loanHandler.oneCycle();
     }
 
@@ -152,6 +156,15 @@ public class BankImpl implements Bank {
     @Override
     public void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
         loanHandler.deriskLoan(loan);
+    }
+
+    @Override
+    public void deriskLoanRequest(String loanId) throws NoMoneyException, NonPositiveAmountException {
+        try {
+            deriskLoan(loans.getDataById(loanId));
+        } catch (DataNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -285,8 +298,9 @@ public class BankImpl implements Bank {
     public List<LoanData> getUnFinishedLoans(String customerId) throws DataNotFoundException {
             List<LoanData> loansList= new ArrayList<>();
             customersAccounts.getDataById(customerId).getLoansRequested().stream()
-                    .filter(loan -> !loan.getStatus().equals("Finished"))
-                    .filter(loan -> !loan.getStatus().equals("New"))
+                    .filter(loan -> !loan.getStatus().equals(LoanStatus.FINISHED))
+                    .filter(loan -> !loan.getStatus().equals(LoanStatus.NEW))
+                    .filter(loan -> !loan.getStatus().equals(LoanStatus.PENDING))
                     .forEach(loan -> {
                         try {
                             loansList.add(getLoanData(loan));

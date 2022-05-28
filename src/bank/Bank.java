@@ -46,6 +46,8 @@ public interface Bank {
 
     void advanceOneYaz() throws DataNotFoundException, NonPositiveAmountException;
 
+    void advanceOneCycle() throws DataNotFoundException, NonPositiveAmountException;
+
     int getCurrentYaz();
 
     //    int createLoan(int ownerId, float amount, String category); // returns loan's id
@@ -54,6 +56,8 @@ public interface Bank {
     void createAccount(String name, int balance); // returns account's id
 
     void deriskLoan(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException;
+
+    void deriskLoanRequest(String loanId) throws NoMoneyException, NonPositiveAmountException;
 
     int getDeriskAmount(Loan loan);
 

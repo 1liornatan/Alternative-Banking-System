@@ -45,7 +45,7 @@ public class CustomerController {
     private ObservableList<String> categoriesList;
     private BooleanProperty isFileSelected;
     private List<TransactionModel> transactionModels;
-    private List<LoanModel> loanModelList;
+    private List<LoanModel> loanPModelList;
     private List<NotificationModel> notificationModels;
 
     @FXML
@@ -270,12 +270,24 @@ public class CustomerController {
 
     @FXML
     void payCycleButtonAction(ActionEvent event) {
-
+        LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
+        try {
+            bankInstance.advanceOneCycle();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        updateData();
     }
 
     @FXML
     void payDebtButtonAction(ActionEvent event) {
-
+      LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
+        try {
+            bankInstance.deriskLoanRequest(selectedLoan.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        updateData();
     }
 
     @FXML
@@ -370,7 +382,7 @@ public class CustomerController {
         customerId = new SimpleStringProperty();
         isFileSelected = new SimpleBooleanProperty();
         transactionModels = new ArrayList<>();
-        loanModelList = new ArrayList<>();
+        loanPModelList = new ArrayList<>();
         investAmount = new SimpleIntegerProperty();
         balanceProperty = new SimpleIntegerProperty();
 
@@ -433,10 +445,10 @@ public class CustomerController {
 
             updateList(loanerDataList, tempLoanerModelList);
 
-            loanerModelList = tempLoanerModelList;
+            loanPModelList = tempLoanerModelList;
 
             Platform.runLater(() -> {
-                loanerLoansPTable.setItems(getLoans(loanerModelList));
+                loanerLoansPTable.setItems(getLoans(loanPModelList));
             });
         });
 

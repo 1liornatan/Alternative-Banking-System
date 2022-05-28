@@ -95,6 +95,7 @@ public class BankLoanHandler implements LoanHandler {
         for(Pair<Loan, Integer> loanPair : filteredLoans) {
             makePayment(loanPair.getKey());
         }
+
     }
 
     private void makePayment(Loan loan) throws DataNotFoundException, NonPositiveAmountException {
@@ -102,6 +103,7 @@ public class BankLoanHandler implements LoanHandler {
         int payment = loan.getPayment();
         try {
             transactions.addData(srcAcc.withdraw(payment, "Loan Cycle"));
+            srcAcc.addNotification(new BankNotification("Loan Cycle", timeHandler.getCurrentTime()));
             loan.fullPaymentCycle();
             Collection<Investment> investments = loan.getInvestments();
             boolean isFinished = true;
@@ -168,6 +170,7 @@ public class BankLoanHandler implements LoanHandler {
         Account srcAcc = customers.getDataById(loan.getOwnerId());
 
         transactions.addData(srcAcc.withdraw(amount, "Derisk Loan"));
+        customers.getDataById(srcAcc.getId()).addNotification(new BankNotification("Derisk Loan",timeHandler.getCurrentTime()));
         int missingCycles = (loan.getCurrentPayment() - loan.getFullPaidCycles());
 
         for(int i = 0; i < missingCycles; i++)
