@@ -52,9 +52,16 @@ public class LoanTable {
 
         TableColumn<LoanModel, String> loanNameColumn = new TableColumn<>("Id");
         loanNameColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        loanNameColumn.setPrefWidth(300);
         TableColumn<LoanModel, Integer> amountColumn = new TableColumn<>("Amount");
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
+
+        loanNameColumn.minWidthProperty().bind(dataTable.widthProperty().multiply(0.6));
+        amountColumn.minWidthProperty().bind(dataTable.widthProperty().multiply(0.2));
+        loanExpanderColumn.minWidthProperty().bind(dataTable.widthProperty().multiply(0.2));
+
+        amountColumn.setStyle("-fx-alignment: CENTER;");
+        loanExpanderColumn.setStyle("-fx-alignment: TOP_CENTER;");
+
 
         dataTable.getColumns().addAll(loanNameColumn, amountColumn, loanExpanderColumn);
     }

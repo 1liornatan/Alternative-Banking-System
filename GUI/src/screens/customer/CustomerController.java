@@ -6,10 +6,13 @@ import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.interest.exceptions.InvalidPercentException;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -140,23 +143,28 @@ public class CustomerController {
                 Platform.runLater(() -> {
                     clearAllFields();
                 });
+                updateData();
                 // TODO: LABEL WITH STATUS & ERROR MESSAGE
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 System.out.println(e.getStackTrace());
-            }
-            finally {
-                updateData();
             }
         });
         setInvestmentsThread.start();
     }
 
     private void clearAllFields() {
-        loansChosenTable.setItems(FXCollections.observableArrayList());
-        loansFoundTable.setItems(FXCollections.observableArrayList());
+        loansChosenTable.getItems().clear();
+        loansFoundTable.getItems().clear();
         amountField.setText("0");
         categoriesComboBox.getCheckModel().checkAll();
+    }
+
+    public void accountChanged() {
+        updateData();
+        progressBarStatusLabel.textProperty().unbind();
+        progressBarStatusLabel.setText("");
+        searchLoansProgressBar.setProgress(0);
     }
 
     @FXML
@@ -197,6 +205,7 @@ public class CustomerController {
                     Platform.runLater(() -> {
                         clearAllFields();
                         addFoundLoans(loansData.getLoans());
+                        setLoansIntegrationButtons();
                     });
                     searchLoansProgressBar.setProgress(1.0);
                     updateMessage("Operation Complete");
@@ -330,6 +339,18 @@ public class CustomerController {
                 }
             }
         });
+        investButton.setDisable(true);
+        tablesLeftButton.setDisable(true);
+        tablesRightButton.setDisable(true);
+        setLoansIntegrationButtons();
+    }
+
+    private void setLoansIntegrationButtons() {
+        BooleanBinding emptyChosen = Bindings.isEmpty(loansChosenTable.getItems());
+        BooleanBinding emptyFound = Bindings.isEmpty(loansFoundTable.getItems());
+        investButton.disableProperty().bind(emptyChosen);
+        tablesRightButton.disableProperty().bind(emptyFound);
+        tablesLeftButton.disableProperty().bind(emptyChosen);
     }
 
 
@@ -517,9 +538,12 @@ public class CustomerController {
         TableColumn<NotificationModel, String> notificationMessageColumn = new TableColumn<>("Message");
         notificationMessageColumn.setCellValueFactory(new PropertyValueFactory<>("message"));
         notificationMessageColumn.setPrefWidth(300);
-        TableColumn<NotificationModel, Integer> yazMadeColumn = new TableColumn<>("Made In Yaz");
+        TableColumn<NotificationModel, Integer> yazMadeColumn = new TableColumn<>("Date");
         yazMadeColumn.setCellValueFactory(new PropertyValueFactory<>("yazMade"));
 
+        yazMadeColumn.maxWidthProperty().bind(notificationsTable.widthProperty().multiply(0.1));
+        yazMadeColumn.setStyle("-fx-alignment: CENTER;");
+        notificationMessageColumn.maxWidthProperty().bind(notificationsTable.widthProperty().multiply(0.9));
         notificationsTable.getColumns().addAll(notificationMessageColumn, yazMadeColumn);
     }
 
@@ -567,5 +591,6 @@ public class CustomerController {
         });
         depositThread.start();
     }
+
 }
 

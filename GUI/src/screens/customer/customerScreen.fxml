@@ -23,22 +23,22 @@
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <BorderPane layoutX="14.0" prefHeight="371.0" prefWidth="600.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="15.0">
-                           <left>
-                              <VBox prefHeight="341.0" prefWidth="359.0" spacing="10.0" BorderPane.alignment="CENTER">
+                           <right>
+                              <AnchorPane BorderPane.alignment="CENTER">
+                                 <children>
+                                    <TableView fx:id="transactionsTable" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="0.0" />
+                                    <Button fx:id="chargeButton" layoutX="30.0" layoutY="301.0" minWidth="80.0" mnemonicParsing="false" text="Charge" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" />
+                                    <Button fx:id="withdrawButton" layoutX="150.0" layoutY="301.0" minWidth="80.0" mnemonicParsing="false" prefHeight="25.0" text="Withdraw" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="15.0" />
+                                 </children>
+                              </AnchorPane>
+                           </right>
+                           <center>
+                              <VBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
                                  <children>
                                     <TableView fx:id="loanerLoansTable" />
                                     <TableView fx:id="lenderLoansTable" prefWidth="267.0" />
                                  </children>
                               </VBox>
-                           </left>
-                           <center>
-                              <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                                 <children>
-                                    <TableView fx:id="transactionsTable" prefHeight="341.0" prefWidth="226.0" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="0.0" />
-                                    <Button fx:id="chargeButton" layoutX="30.0" layoutY="301.0" minWidth="80.0" mnemonicParsing="false" text="Charge" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" />
-                                    <Button fx:id="withdrawButton" layoutX="150.0" layoutY="301.0" minWidth="80.0" mnemonicParsing="false" prefHeight="25.0" text="Withdraw" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="15.0" />
-                                 </children>
-                              </AnchorPane>
                            </center>
                         </BorderPane>
                      </children>
@@ -139,7 +139,7 @@
                            <center>
                               <AnchorPane>
                                  <children>
-                                    <HBox alignment="CENTER" layoutY="-26.0" prefHeight="165.0" prefWidth="600.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-26.0">
+                                    <HBox alignment="CENTER" layoutY="-26.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-26.0">
                                        <children>
                                           <VBox alignment="BOTTOM_CENTER">
                                              <children>
