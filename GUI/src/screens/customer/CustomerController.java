@@ -356,7 +356,6 @@ public class CustomerController {
             Platform.runLater(() -> {
                 loanerLoansTable.setItems(getLoans(loanerModelList));
                 lenderLoansTable.setItems(getLoans(lenderModelList));
-                loanerLoansPTable.setItems(getLoans(loanerModelList));
             });
         });
 
