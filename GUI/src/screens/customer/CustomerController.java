@@ -11,6 +11,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -55,6 +56,12 @@ public class CustomerController {
 
     @FXML
     private Button chargeButton;
+
+    @FXML
+    private ProgressBar searchLoansProgressBar;
+
+    @FXML
+    private Label progressBarStatusLabel;
 
     @FXML
     private Button withdrawButton;
@@ -164,21 +171,45 @@ public class CustomerController {
         investAmount.set(Integer.valueOf(amountField.getText()));
         if(investAmount.get() <= 0)
             return;
-        RequestDTO requestDTO = new RequestDTO
-            .Builder(customerId.get(),investAmount.get())
-            .categories(getSelectedCategories()) // TODO: apply optional options
+
+        Task task = new Task() {
+            @Override
+            protected Object call() throws Exception {
+                searchLoansProgressBar.setProgress(0);
+                updateMessage("Gathering Information...");
+                RequestDTO requestDTO = new RequestDTO
+                        .Builder(customerId.get(),investAmount.get())
+                        .categories(getSelectedCategories()) // TODO: apply optional options
 /*                .minInterest(Integer.value)
             .minDuration(minLoanDuration)
             .maxLoans(maxRequestedLoans)*/
-            .build();
+                        .build();
 
-        try {
-            LoansData loansData = bankInstance.loanAssignmentRequest(requestDTO);
-            clearAllFields();
-            addFoundLoans(loansData.getLoans());
-        } catch (InvalidPercentException e) {
-            e.printStackTrace();
-        }
+                try {
+                    Thread.sleep(2000);
+                    searchLoansProgressBar.setProgress(0.3);
+                    updateMessage("Searching Loans...");
+                    LoansData loansData = bankInstance.loanAssignmentRequest(requestDTO);
+                    Thread.sleep(1000);
+                    searchLoansProgressBar.setProgress(0.7);
+                    updateMessage("Printing Loans...");
+                    Thread.sleep(1000);
+                    Platform.runLater(() -> {
+                        clearAllFields();
+                        addFoundLoans(loansData.getLoans());
+                    });
+                    searchLoansProgressBar.setProgress(1.0);
+                    updateMessage("Operation Complete");
+                    return "Found " + loansData.getLoans().size() + " Loans";
+                } catch (InvalidPercentException e) {
+                    return e.getMessage();
+                }
+            }
+        };
+        progressBarStatusLabel.textProperty().bind(task.messageProperty());
+        Thread findLoans = new Thread(task);
+        findLoans.start();
+
     }
 
     private void addFoundLoans(List<LoanData> loansList) {
