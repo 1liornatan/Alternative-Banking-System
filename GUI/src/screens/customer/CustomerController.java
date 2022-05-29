@@ -355,6 +355,7 @@ public class CustomerController {
         tablesLeftButton.setDisable(true);
         tablesRightButton.setDisable(true);
         setLoansIntegrationButtons();
+
     }
 
     private void setLoansIntegrationButtons() {

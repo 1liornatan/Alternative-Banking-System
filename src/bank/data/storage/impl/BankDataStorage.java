@@ -116,10 +116,10 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
 
     @Override
     public void addDataSet(Collection<E> dataSet) {
-        for(E data : dataSet) {
-            String id = data.getId();
-            F f = new F(data);
-            synchronized (this) {
+        synchronized (this) {
+            for (E data : dataSet) {
+                String id = data.getId();
+                F f = new F(data);
                 container.put(id, f);
             }
         }

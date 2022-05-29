@@ -4,19 +4,23 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.CheckComboBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="screens.customer.CustomerController">
+<AnchorPane prefHeight="481.0" prefWidth="712.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="screens.customer.CustomerController">
    <children>
-      <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="606.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-6.0" AnchorPane.topAnchor="0.0">
         <tabs>
             <Tab text="Information">
               <content>
@@ -137,31 +141,36 @@
                               </AnchorPane>
                            </top>
                            <center>
-                              <AnchorPane>
-                                 <children>
-                                    <HBox alignment="CENTER" layoutY="-26.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-26.0">
+                              <ScrollPane fitToHeight="true" fitToWidth="true" minHeight="191.0">
+                                 <content>
+                                    <GridPane prefHeight="191.0" prefWidth="718.0">
+                                       <columnConstraints>
+                                          <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
+                                          <ColumnConstraints hgrow="NEVER" maxWidth="107.0" minWidth="10.0" prefWidth="107.0" />
+                                          <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
+                                       </columnConstraints>
+                                       <rowConstraints>
+                                          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                       </rowConstraints>
                                        <children>
-                                          <VBox alignment="BOTTOM_CENTER">
+                                          <VBox alignment="CENTER" spacing="20.0" GridPane.columnIndex="1">
+                                             <children>
+                                                <Button fx:id="tablesRightButton" maxHeight="32.0" maxWidth="32.0" minHeight="32.0" minWidth="32.0" mnemonicParsing="false" onAction="#tablesRightButtonAction" prefHeight="32.0" prefWidth="32.0" />
+                                                <Button fx:id="tablesLeftButton" maxHeight="32.0" maxWidth="32.0" minHeight="32.0" minWidth="32.0" mnemonicParsing="false" onAction="#tablesLeftButtonAction" prefHeight="32.0" prefWidth="32.0" />
+                                                <Button fx:id="investButton" mnemonicParsing="false" onAction="#investButtonAction" prefHeight="25.0" prefWidth="80.0" text="Invest" />
+                                             </children>
+                                          </VBox>
+                                          <VBox alignment="CENTER">
                                              <children>
                                                 <Label fx:id="loansFoundLabel" text="Loans Found" />
-                                                <TableView fx:id="loansFoundTable" />
+                                                <TableView fx:id="loansFoundTable">
+                                                   <VBox.margin>
+                                                      <Insets bottom="10.0" left="10.0" />
+                                                   </VBox.margin>
+                                                </TableView>
                                              </children>
-                                             <HBox.margin>
-                                                <Insets bottom="10.0" left="10.0" />
-                                             </HBox.margin>
                                           </VBox>
-                                          <AnchorPane prefHeight="139.0" prefWidth="80.0">
-                                             <children>
-                                                <VBox alignment="CENTER" layoutX="-1.0" layoutY="5.0" prefHeight="139.0" prefWidth="45.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                   <children>
-                                                      <Button fx:id="tablesRightButton" maxHeight="32.0" maxWidth="32.0" minHeight="32.0" minWidth="32.0" mnemonicParsing="false" onAction="#tablesRightButtonAction" prefHeight="32.0" prefWidth="32.0" />
-                                                      <Button fx:id="tablesLeftButton" maxHeight="32.0" maxWidth="32.0" minHeight="32.0" minWidth="32.0" mnemonicParsing="false" onAction="#tablesLeftButtonAction" prefHeight="32.0" prefWidth="32.0" />
-                                                      <Button fx:id="investButton" mnemonicParsing="false" onAction="#investButtonAction" prefHeight="25.0" prefWidth="80.0" text="Invest" />
-                                                   </children>
-                                                </VBox>
-                                             </children>
-                                          </AnchorPane>
-                                          <VBox alignment="BOTTOM_CENTER">
+                                          <VBox alignment="CENTER" GridPane.columnIndex="2">
                                              <children>
                                                 <Label fx:id="loansChosenLabel" text="Loans Chosen" />
                                                 <TableView fx:id="loansChosenTable">
@@ -172,9 +181,9 @@
                                              </children>
                                           </VBox>
                                        </children>
-                                    </HBox>
-                                 </children>
-                              </AnchorPane>
+                                    </GridPane>
+                                 </content>
+                              </ScrollPane>
                            </center>
                         </BorderPane>
                      </children></AnchorPane>
