@@ -1,5 +1,6 @@
 package bank.accounts.impl;
 
+import bank.accounts.CustomerAccount;
 import bank.loans.Loan;
 import bank.loans.LoanStatus;
 import bank.messages.Notification;
@@ -7,7 +8,7 @@ import bank.transactions.Transaction;
 
 import java.util.*;
 
-public class Customer extends LoanAccount implements bank.accounts.CustomerAccount {
+public class Customer extends LoanAccount implements CustomerAccount {
     private final String name;
     private List<Loan> loansRequested, loansInvested;
     private List<Notification> notificationList;

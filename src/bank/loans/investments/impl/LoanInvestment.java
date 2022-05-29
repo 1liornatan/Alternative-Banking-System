@@ -7,14 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LoanInvestment implements Investment {
-    private final String investorId;
+    private static int idGenerator = 40000;
+    private String investorId;
+
     private final Interest interest;
-    private int amountPaid, paymentsReceived;
+    private int amountPaid, paymentsReceived, id;
     private List<Integer> payments;
+
+
 
     public LoanInvestment(String investorId, Interest interest) {
         this.investorId = investorId;
         this.interest = interest;
+        this.id = idGenerator++;
 
         amountPaid = 0;
         paymentsReceived = 0;
@@ -22,6 +27,22 @@ public class LoanInvestment implements Investment {
         payments = new ArrayList<>();
         setPayments();
     }
+
+    @Override
+    public void setInvestorId(String investorId) {
+        this.investorId = investorId;
+    }
+
+    @Override
+    public String getId() {
+        return String.valueOf(id);
+    }
+
+    @Override
+    public Interest getInterest() {
+        return interest;
+    }
+
 
     @Override
     public int getPaymentsReceived() {
@@ -100,5 +121,7 @@ public class LoanInvestment implements Investment {
     public boolean isFullyPaid() {
         return (amountPaid == getTotalPayment());
     }
+
+
 
 }

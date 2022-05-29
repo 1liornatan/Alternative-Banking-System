@@ -53,6 +53,7 @@ public class BankImpl implements Bank {
     private DataStorage<Account> loanAccounts;
     private DataStorage<Transaction> transactions;
     private DataStorage<Loan> loans;
+    private DataStorage<Investment> sellInvestmentsDataStorage;
     private Set<String> categories;
     private BankLoanHandler loanHandler;
     private TimeHandler timeHandler;
@@ -65,6 +66,25 @@ public class BankImpl implements Bank {
         loans = new BankDataStorage<>(timeHandler);
         loanHandler = new BankLoanHandler(transactions, loans, customersAccounts, timeHandler);
         categories = new HashSet<>();
+        sellInvestmentsDataStorage = new BankDataStorage<>(timeHandler);
+    }
+
+    private void buyInvestment(String investmentId, String buyerId, String sellerId) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
+        Investment investment = sellInvestmentsDataStorage.getDataById(investmentId);
+        int amount = calculateSellPrice(investment);
+        CustomerAccount buyerAccount = customersAccounts.getDataById(buyerId);
+        CustomerAccount sellerAccount = customersAccounts.getDataById(sellerId);
+
+        buyerAccount.withdraw(amount, "Buying Investment");
+        sellerAccount.deposit(amount, "Selling Investment");
+        investment.setInvestorId(buyerId);
+
+    }
+
+    private int calculateSellPrice(Investment investment) {
+        Interest interest = investment.getInterest();
+        int leftToReceive = interest.getFinalAmount() - investment.getAmountPaid();
+        return Integer.valueOf(String.valueOf(leftToReceive * (1 - interest.getPercent())));
     }
 
     @Override

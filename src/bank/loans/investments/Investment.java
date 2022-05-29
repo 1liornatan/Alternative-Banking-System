@@ -1,8 +1,11 @@
 package bank.loans.investments;
 
+import bank.data.Singular;
+import bank.loans.interest.Interest;
+
 import java.io.Serializable;
 
-public interface Investment extends Serializable {
+public interface Investment extends Serializable, Singular {
     String getInvestorId();
 
     int getPayment(int index);
@@ -14,6 +17,10 @@ public interface Investment extends Serializable {
     int getPayment();
 
     int getTotalPayment();
+
+    void setInvestorId(String investorId);
+
+    Interest getInterest();
 
     int getPaymentsReceived();
 
