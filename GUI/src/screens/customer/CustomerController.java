@@ -48,6 +48,11 @@ public class CustomerController {
     private StringProperty customerId;
     private IntegerProperty investAmount;
     private IntegerProperty balanceProperty;
+    private IntegerProperty minInterestProperty;
+    private IntegerProperty minLoanDurationProperty;
+    private IntegerProperty maxRequestedLoansProperty;
+    private IntegerProperty maxOwnershipFieldProperty;
+    private IntegerProperty maxLoanerLoansProperty;
     private ObservableList<String> categoriesList;
     private BooleanProperty isFileSelected;
     private List<TransactionModel> transactionModels;
@@ -192,6 +197,10 @@ public class CustomerController {
     @FXML
     void searchLoansButtonAction(ActionEvent event) {
         investAmount.set(Integer.valueOf(amountField.getText()));
+        minInterestProperty.set(Integer.valueOf(minInterestField.getText()));
+        minLoanDurationProperty.set(Integer.valueOf(minYazField.getText()));
+        maxOwnershipFieldProperty.set(Integer.valueOf(maxOwnershipField.getText()));
+        maxLoanerLoansProperty.set(Integer.valueOf(maxLoanerLoansField.getText()));
         if(investAmount.get() <= 0)
             return;
 
@@ -201,11 +210,11 @@ public class CustomerController {
                 searchLoansProgressBar.setProgress(0);
                 updateMessage("Gathering Information...");
                 RequestDTO requestDTO = new RequestDTO
-                        .Builder(customerId.get(),investAmount.get())
+                        .Builder(customerId.get(), investAmount.get())
                         .categories(getSelectedCategories()) // TODO: apply optional options
-/*                .minInterest(Integer.value)
-            .minDuration(minLoanDuration)
-            .maxLoans(maxRequestedLoans)*/
+                        .minInterest(minInterestProperty.get())
+                        .minDuration(minLoanDurationProperty.get())
+                        .maxLoans(maxRequestedLoansProperty.get())
                         .build();
 
                 try {
@@ -223,8 +232,8 @@ public class CustomerController {
                         setLoansIntegrationButtons();
                     });
                     searchLoansProgressBar.setProgress(1.0);
-                    updateMessage("Operation Complete");
-                    return "Found " + loansData.getLoans().size() + " Loans";
+                    updateMessage("Found " + loansData.getLoans().size() + " Loans");
+                    return "Success";
                 } catch (InvalidPercentException e) {
                     return e.getMessage();
                 }
@@ -341,6 +350,9 @@ public class CustomerController {
                 if (!newValue.matches("\\d*")) {
                     minInterestField.setText(newValue.replaceAll("[^\\d]", ""));
                 }
+                else if(Integer.valueOf(newValue) < 0) {
+                    minInterestField.setText("0");
+                }
             }
         });
         minYazField.textProperty().addListener(new ChangeListener<String>() {
@@ -349,6 +361,9 @@ public class CustomerController {
                                 String newValue) {
                 if (!newValue.matches("\\d*")) {
                     minYazField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+                else if(Integer.valueOf(newValue) < 1) {
+                    minYazField.setText("1");
                 }
             }
         });
@@ -386,12 +401,19 @@ public class CustomerController {
 
         amountField.setText("0");
         debtAmountField.setText("0");
+        minInterestField.setText("1");
+        minYazField.setText("0");
+        maxOwnershipField.setText("0");
+        maxLoanerLoansField.setText("0");
 
         investButton.setDisable(true);
         tablesLeftButton.setDisable(true);
         tablesRightButton.setDisable(true);
         setLoansIntegrationButtons();
         debtPaymentHBox.setDisable(true);
+
+        loansChosenTable.minWidthProperty().bind(loansFoundTable.minWidthProperty());
+        loansChosenTable.maxWidthProperty().bind(loansFoundTable.maxWidthProperty());
     }
 
     private void setLoansIntegrationButtons() {
@@ -422,7 +444,11 @@ public class CustomerController {
         loanPModelList = new ArrayList<>();
         investAmount = new SimpleIntegerProperty();
         balanceProperty = new SimpleIntegerProperty();
-
+        minInterestProperty = new SimpleIntegerProperty();
+        minLoanDurationProperty = new SimpleIntegerProperty();
+        maxRequestedLoansProperty = new SimpleIntegerProperty();
+        maxOwnershipFieldProperty = new SimpleIntegerProperty();
+        maxLoanerLoansProperty = new SimpleIntegerProperty();
     }
 
     public void updateCategories() {
