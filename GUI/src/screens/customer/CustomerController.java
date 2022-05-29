@@ -17,8 +17,14 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import manager.investments.InvestmentsData;
 import manager.investments.RequestDTO;
 import manager.loans.LoanData;
@@ -119,6 +125,15 @@ public class CustomerController {
 
     @FXML
     private Button payDebtButton;
+
+    @FXML
+    private Button submitDebtButton;
+
+    @FXML
+    private HBox debtPaymentHBox;
+
+    @FXML
+    private TextField debtAmountField;
 
     @FXML
     void investButtonAction(ActionEvent event) {
@@ -281,7 +296,12 @@ public class CustomerController {
 
     @FXML
     void payDebtButtonAction(ActionEvent event) {
-      LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
+        debtPaymentHBox.setDisable(false);
+    }
+
+    @FXML
+    void submitDebtButtonAction(ActionEvent event) {
+        LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
         try {
             bankInstance.deriskLoanRequest(selectedLoan.getId());
         } catch (Exception e) {
@@ -297,24 +317,25 @@ public class CustomerController {
         LoanTable.setDataTables(loansFoundTable);
         LoanTable.setDataTables((loansChosenTable));
         LoanTable.setDataTables(loanerLoansPTable);
+
         setNotificationsTable();
         setTransactionsTable();
-        amountField.textProperty().addListener(new ChangeListener<String>() {
+
+        ChangeListener<String> changeListener = new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
                                 String newValue) {
                 if (!newValue.matches("\\d*")) {
                     amountField.setText(newValue.replaceAll("[^\\d]", ""));
-                }
-                else if(newValue.isEmpty()) {
+                } else if (newValue.isEmpty()) {
                     amountField.setText("0");
-                }
-                else if(Integer.valueOf(newValue) > balanceProperty.get()) {
+                } else if (Integer.valueOf(newValue) > balanceProperty.get()) {
                     amountField.setText(String.valueOf(balanceProperty.get()));
                 }
             }
-        });
-        amountField.setText("0");
+        };
+
+        amountField.textProperty().addListener(changeListener);
         minInterestField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
@@ -351,11 +372,16 @@ public class CustomerController {
                 }
             }
         });
+        debtAmountField.textProperty().addListener(changeListener);
+
+        amountField.setText("0");
+        debtAmountField.setText("0");
+
         investButton.setDisable(true);
         tablesLeftButton.setDisable(true);
         tablesRightButton.setDisable(true);
         setLoansIntegrationButtons();
-
+        debtPaymentHBox.setDisable(true);
     }
 
     private void setLoansIntegrationButtons() {
@@ -603,6 +629,33 @@ public class CustomerController {
             }
         });
         depositThread.start();
+    }
+
+    public void makeEnterAmountScreen(String message) {
+        Stage newStage = new Stage();
+        VBox comp = new VBox();
+        Label messageLabel = new Label(message);
+        TextField amountField = new TextField("Amount");
+        comp.getChildren().add(messageLabel);
+        comp.getChildren().add(amountField);
+
+        HBox buttonsBox = new HBox();
+        Button cancelButton = new Button("Cancel");
+        Button enterButton = new Button("Submit");
+
+        buttonsBox.getChildren().add(cancelButton);
+        buttonsBox.getChildren().add(enterButton);
+
+        comp.getChildren().add(buttonsBox);
+
+        // Style
+        comp.setAlignment(Pos.CENTER);
+        comp.setFillWidth(true);
+        newStage.initStyle(StageStyle.UNDECORATED);
+
+        Scene stageScene = new Scene(comp, 300, 300);
+        newStage.setScene(stageScene);
+        newStage.show();
     }
 
 }

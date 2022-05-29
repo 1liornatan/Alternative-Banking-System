@@ -195,14 +195,25 @@
                      <children>
                         <BorderPane prefHeight="371.0" prefWidth="600.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="15.0">
                            <left>
-                              <VBox prefHeight="341.0" prefWidth="359.0" spacing="10.0" BorderPane.alignment="CENTER">
+                              <VBox alignment="CENTER" prefHeight="341.0" prefWidth="359.0" spacing="10.0" BorderPane.alignment="CENTER">
                                  <children>
-                                    <TableView fx:id="loanerLoansPTable" />
+                                    <TableView fx:id="loanerLoansPTable" prefWidth="359.0" />
                                     <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0">
                                        <children>
                                           <Button fx:id="payCycleButton" mnemonicParsing="false" onAction="#payCycleButtonAction" prefWidth="80.0" text="Pay Cycle" />
                                           <Button fx:id="closeLoanButton" mnemonicParsing="false" onAction="#closeLoanButtonAction" prefWidth="80.0" text="Close Loan" />
                                           <Button fx:id="payDebtButton" mnemonicParsing="false" onAction="#payDebtButtonAction" prefWidth="80.0" text="Pay Debt" />
+                                       </children>
+                                    </HBox>
+                                    <HBox fx:id="debtPaymentHBox" alignment="BOTTOM_CENTER" spacing="30.0">
+                                       <children>
+                                          <VBox alignment="CENTER">
+                                             <children>
+                                                <Label text="Debt Payment Amount" />
+                                                <TextField fx:id="debtAmountField" alignment="CENTER" maxHeight="25.0" maxWidth="121.0" prefHeight="25.0" prefWidth="121.0" />
+                                             </children>
+                                          </VBox>
+                                          <Button fx:id="submitDebtButton" mnemonicParsing="false" onAction="#submitDebtButtonAction" text="Submit" />
                                        </children>
                                     </HBox>
                                  </children>
