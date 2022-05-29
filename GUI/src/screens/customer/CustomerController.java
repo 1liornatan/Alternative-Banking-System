@@ -412,8 +412,7 @@ public class CustomerController {
         setLoansIntegrationButtons();
         debtPaymentHBox.setDisable(true);
 
-        loansChosenTable.minWidthProperty().bind(loansFoundTable.minWidthProperty());
-        loansChosenTable.maxWidthProperty().bind(loansFoundTable.maxWidthProperty());
+        loansChosenTable.minWidthProperty().bind(loansFoundTable.widthProperty());
     }
 
     private void setLoansIntegrationButtons() {
