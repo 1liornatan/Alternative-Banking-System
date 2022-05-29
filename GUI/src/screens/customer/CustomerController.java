@@ -321,7 +321,7 @@ public class CustomerController {
         setNotificationsTable();
         setTransactionsTable();
 
-        ChangeListener<String> changeListener = new ChangeListener<String>() {
+        amountField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
                                 String newValue) {
@@ -333,9 +333,7 @@ public class CustomerController {
                     amountField.setText(String.valueOf(balanceProperty.get()));
                 }
             }
-        };
-
-        amountField.textProperty().addListener(changeListener);
+        });
         minInterestField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
@@ -372,7 +370,19 @@ public class CustomerController {
                 }
             }
         });
-        debtAmountField.textProperty().addListener(changeListener);
+        debtAmountField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    debtAmountField.setText(newValue.replaceAll("[^\\d]", ""));
+                } else if (newValue.isEmpty()) {
+                    debtAmountField.setText("0");
+                } else if (Integer.valueOf(newValue) > balanceProperty.get()) {
+                    debtAmountField.setText(String.valueOf(balanceProperty.get()));
+                }
+            }
+        });
 
         amountField.setText("0");
         debtAmountField.setText("0");
