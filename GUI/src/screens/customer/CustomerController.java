@@ -59,7 +59,6 @@ public class CustomerController {
     private IntegerProperty minLoanDurationProperty;
     private IntegerProperty maxRequestedLoansProperty;
     private IntegerProperty maxOwnershipFieldProperty;
-    private IntegerProperty maxLoanerLoansProperty;
     private ObservableList<String> categoriesList;
     private BooleanProperty isFileSelected;
     private List<TransactionModel> transactionModels;
@@ -192,6 +191,7 @@ public class CustomerController {
                 bankInstance.investmentTrade(data);
                 Platform.runLater(() -> {
                     updateData();
+                    buyInvestmentTable.getItems().remove(selectedItem);
                     buyErrorLabel.setText("Investment bought successfully!");
                     buyErrorLabel.setTextFill(Color.GREEN);
                 });
@@ -316,14 +316,23 @@ public class CustomerController {
         minInterestProperty.set(Integer.valueOf(minInterestField.getText()));
         minLoanDurationProperty.set(Integer.valueOf(minYazField.getText()));
         maxOwnershipFieldProperty.set(Integer.valueOf(maxOwnershipField.getText()));
-        maxLoanerLoansProperty.set(Integer.valueOf(maxLoanerLoansField.getText()));
-        if(investAmount.get() <= 0)
+        maxRequestedLoansProperty.set(Integer.valueOf(maxLoanerLoansField.getText()));
+        searchLoansProgressBar.setProgress(0);
+
+        if(investAmount.get() <= 0) {
+            progressBarStatusLabel.textProperty().unbind();
+            progressBarStatusLabel.setText("Amount must be positive!");
+            progressBarStatusLabel.setTextFill(Color.RED);
             return;
+        }
 
         Task task = new Task() {
             @Override
             protected Object call() throws Exception {
-                searchLoansProgressBar.setProgress(0);
+                Platform.runLater(() -> {
+                    searchLoansButton.setDisable(true);
+                    searchLoansProgressBar.setProgress(0);
+                });
                 updateMessage("Gathering Information...");
                 RequestDTO requestDTO = new RequestDTO
                         .Builder(customerId.get(), investAmount.get())
@@ -335,27 +344,30 @@ public class CustomerController {
 
                 try {
                     Thread.sleep(2000);
-                    searchLoansProgressBar.setProgress(0.3);
+                    Platform.runLater(() -> searchLoansProgressBar.setProgress(0.3));
                     updateMessage("Searching Loans...");
                     LoansData loansData = bankInstance.loanAssignmentRequest(requestDTO);
                     Thread.sleep(1000);
-                    searchLoansProgressBar.setProgress(0.7);
+                    Platform.runLater(() -> searchLoansProgressBar.setProgress(0.7));
                     updateMessage("Printing Loans...");
                     Thread.sleep(1000);
                     Platform.runLater(() -> {
                         clearAllFields();
                         addFoundLoans(loansData.getLoans());
                         setLoansIntegrationButtons();
+                        searchLoansProgressBar.setProgress(1.0);
                     });
-                    searchLoansProgressBar.setProgress(1.0);
                     updateMessage("Found " + loansData.getLoans().size() + " Loans");
                     return "Success";
                 } catch (InvalidPercentException e) {
                     return e.getMessage();
+                } finally {
+                    Platform.runLater(() -> searchLoansButton.setDisable(false));
                 }
             }
         };
         progressBarStatusLabel.textProperty().bind(task.messageProperty());
+        progressBarStatusLabel.setTextFill(Color.BLUE);
         Thread findLoans = new Thread(task);
         findLoans.start();
 
@@ -522,7 +534,6 @@ public class CustomerController {
         minLoanDurationProperty = new SimpleIntegerProperty();
         maxRequestedLoansProperty = new SimpleIntegerProperty();
         maxOwnershipFieldProperty = new SimpleIntegerProperty();
-        maxLoanerLoansProperty = new SimpleIntegerProperty();
         buyInvestmentModels = new ArrayList<>();
         sellInvestmentModels = new ArrayList<>();
     }
@@ -556,8 +567,8 @@ public class CustomerController {
                 bankInstance.setInvestmentsData(investmentsData);
                 Platform.runLater(() -> {
                     clearAllFields();
+                    updateData();
                 });
-                updateData();
                 // TODO: LABEL WITH STATUS & ERROR MESSAGE
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -595,7 +606,9 @@ public class CustomerController {
                     .endYaz(loanData.getFinishedYaz())
                     .startYaz(loanData.getStartedYaz())
                     .nextPaymentInYaz(loanData.getNextPaymentInYaz())
-                    .finalAmount(loanData.getFinalAmount()).build();
+                    .finalAmount(loanData.getFinalAmount())
+                    .status(loanData.getStatus())
+                    .build();
 
             tempLoanModelList.add(loanModel);
         }
@@ -603,11 +616,25 @@ public class CustomerController {
     }
 
     public void updateData() {
+       // updateLoansExpander();
         updateLoansData();
         updatePaymentLoansData();
         updateTransactions();
         updateNotifications();
         updateOwnedInvestments();
+    }
+
+    private void updateLoansExpander() {
+        updateExpander(loanerLoansTable);
+        updateExpander(lenderLoansTable);
+        updateExpander(loansFoundTable);
+        updateExpander(loansChosenTable);
+        updateExpander(loanerLoansPTable);
+    }
+
+    private void updateExpander(TableView<LoanModel> tableView) {
+        tableView.getColumns().clear();
+        LoanTable.setDataTables(tableView);
     }
 
 
@@ -706,7 +733,8 @@ public class CustomerController {
                     .endYaz(loanData.getFinishedYaz())
                     .startYaz(loanData.getStartedYaz())
                     .nextPaymentInYaz(loanData.getNextPaymentInYaz())
-                    .finalAmount(loanData.getFinalAmount()).build();;
+                    .status(loanData.getStatus())
+                    .finalAmount(loanData.getFinalAmount()).build();
 
             dest.add(loanModel);
         }

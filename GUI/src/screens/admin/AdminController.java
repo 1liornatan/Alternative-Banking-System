@@ -126,7 +126,9 @@ public class AdminController {
                             .endYaz(loanData.getFinishedYaz())
                             .startYaz(loanData.getStartedYaz())
                             .nextPaymentInYaz(loanData.getNextPaymentInYaz())
-                            .finalAmount(loanData.getFinalAmount()).build();
+                            .finalAmount(loanData.getFinalAmount())
+                            .status(loanData.getStatus())
+                            .build();
 
                     tempLoanModelList.add(loanModel);
                 }

@@ -4,13 +4,12 @@ import bank.accounts.CustomerAccount;
 import bank.loans.Loan;
 import bank.loans.LoanStatus;
 import bank.messages.Notification;
-import bank.transactions.Transaction;
 
 import java.util.*;
 
 public class Customer extends LoanAccount implements CustomerAccount {
     private final String name;
-    private List<Loan> loansRequested, loansInvested;
+    private Collection<Loan> loansRequested, loansInvested;
     private List<Notification> notificationList;
 
     @Override
@@ -30,8 +29,8 @@ public class Customer extends LoanAccount implements CustomerAccount {
         super(balance);
         this.name = name;
 
-        loansRequested = new ArrayList<>();
-        loansInvested = new ArrayList<>();
+        loansRequested = new HashSet<>();
+        loansInvested = new HashSet<>();
         notificationList = new ArrayList<>();
     }
 
@@ -55,12 +54,12 @@ public class Customer extends LoanAccount implements CustomerAccount {
     }
 
     @Override
-    public List<Loan> getLoansRequested() {
+    public Collection<Loan> getLoansRequested() {
         return loansRequested;
     }
 
     @Override
-    public List<Loan> getLoansInvested() {
+    public Collection<Loan> getLoansInvested() {
         return loansInvested;
     }
 

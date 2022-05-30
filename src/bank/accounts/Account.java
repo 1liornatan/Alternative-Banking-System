@@ -15,10 +15,6 @@ public interface Account extends Singular {
 
     List<Transaction> getTransactions();
 
-    List<Loan> getLoansRequested();
-
-    List<Loan> getLoansInvested();
-
     String getId();
 
     int getBalance();

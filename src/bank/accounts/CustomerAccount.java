@@ -6,6 +6,7 @@ import bank.loans.LoanStatus;
 import bank.messages.Notification;
 import manager.customers.CustomerData;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface CustomerAccount extends Account {
@@ -16,5 +17,10 @@ public interface CustomerAccount extends Account {
     void addRequestedLoan(Loan loan);
     void addInvestedLoan(Loan loan);
     int getNumOfInvestedLoansByStatus(LoanStatus status);
+
+    Collection<Loan> getLoansRequested();
+
+    Collection<Loan> getLoansInvested();
+
     int getNumOfRequestedLoansByStatus(LoanStatus status);
 }

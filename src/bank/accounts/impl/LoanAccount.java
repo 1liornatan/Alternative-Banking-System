@@ -45,16 +45,6 @@ public class LoanAccount implements Account, Singular {
     }
 
     @Override
-    public List<Loan> getLoansRequested(){
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<Loan> getLoansInvested(){
-        return new ArrayList<>();
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hash(id);
     }

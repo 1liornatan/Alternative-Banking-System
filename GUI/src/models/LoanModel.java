@@ -8,7 +8,7 @@ import javafx.beans.property.StringProperty;
 public class LoanModel {
     private StringProperty id, status;
     private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
-
+    private IntegerProperty amountToActive, investorsAmount, deriskAmount;
 
     private LoanModel(LoanModelBuilder builder) {
         this.id = builder.id;
@@ -18,6 +18,8 @@ public class LoanModel {
         this.nextPaymentInYaz = builder.nextPaymentInYaz;
         this.finalAmount = builder.finalAmount;
         this.status = builder.status;
+        this.amountToActive = builder.amountToActive;
+        this.deriskAmount = builder.deriskAmount;
     }
 
     public String getId() {
@@ -76,7 +78,33 @@ public class LoanModel {
         return status;
     }
 
+    public int getAmountToActive() {
+        return amountToActive.get();
+    }
+
+    public IntegerProperty amountToActiveProperty() {
+        return amountToActive;
+    }
+
+    public int getInvestorsAmount() {
+        return investorsAmount.get();
+    }
+
+    public IntegerProperty investorsAmountProperty() {
+        return investorsAmount;
+    }
+
+    public int getDeriskAmount() {
+        return deriskAmount.get();
+    }
+
+    public IntegerProperty deriskAmountProperty() {
+        return deriskAmount;
+    }
+
     public static class LoanModelBuilder {
+        public IntegerProperty amountToActive, investorsAmount;
+        public IntegerProperty deriskAmount;
         private StringProperty id, status;
         private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
 
@@ -88,10 +116,28 @@ public class LoanModel {
             nextPaymentInYaz = new SimpleIntegerProperty();
             finalAmount = new SimpleIntegerProperty();
             status = new SimpleStringProperty();
+            amountToActive = new SimpleIntegerProperty();
+            investorsAmount = new SimpleIntegerProperty();
+            deriskAmount = new SimpleIntegerProperty();
         }
 
         public LoanModelBuilder id(String id) {
             this.id.set(id);
+            return this;
+        }
+
+        public LoanModelBuilder amountToActive(int amount) {
+            this.amountToActive(amount);
+            return this;
+        }
+
+        public LoanModelBuilder deriskAmount(int amount) {
+            this.deriskAmount(amount);
+            return this;
+        }
+
+        public LoanModelBuilder investorsAmount(int amount) {
+            this.investorsAmount(amount);
             return this;
         }
 

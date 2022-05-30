@@ -394,7 +394,18 @@ public class BankImpl implements Bank {
                 .filter(p -> p.getKey().getInterestPercent() >= minInterest)
                 .filter(p -> categories.contains(p.getKey().getCategory()))
                 .filter(p -> p.getKey().getDuration() >= minDuration)
-                .filter(p->p.getKey().getLoanAccount().getLoansRequested().size() <= maxRelatedLoans)
+                .filter(p -> {
+                    try {
+                        if(maxRelatedLoans == 0)
+                            return true;
+
+                        int relatedLoansAmount = customersAccounts.getDataById(p.getKey().getOwnerId()).getLoansRequested().size();
+                        return relatedLoansAmount <= maxRelatedLoans;
+
+                    } catch (DataNotFoundException e) {
+                        return false;
+                    }
+                })
                 .collect(Collectors.toList());
 
         List<LoanData> loansDataList = new ArrayList<>();
@@ -454,11 +465,11 @@ public class BankImpl implements Bank {
 
     @Override
     public CustomerDTO getCustomerDTO(String id) throws DataNotFoundException {
-        Account account = customersAccounts.getDataById(id);
+        CustomerAccount account = customersAccounts.getDataById(id);
         List<LoanDTO> loansInvestedDTOList = new ArrayList<>();
         List<LoanDTO> loansRequestedDTOList = new ArrayList<>();
-        List<Loan> loansInvested = account.getLoansInvested();
-        List<Loan> loansRequested = account.getLoansRequested();
+        Collection<Loan> loansInvested = account.getLoansInvested();
+        Collection<Loan> loansRequested = account.getLoansRequested();
 
         for(Loan loan : loansInvested)
             loansInvestedDTOList.add(getLoanDTO(loan));
@@ -551,7 +562,7 @@ public class BankImpl implements Bank {
         loanData.setInterest(loan.getInterestPercent());
         loanData.setName(loan.getId());
         loanData.setLoanRequester(customersAccounts.getDataById(loan.getOwnerId()).getId());
-        loanData.setStatus(loan.getStatus().name());
+        loanData.setStatus(loan.getStatus().toString());
         loanData.setNextPaymentAmount(loan.getPayment());
         loanData.setCyclesPerPayment(loan.getCyclesPerPayment());
         loanData.setMissingCycles(loan.getMissingCycles());
