@@ -161,6 +161,9 @@ public class CustomerController {
     private Label buyErrorLabel;
 
     @FXML
+    private Label paymentErrorLabel;
+
+    @FXML
     private TableView<InvestmentModel> sellInvestmentTable;
 
     @FXML
