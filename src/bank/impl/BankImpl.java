@@ -568,7 +568,14 @@ public class BankImpl implements Bank {
         loanData.setMissingCycles(loan.getMissingCycles());
         loanData.setNextPaymentInYaz(loan.getNextYaz());
         loanData.setStartedYaz(loan.getStartedYaz());
+        loanData.setInvestorsAmount(getInvestorsAmount(loan));
         return loanData;
+    }
+
+    private int getInvestorsAmount(Loan loan) {
+        Set<String> investors = new HashSet<>();
+        loan.getInvestments().stream().forEach(inv -> investors.add(inv.getInvestorId()));
+        return investors.size();
     }
 
     @Override

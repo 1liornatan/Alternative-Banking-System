@@ -611,6 +611,9 @@ public class CustomerController {
                     .nextPaymentInYaz(loanData.getNextPaymentInYaz())
                     .finalAmount(loanData.getFinalAmount())
                     .status(loanData.getStatus())
+                    .investorsAmount(loanData.getInvestorsAmount())
+                    .amountToActive(loanData.getAmountToActive())
+                    .deriskAmount(loanData.getDeriskAmount())
                     .build();
 
             tempLoanModelList.add(loanModel);
@@ -691,8 +694,8 @@ public class CustomerController {
             List<LoanData>  loanerDataList = bankInstance.getLoanerData(customerId.get()).getLoans();
             List<LoanData>  lenderDataList = bankInstance.getInvestorData(customerId.get()).getLoans();
 
-            updateList(loanerDataList, tempLoanerModelList);
-            updateList(lenderDataList, tempLenderModelList);
+            tempLoanerModelList = makeLoanModelList(loanerDataList);
+            tempLenderModelList = makeLoanModelList(lenderDataList);
 
             lenderModelList = tempLenderModelList;
             loanerModelList = tempLoanerModelList;
@@ -716,7 +719,7 @@ public class CustomerController {
                 e.printStackTrace();
             }
 
-            updateList(loanerDataList, tempLoanerModelList);
+            tempLoanerModelList = makeLoanModelList(loanerDataList);
 
             loanPModelList = tempLoanerModelList;
 
@@ -726,21 +729,6 @@ public class CustomerController {
         });
 
         updatePaymentLoanThread.start();
-    }
-
-    private void updateList(List<LoanData> src, List<LoanModel> dest) {
-        for(LoanData loanData : src) {
-            LoanModel loanModel = new LoanModel.LoanModelBuilder()
-                    .id(loanData.getName())
-                    .amount(loanData.getBaseAmount())
-                    .endYaz(loanData.getFinishedYaz())
-                    .startYaz(loanData.getStartedYaz())
-                    .nextPaymentInYaz(loanData.getNextPaymentInYaz())
-                    .status(loanData.getStatus())
-                    .finalAmount(loanData.getFinalAmount()).build();
-
-            dest.add(loanModel);
-        }
     }
 
     public BankImpl getBankInstance() {

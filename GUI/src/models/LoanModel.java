@@ -20,6 +20,7 @@ public class LoanModel {
         this.status = builder.status;
         this.amountToActive = builder.amountToActive;
         this.deriskAmount = builder.deriskAmount;
+        this.investorsAmount = builder.investorsAmount;
     }
 
     public String getId() {
@@ -109,16 +110,16 @@ public class LoanModel {
         private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
 
         public LoanModelBuilder() {
-            id = new SimpleStringProperty();
-            amount = new SimpleIntegerProperty();
-            startYaz = new SimpleIntegerProperty();
-            endYaz = new SimpleIntegerProperty();
-            nextPaymentInYaz = new SimpleIntegerProperty();
-            finalAmount = new SimpleIntegerProperty();
-            status = new SimpleStringProperty();
-            amountToActive = new SimpleIntegerProperty();
-            investorsAmount = new SimpleIntegerProperty();
-            deriskAmount = new SimpleIntegerProperty();
+            id = new SimpleStringProperty(null);
+            amount = new SimpleIntegerProperty(0);
+            startYaz = new SimpleIntegerProperty(0);
+            endYaz = new SimpleIntegerProperty(0);
+            nextPaymentInYaz = new SimpleIntegerProperty(0);
+            finalAmount = new SimpleIntegerProperty(0);
+            status = new SimpleStringProperty("New");
+            amountToActive = new SimpleIntegerProperty(0);
+            investorsAmount = new SimpleIntegerProperty(0);
+            deriskAmount = new SimpleIntegerProperty(0);
         }
 
         public LoanModelBuilder id(String id) {
@@ -127,17 +128,17 @@ public class LoanModel {
         }
 
         public LoanModelBuilder amountToActive(int amount) {
-            this.amountToActive(amount);
+            this.amountToActive.set(amount);
             return this;
         }
 
         public LoanModelBuilder deriskAmount(int amount) {
-            this.deriskAmount(amount);
+            this.deriskAmount.set(amount);
             return this;
         }
 
         public LoanModelBuilder investorsAmount(int amount) {
-            this.investorsAmount(amount);
+            this.investorsAmount.set(amount);
             return this;
         }
 

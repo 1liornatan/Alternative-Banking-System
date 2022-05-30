@@ -7,6 +7,15 @@ public class LoanData {
     int startedYaz, finishedYaz;
     int nextPaymentInYaz, nextPaymentAmount, cyclesPerPayment;
     int amountToActive, deriskAmount, missingCycles;
+    int investorsAmount;
+
+    public int getInvestorsAmount() {
+        return investorsAmount;
+    }
+
+    public void setInvestorsAmount(int investorsAmount) {
+        this.investorsAmount = investorsAmount;
+    }
 
     public String getName() {
         return name;
