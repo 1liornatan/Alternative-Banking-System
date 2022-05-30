@@ -18,11 +18,15 @@ public interface Investment extends Serializable, Singular {
 
     int getTotalPayment();
 
+    String getLoanId();
+
     void setInvestorId(String investorId);
 
     Interest getInterest();
 
     int getPaymentsReceived();
+
+    double getSellPrice();
 
     int getAmountPaid();
 

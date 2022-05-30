@@ -28,7 +28,9 @@ import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.accounts.AccountDTO;
 import manager.customers.*;
+import manager.investments.InvestmentData;
 import manager.investments.InvestmentsData;
+import manager.investments.InvestmentsSellData;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.loans.LoanData;
@@ -69,22 +71,81 @@ public class BankImpl implements Bank {
         sellInvestmentsDataStorage = new BankDataStorage<>(timeHandler);
     }
 
-    private void buyInvestment(String investmentId, String buyerId, String sellerId) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
-        Investment investment = sellInvestmentsDataStorage.getDataById(investmentId);
-        int amount = calculateSellPrice(investment);
-        CustomerAccount buyerAccount = customersAccounts.getDataById(buyerId);
-        CustomerAccount sellerAccount = customersAccounts.getDataById(sellerId);
+    public void listInvestment(InvestmentData data) throws DataNotFoundException {
+        Optional<Investment> first = loans.getDataPair(data.getLoanId()).getKey().getInvestments().stream().filter(inv -> inv.getId().equals(data.getInvestmentId())).findFirst();
 
-        buyerAccount.withdraw(amount, "Buying Investment");
-        sellerAccount.deposit(amount, "Selling Investment");
-        investment.setInvestorId(buyerId);
-
+        if(first.isPresent()) {
+            sellInvestmentsDataStorage.addData(first.get());
+        }
     }
 
-    private int calculateSellPrice(Investment investment) {
-        Interest interest = investment.getInterest();
-        int leftToReceive = interest.getFinalAmount() - investment.getAmountPaid();
-        return Integer.valueOf(String.valueOf(leftToReceive * (1 - interest.getPercent())));
+    public void unlistInvestment(InvestmentData data) throws DataNotFoundException {
+        if(sellInvestmentsDataStorage.isDataExists(data.getInvestmentId()))
+            sellInvestmentsDataStorage.remove(data.getInvestmentId());
+    }
+
+
+    public void investmentTrade(InvestmentData data) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
+        buyInvestment(data.getInvestmentId(), data.getBuyerId(), data.getOwnerId());
+    }
+    private void buyInvestment(String investmentId, String buyerId, String sellerId) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
+        Investment investment = sellInvestmentsDataStorage.getDataById(investmentId);
+        int amount = (int)investment.getSellPrice();
+        CustomerAccount buyerAccount = customersAccounts.getDataById(buyerId);
+        CustomerAccount sellerAccount = customersAccounts.getDataById(sellerId);
+        Loan loan = loans.getDataById(investment.getLoanId());
+        String investPrinting = investment.toString();
+
+        transactions.addData(buyerAccount.withdraw(amount, "Buying Investment"));
+        transactions.addData(sellerAccount.deposit(amount, "Selling Investment"));
+
+        buyerAccount.getLoansInvested().add(loan);
+        sellerAccount.getLoansInvested().remove(loan);
+        buyerAccount.addNotification(new BankNotification("Bought " + investPrinting, getCurrentYaz()));
+        sellerAccount.addNotification(new BankNotification("Sold " + investPrinting, getCurrentYaz()));
+        investment.setInvestorId(buyerId);
+
+        sellInvestmentsDataStorage.remove(investmentId);
+    }
+
+    public InvestmentsSellData getCustomerInvestments(String customerId) throws DataNotFoundException {
+        CustomerAccount account = customersAccounts.getDataById(customerId);
+        List<Investment> investments = new ArrayList<>();
+
+        account.getLoansInvested().stream().forEach(loan -> {
+            loan.getInvestments().stream().filter(investment -> investment.getInvestorId().equals(customerId)).forEach(investment -> {
+                investments.add(investment);
+            });
+        });
+
+        return investmentsListToData(investments);
+    }
+
+    private InvestmentsSellData investmentsListToData(List<Investment> investments) {
+        List<String> ownerId = new ArrayList<>();
+        List<String> loanId = new ArrayList<>();
+        List<Integer> amount = new ArrayList<>();
+        List<Integer> yazPlaced = new ArrayList<>();
+        List<String> invIds = new ArrayList<>();
+        List<Boolean> forSale = new ArrayList<>();
+
+        for(Investment investment : investments) {
+            ownerId.add(investment.getInvestorId());
+            loanId.add(investment.getLoanId());
+            amount.add((int)investment.getSellPrice());
+            yazPlaced.add(0);
+            invIds.add(investment.getId());
+            forSale.add(sellInvestmentsDataStorage.isDataExists(investment.getId()));
+        }
+
+        return new InvestmentsSellData.SellBuilder()
+                .name(ownerId)
+                .loans(loanId)
+                .amount(amount)
+                .time(yazPlaced)
+                .id(invIds)
+                .forSale(forSale)
+                .Build();
     }
 
     @Override
@@ -193,7 +254,44 @@ public class BankImpl implements Bank {
     }
 
 
+    @Override
+    public InvestmentsSellData getInvestmentsForSell(String requesterId) {
+        List<String> investors = new ArrayList<>();
+        List<String> loans = new ArrayList<>();
+        List<Integer> sellAmounts = new ArrayList<>();
+        List<Integer> yazPlaced = new ArrayList<>();
+        List<String> invIds = new ArrayList<>();
+        List<Boolean> forSale = new ArrayList<>();
 
+        Collection<Pair<Investment, Integer>> allPairs = sellInvestmentsDataStorage.getAllPairs();
+
+        for(Pair<Investment, Integer> invPair : allPairs) {
+            Investment investment = invPair.getKey();
+            String investorId = investment.getInvestorId();
+
+            if(investorId.equals(requesterId)) // filter all owned investments
+                continue;
+
+            investors.add(investorId);
+            loans.add(investment.getLoanId());
+            sellAmounts.add((int)investment.getSellPrice());
+            yazPlaced.add(invPair.getValue());
+            invIds.add(investment.getId());
+            forSale.add(true);
+        }
+
+        InvestmentsSellData sellData = new InvestmentsSellData.SellBuilder()
+                .name(investors)
+                .loans(loans)
+                .amount(sellAmounts)
+                .time(yazPlaced)
+                .id(invIds)
+                .forSale(forSale)
+                .Build();
+
+        return sellData;
+
+    }
     public void setInvestmentsData(InvestmentsData investmentsData) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
         List<String> loansIds = investmentsData.getLoansIds();
         List<Loan> loansList = new ArrayList<>();
@@ -216,7 +314,7 @@ public class BankImpl implements Bank {
 
         Interest interest = new BasicInterest(percent, amountInvesting, cyclesPerPayment, duration);
 
-        Investment loanInvestment = new LoanInvestment(investor, interest);
+        Investment loanInvestment = new LoanInvestment(investor, interest, loan.getId());
         loanHandler.addInvestment(loan, loanInvestment, investingAccount);
         investingAccount.addNotification(new BankNotification("Invested " + amountInvesting + " in '" + loan.getId() + "'.",
                 timeHandler.getCurrentTime()));

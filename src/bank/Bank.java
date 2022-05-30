@@ -13,6 +13,7 @@ import bank.transactions.Transaction;
 import files.xmls.exceptions.*;
 import manager.customers.*;
 import manager.investments.InvestDTO;
+import manager.investments.InvestmentsSellData;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.categories.CategoriesDTO;
@@ -60,6 +61,8 @@ public interface Bank {
     void deriskLoanRequest(String loanId) throws NoMoneyException, NonPositiveAmountException;
 
     int getDeriskAmount(Loan loan);
+
+    InvestmentsSellData getInvestmentsForSell(String requesterId);
 
     void createInvestment(String investor, Loan loan, int amount) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
 

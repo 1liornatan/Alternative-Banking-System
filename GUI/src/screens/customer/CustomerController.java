@@ -5,6 +5,7 @@ import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.interest.exceptions.InvalidPercentException;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -23,18 +24,24 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import manager.investments.InvestmentData;
 import manager.investments.InvestmentsData;
+import manager.investments.InvestmentsSellData;
 import manager.investments.RequestDTO;
 import manager.loans.LoanData;
 import manager.loans.LoansData;
 import manager.messages.NotificationData;
 import manager.transactions.TransactionData;
+import models.InvestmentModel;
 import models.LoanModel;
 import models.NotificationModel;
 import models.TransactionModel;
 import models.utils.LoanTable;
+import models.utils.TradeTable;
 import org.controlsfx.control.CheckComboBox;
 
 import java.util.*;
@@ -58,6 +65,8 @@ public class CustomerController {
     private List<TransactionModel> transactionModels;
     private List<LoanModel> loanPModelList;
     private List<NotificationModel> notificationModels;
+    private List<InvestmentModel> buyInvestmentModels;
+    private List<InvestmentModel> sellInvestmentModels;
 
     @FXML
     private TableView<LoanModel> loanerLoansTable;
@@ -141,51 +150,158 @@ public class CustomerController {
     private TextField debtAmountField;
 
     @FXML
+    private TableView<InvestmentModel> buyInvestmentTable;
+
+    @FXML
+    private Button searchInvestmentButton;
+
+    @FXML
+    private Button buyInvestmentButton;
+
+    @FXML
+    private Label buyErrorLabel;
+
+    @FXML
+    private TableView<InvestmentModel> sellInvestmentTable;
+
+    @FXML
+    private Button listInvestmentButton;
+
+    @FXML
+    private Button unlistInvestmentButton;
+
+    @FXML
+    private Label sellErrorLabel;
+
+    @FXML
+    void buyInvestmentButtonAction(ActionEvent event) {
+        InvestmentModel selectedItem = buyInvestmentTable.getSelectionModel().getSelectedItem();
+        if(selectedItem == null) {
+            buyErrorLabel.setText("Please select an investment!");
+            buyErrorLabel.setTextFill(Color.RED);
+        }
+        else {
+            InvestmentData data = new InvestmentData.InvestmentDataBuilder()
+                    .loan(selectedItem.getLoanId())
+                    .buyer(customerId.get())
+                    .owner(selectedItem.getOwnerId())
+                    .investment(selectedItem.getInvestmentId())
+                    .build();
+
+            try {
+                bankInstance.investmentTrade(data);
+                Platform.runLater(() -> {
+                    updateData();
+                    buyErrorLabel.setText("Investment bought successfully!");
+                    buyErrorLabel.setTextFill(Color.GREEN);
+                });
+            } catch (DataNotFoundException | NonPositiveAmountException | NoMoneyException e) {
+                buyErrorLabel.setText(e.getMessage());
+                buyErrorLabel.setTextFill(Color.RED);
+            }
+        }
+    }
+
+    @FXML
     void investButtonAction(ActionEvent event) {
         setInvestmentsChosen();
     }
 
-    private void setInvestmentsChosen() {
-        Thread setInvestmentsThread = new Thread(() -> {
-            int amount = investAmount.get();
-            List<String> selectedLoansIds = new ArrayList<>();
-            loansChosenTable.getItems().stream().forEach(loanModel -> {
-                selectedLoansIds.add(loanModel.getId());
+
+    @FXML
+    void listInvestmentButtonAction(ActionEvent event) {
+        InvestmentModel selectedItem = sellInvestmentTable.selectionModelProperty().get().getSelectedItem();
+        if(selectedItem == null) {
+            sellErrorLabel.setText("Please select an investment!");
+            sellErrorLabel.setTextFill(Color.RED);
+        }
+        else if(selectedItem.isIsForSale()) {
+            sellErrorLabel.setText("Investment is already listed!");
+            sellErrorLabel.setTextFill(Color.RED);
+        }
+        else {
+            String id = selectedItem.getInvestmentId();
+            String loanId = selectedItem.getLoanId();
+            Thread listInvestmentThread = new Thread(() -> {
+                InvestmentData data = new InvestmentData.InvestmentDataBuilder()
+                        .investment(id)
+                        .loan(loanId)
+                        .build();
+                try {
+                    bankInstance.listInvestment(data);
+                    Platform.runLater(() -> {
+                        updateOwnedInvestments();
+                        sellErrorLabel.setText("Listed investment successfully!");
+                        sellErrorLabel.setTextFill(Color.GREEN);
+                    });
+                } catch (DataNotFoundException e) {
+                    Platform.runLater(() -> {
+                        sellErrorLabel.setText(e.getMessage());
+                        sellErrorLabel.setTextFill(Color.RED);
+                    });
+
+                }
             });
-            InvestmentsData investmentsData = new InvestmentsData.InvestmentsBuilder()
-                    .Name(customerId.get())
-                    .Amount(amount)
-                    .Loans(selectedLoansIds)
-                    .Build();
+            listInvestmentThread.start();
+        }
+    }
 
-            try {
-                bankInstance.setInvestmentsData(investmentsData);
-                Platform.runLater(() -> {
-                    clearAllFields();
-                });
-                updateData();
-                // TODO: LABEL WITH STATUS & ERROR MESSAGE
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                System.out.println(e.getStackTrace());
-            }
+    @FXML
+    void searchInvestmentButtonAction(ActionEvent event) {
+        Thread searchInvestmentsThread = new Thread(() -> {
+            InvestmentsSellData investmentsForSell = bankInstance.getInvestmentsForSell(customerId.get());
+            List<InvestmentModel> tempInvList = getInvModels(investmentsForSell);
+
+            buyInvestmentModels = tempInvList;
+
+            Platform.runLater(() -> {
+                buyInvestmentTable.setItems(getBuyInvestments());
+            });
+
         });
-        setInvestmentsThread.start();
+        searchInvestmentsThread.start();
     }
 
-    private void clearAllFields() {
-        loansChosenTable.getItems().clear();
-        loansFoundTable.getItems().clear();
-        amountField.setText("0");
-        categoriesComboBox.getCheckModel().checkAll();
+    private ObservableList<InvestmentModel> getBuyInvestments() {
+        return FXCollections.observableArrayList(buyInvestmentModels);
     }
 
-    public void accountChanged() {
-        updateData();
-        progressBarStatusLabel.textProperty().unbind();
-        progressBarStatusLabel.setText("");
-        searchLoansProgressBar.setProgress(0);
+    @FXML
+    void unlistInvestmentButtonAction(ActionEvent event) {
+        InvestmentModel selectedItem = sellInvestmentTable.selectionModelProperty().get().getSelectedItem();
+        if(selectedItem == null) {
+            sellErrorLabel.setText("Please select an investment!");
+            sellErrorLabel.setTextFill(Color.RED);
+        }
+        else if(!selectedItem.isIsForSale()) {
+            sellErrorLabel.setText("Investment is already unlisted!");
+            sellErrorLabel.setTextFill(Color.RED);
+        }
+        else {
+            Thread unlistInvestmentThread = new Thread(() -> {
+                InvestmentData data = new InvestmentData.InvestmentDataBuilder()
+                        .investment(selectedItem.getInvestmentId())
+                        .build();
+
+                try {
+                    bankInstance.unlistInvestment(data);
+                    Platform.runLater(() -> {
+                        updateOwnedInvestments();
+                        sellErrorLabel.setText("Unlisted investment successfully!");
+                        sellErrorLabel.setTextFill(Color.GREEN);
+                    });
+                } catch (DataNotFoundException e) {
+                    Platform.runLater(() -> {
+                        sellErrorLabel.setText(e.getMessage());
+                        sellErrorLabel.setTextFill(Color.RED);
+                    });
+                }
+            });
+
+            unlistInvestmentThread.start();
+        }
     }
+
 
     @FXML
     void tablesLeftButtonAction(ActionEvent event) {
@@ -245,41 +361,6 @@ public class CustomerController {
 
     }
 
-    private void addFoundLoans(List<LoanData> loansList) {
-        loansFoundTable.setItems(FXCollections.observableArrayList(makeLoanModelList(loansList)));
-    }
-
-
-    private List<LoanModel> makeLoanModelList(List<LoanData> loanDataList) {
-        List<LoanModel> tempLoanModelList = new ArrayList<>();
-        for(LoanData loanData : loanDataList) {
-            LoanModel loanModel = new LoanModel.LoanModelBuilder()
-                    .id(loanData.getName())
-                    .amount(loanData.getBaseAmount())
-                    .endYaz(loanData.getFinishedYaz())
-                    .startYaz(loanData.getStartedYaz())
-                    .nextPaymentInYaz(loanData.getNextPaymentInYaz())
-                    .finalAmount(loanData.getFinalAmount()).build();
-
-            tempLoanModelList.add(loanModel);
-        }
-        return tempLoanModelList;
-    }
-
-    public void updateData() {
-        updateLoansData();
-        updatePaymentLoansData();
-        updateTransactions();
-        updateNotifications();
-    }
-
-    private Set<String> getSelectedCategories() {
-
-        ObservableList<String> checkedItems = categoriesComboBox.getCheckModel().getCheckedItems();
-
-        return checkedItems.stream().collect(Collectors.toSet());
-    }
-
     @FXML
     void tablesRightButtonAction(ActionEvent event) {
         ObservableList<LoanModel> selectedItems = loansFoundTable.getSelectionModel().getSelectedItems();
@@ -321,14 +402,7 @@ public class CustomerController {
 
     @FXML
     void initialize() {
-        LoanTable.setDataTables(loanerLoansTable);
-        LoanTable.setDataTables(lenderLoansTable);
-        LoanTable.setDataTables(loansFoundTable);
-        LoanTable.setDataTables((loansChosenTable));
-        LoanTable.setDataTables(loanerLoansPTable);
-
-        setNotificationsTable();
-        setTransactionsTable();
+        setDataTables();
 
         amountField.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -415,25 +489,26 @@ public class CustomerController {
         loansChosenTable.minWidthProperty().bind(loansFoundTable.widthProperty());
     }
 
-    private void setLoansIntegrationButtons() {
-        BooleanBinding emptyChosen = Bindings.isEmpty(loansChosenTable.getItems());
-        BooleanBinding emptyFound = Bindings.isEmpty(loansFoundTable.getItems());
-        investButton.disableProperty().bind(emptyChosen);
-        tablesRightButton.disableProperty().bind(emptyFound);
-        tablesLeftButton.disableProperty().bind(emptyChosen);
-    }
+    private void setDataTables() {
+        LoanTable.setDataTables(loanerLoansTable);
+        LoanTable.setDataTables(lenderLoansTable);
+        LoanTable.setDataTables(loansFoundTable);
+        LoanTable.setDataTables((loansChosenTable));
+        LoanTable.setDataTables(loanerLoansPTable);
+        TradeTable.setDataTable(buyInvestmentTable);
+        TradeTable.setDataTable(sellInvestmentTable);
 
+        TableColumn<InvestmentModel, Boolean> isListed = new TableColumn<>("Listed");
+        isListed.setCellValueFactory(new PropertyValueFactory<>("isForSale"));
+        isListed.setStyle("-fx-alignment: CENTER;");
 
-    public String getCustomerId() {
-        return customerId.get();
-    }
+        sellInvestmentTable.getColumns().add(isListed);
+        sellInvestmentTable.getColumns().get(3).minWidthProperty().bind(sellInvestmentTable.widthProperty().multiply(0.1));
+        isListed.minWidthProperty().bind(sellInvestmentTable.widthProperty().multiply(0.1));
 
-    public StringProperty customerIdProperty() {
-        return customerId;
-    }
+        setNotificationsTable();
+        setTransactionsTable();
 
-    public void setCustomerId(String customerId) {
-        this.customerId.set(customerId);
     }
 
     public CustomerController() {
@@ -448,7 +523,113 @@ public class CustomerController {
         maxRequestedLoansProperty = new SimpleIntegerProperty();
         maxOwnershipFieldProperty = new SimpleIntegerProperty();
         maxLoanerLoansProperty = new SimpleIntegerProperty();
+        buyInvestmentModels = new ArrayList<>();
+        sellInvestmentModels = new ArrayList<>();
     }
+
+    private void setLoansIntegrationButtons() {
+        BooleanBinding emptyChosen = Bindings.isEmpty(loansChosenTable.getItems());
+        BooleanBinding emptyFound = Bindings.isEmpty(loansFoundTable.getItems());
+        investButton.disableProperty().bind(emptyChosen);
+        tablesRightButton.disableProperty().bind(emptyFound);
+        tablesLeftButton.disableProperty().bind(emptyChosen);
+    }
+
+    private void addFoundLoans(List<LoanData> loansList) {
+        loansFoundTable.setItems(FXCollections.observableArrayList(makeLoanModelList(loansList)));
+    }
+
+    private void setInvestmentsChosen() {
+        Thread setInvestmentsThread = new Thread(() -> {
+            int amount = investAmount.get();
+            List<String> selectedLoansIds = new ArrayList<>();
+            loansChosenTable.getItems().stream().forEach(loanModel -> {
+                selectedLoansIds.add(loanModel.getId());
+            });
+            InvestmentsData investmentsData = new InvestmentsData.InvestmentsBuilder()
+                    .Name(customerId.get())
+                    .Amount(amount)
+                    .Loans(selectedLoansIds)
+                    .Build();
+
+            try {
+                bankInstance.setInvestmentsData(investmentsData);
+                Platform.runLater(() -> {
+                    clearAllFields();
+                });
+                updateData();
+                // TODO: LABEL WITH STATUS & ERROR MESSAGE
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                System.out.println(e.getStackTrace());
+            }
+        });
+        setInvestmentsThread.start();
+    }
+
+    private void clearAllFields() {
+        loansChosenTable.getItems().clear();
+        loansFoundTable.getItems().clear();
+        buyInvestmentTable.getItems().clear();
+        sellInvestmentTable.getItems().clear();
+        amountField.setText("0");
+        categoriesComboBox.getCheckModel().checkAll();
+        sellErrorLabel.setText("");
+        buyErrorLabel.setText("");
+
+    }
+
+    public void accountChanged() {
+        updateData();
+        progressBarStatusLabel.textProperty().unbind();
+        progressBarStatusLabel.setText("");
+        searchLoansProgressBar.setProgress(0);
+    }
+
+    private List<LoanModel> makeLoanModelList(List<LoanData> loanDataList) {
+        List<LoanModel> tempLoanModelList = new ArrayList<>();
+        for(LoanData loanData : loanDataList) {
+            LoanModel loanModel = new LoanModel.LoanModelBuilder()
+                    .id(loanData.getName())
+                    .amount(loanData.getBaseAmount())
+                    .endYaz(loanData.getFinishedYaz())
+                    .startYaz(loanData.getStartedYaz())
+                    .nextPaymentInYaz(loanData.getNextPaymentInYaz())
+                    .finalAmount(loanData.getFinalAmount()).build();
+
+            tempLoanModelList.add(loanModel);
+        }
+        return tempLoanModelList;
+    }
+
+    public void updateData() {
+        updateLoansData();
+        updatePaymentLoansData();
+        updateTransactions();
+        updateNotifications();
+        updateOwnedInvestments();
+    }
+
+
+    private Set<String> getSelectedCategories() {
+
+        ObservableList<String> checkedItems = categoriesComboBox.getCheckModel().getCheckedItems();
+
+        return checkedItems.stream().collect(Collectors.toSet());
+    }
+
+    public String getCustomerId() {
+        return customerId.get();
+    }
+
+    public StringProperty customerIdProperty() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId.set(customerId);
+    }
+
 
     public void updateCategories() {
         if(!isFileSelected.get())
@@ -691,6 +872,54 @@ public class CustomerController {
         Scene stageScene = new Scene(comp, 300, 300);
         newStage.setScene(stageScene);
         newStage.show();
+    }
+
+
+    private List<InvestmentModel> getInvModels(InvestmentsSellData investmentsForSell) {
+        List<InvestmentModel> investmentModels = new ArrayList<>();
+
+        List<String> investorsIds = investmentsForSell.getInvestorsIds();
+        List<String> investmentIds = investmentsForSell.getInvIds();
+        List<String> loansIds = investmentsForSell.getLoansIds();
+        List<Integer> amounts = investmentsForSell.getAmounts();
+        List<Integer> yazPlaced = investmentsForSell.getYazPlaced();
+        List<Boolean> forSale = investmentsForSell.getForSale();
+
+        int arrSize = loansIds.size();
+
+        for(int i = 0; i < arrSize; i++) {
+            investmentModels.add(new InvestmentModel.InvestmentModelBuilder()
+                    .loan(loansIds.get(i))
+                    .owner(investorsIds.get(i))
+                    .amount(amounts.get(i))
+                    .yaz(yazPlaced.get(i))
+                    .id(investmentIds.get(i))
+                    .forSale(forSale.get(i))
+                    .build());
+        }
+        return investmentModels;
+    }
+
+    private void updateOwnedInvestments() {
+        Thread updateOwnedInvestments = new Thread(() -> {
+            try {
+                InvestmentsSellData customerInvestments = bankInstance.getCustomerInvestments(customerId.get());
+                sellInvestmentModels = getInvModels(customerInvestments);
+
+
+                Platform.runLater(() -> {
+                    sellInvestmentTable.setItems(getSellInvestments());
+                });
+
+            } catch (DataNotFoundException e) {
+                sellErrorLabel.setText(e.getMessage());
+            }
+        });
+        updateOwnedInvestments.start();
+    }
+
+    private ObservableList<InvestmentModel> getSellInvestments() {
+        return FXCollections.observableArrayList(sellInvestmentModels);
     }
 
 }

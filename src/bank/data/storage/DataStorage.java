@@ -16,5 +16,5 @@ public interface DataStorage<E> {
     Collection<Pair<E, Integer>> getAllPairs();
 
 
-
+    void remove(String id) throws DataNotFoundException;
 }

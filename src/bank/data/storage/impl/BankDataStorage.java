@@ -48,6 +48,10 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
     }
 
     @Override
+    public void remove(String id) throws DataNotFoundException {
+        container.remove(id);
+    }
+    @Override
     public Pair<E, Integer> getDataPair(String id) throws DataNotFoundException {
         F dataBox;
         synchronized (this) {

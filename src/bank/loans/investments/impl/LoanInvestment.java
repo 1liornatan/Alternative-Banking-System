@@ -5,6 +5,7 @@ import bank.loans.investments.Investment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class LoanInvestment implements Investment {
     private static int idGenerator = 40000;
@@ -13,19 +14,24 @@ public class LoanInvestment implements Investment {
     private final Interest interest;
     private int amountPaid, paymentsReceived, id;
     private List<Integer> payments;
+    private final String loanId;
 
-
-
-    public LoanInvestment(String investorId, Interest interest) {
+    public LoanInvestment(String investorId, Interest interest, String loanId) {
         this.investorId = investorId;
         this.interest = interest;
         this.id = idGenerator++;
+        this.loanId = loanId;
 
         amountPaid = 0;
         paymentsReceived = 0;
 
         payments = new ArrayList<>();
         setPayments();
+    }
+
+    @Override
+    public String getLoanId() {
+        return loanId;
     }
 
     @Override
@@ -47,6 +53,17 @@ public class LoanInvestment implements Investment {
     @Override
     public int getPaymentsReceived() {
         return paymentsReceived;
+    }
+
+    @Override
+    public double getSellPrice() {
+        int duration = interest.getDuration();
+        int cycles = interest.getCyclesPerPayment();
+        int paymentsCount = (duration / cycles);
+
+        int paymentsLeft = paymentsCount - paymentsReceived;
+        int baseAmount = getBaseAmount();
+        return (paymentsLeft / paymentsCount) * baseAmount;
     }
     private void setPayments() {
 
@@ -82,7 +99,6 @@ public class LoanInvestment implements Investment {
             paymentsReceived++;
         }
     }
-
 
     @Override
     public int getBaseAmount() {
@@ -122,6 +138,21 @@ public class LoanInvestment implements Investment {
         return (amountPaid == getTotalPayment());
     }
 
+    @Override
+    public String toString() {
+        return "Investment in '" + loanId + "' for " + getSellPrice();
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LoanInvestment that = (LoanInvestment) o;
+        return id == that.id;
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
