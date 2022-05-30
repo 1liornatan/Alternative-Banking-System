@@ -42,7 +42,7 @@ public class LoanTable {
                 setPendingField(expander, loan);
                 break;
 
-            case RISK:
+            case RISKED:
                 setRiskedField(expander, loan);
                 break;
 
@@ -68,6 +68,7 @@ public class LoanTable {
         TextField nextPaymentField = new TextField(String.valueOf(loan.getNextPaymentInYaz()));
         TextField baseAmountField = new TextField(String.valueOf(loan.getAmount()));
         TextField deriskAmountField = new TextField(String.valueOf(loan.getDeriskAmount()));
+        TextField missingCyclesField = new TextField(String.valueOf(loan.getMissingCycles()));
         TextField fullAmountField = new TextField(String.valueOf(loan.getFinalAmount()));
 
         bindField(startYazField);
@@ -75,9 +76,11 @@ public class LoanTable {
         bindField(baseAmountField);
         bindField(fullAmountField);
         bindField(deriskAmountField);
+        bindField(missingCyclesField);
 
         expander.addRow(0, new VBox(new Label("Started Yaz"), startYazField));
         expander.addRow(0, new VBox(new Label("Next Payment in"), nextPaymentField));
+        expander.addRow(1, new VBox(new Label("Missing Cycles"), missingCyclesField));
         expander.addRow(1, new VBox(new Label("Debt Amount"), deriskAmountField));
         expander.addRow(2, new VBox(new Label("Base Amount"), baseAmountField));
         expander.addRow(2, new VBox(new Label("Final Amount"), fullAmountField));

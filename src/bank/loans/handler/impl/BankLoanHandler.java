@@ -1,9 +1,7 @@
 package bank.loans.handler.impl;
 
-import bank.Bank;
 import bank.accounts.Account;
 import bank.accounts.CustomerAccount;
-import bank.accounts.impl.Customer;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.data.storage.DataStorage;
@@ -88,7 +86,7 @@ public class BankLoanHandler implements LoanHandler {
     public void oneCycle() throws DataNotFoundException, NonPositiveAmountException {
         Collection<Pair<Loan, Integer>> loanCollection = loans.getAllPairs();
         Collection<Pair<Loan, Integer>> filteredLoans = loanCollection.stream()
-                .filter((loan -> (loan.getKey().getStatus() == LoanStatus.RISK) || (loan.getKey().getStatus() == LoanStatus.ACTIVE)))
+                .filter((loan -> (loan.getKey().getStatus() == LoanStatus.RISKED) || (loan.getKey().getStatus() == LoanStatus.ACTIVE)))
                 .filter((loan -> ((timeHandler.getCurrentTime() % loan.getKey().getCyclesPerPayment()) == 0)))
                 .collect(Collectors.toList());
 
@@ -124,7 +122,7 @@ public class BankLoanHandler implements LoanHandler {
         } catch (NonPositiveAmountException e) {
             e.printStackTrace();
         } catch (NoMoneyException e) {
-            loan.setStatus(LoanStatus.RISK);
+            loan.setStatus(LoanStatus.RISKED);
             addRiskedNotification(loan);
             partiallyPayment(loan);
         } finally {

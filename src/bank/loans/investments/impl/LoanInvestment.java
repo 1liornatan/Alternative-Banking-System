@@ -115,6 +115,9 @@ public class LoanInvestment implements Investment {
 
     @Override
     public int getPayment(int index) {
+        if(index >= payments.size())
+            return 0;
+
         return payments.get(index);
     }
 

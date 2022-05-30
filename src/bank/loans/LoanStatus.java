@@ -4,7 +4,7 @@ public enum LoanStatus {
     NEW("New"),
     PENDING("Pending"),
     ACTIVE("Active"),
-    RISK("In Risk"),
+    RISKED("Risked"),
     FINISHED("Finished");
 
     private String statusText;

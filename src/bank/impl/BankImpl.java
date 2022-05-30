@@ -197,6 +197,29 @@ public class BankImpl implements Bank {
     @Override
     public void advanceOneYaz() {
         timeHandler.advanceTime();
+        updateLoansStatus();
+    }
+
+    private void updateLoansStatus() {
+        Collection<Pair<Loan, Integer>> allPairs = loans.getAllPairs();
+        allPairs.stream()
+                .filter(pair -> {
+                    Loan currLoan = pair.getKey();
+                    LoanStatus status = currLoan.getStatus();
+                    return (status == LoanStatus.ACTIVE);
+                })
+                .filter(pair -> {
+                    Loan loan = pair.getKey();
+                    return getMissingCycles(loan) > 1;
+                })
+                .forEach(pair -> pair.getKey().setStatus(LoanStatus.RISKED));
+    }
+
+    private int getMissingCycles(Loan loan) {
+        int cyclesHadToPay = (getCurrentYaz() - loan.getStartedYaz()) / loan.getCyclesPerPayment();
+        int cyclesPaid = loan.getFullPaidCycles();
+
+        return Math.min((cyclesHadToPay - cyclesPaid), loan.getDuration() - cyclesPaid);
     }
 
     @Override
@@ -565,10 +588,10 @@ public class BankImpl implements Bank {
         loanData.setStatus(loan.getStatus().toString());
         loanData.setNextPaymentAmount(loan.getPayment());
         loanData.setCyclesPerPayment(loan.getCyclesPerPayment());
-        loanData.setMissingCycles(loan.getMissingCycles());
         loanData.setNextPaymentInYaz(loan.getNextYaz());
         loanData.setStartedYaz(loan.getStartedYaz());
         loanData.setInvestorsAmount(getInvestorsAmount(loan));
+        loanData.setMissingCycles(getMissingCycles(loan));
         return loanData;
     }
 
@@ -585,12 +608,12 @@ public class BankImpl implements Bank {
         customerData.setName(customer.getId());
         customerData.setNumOfActiveLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.ACTIVE));
         customerData.setNumOfPendingLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.PENDING));
-        customerData.setNumOfRiskLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.RISK));
+        customerData.setNumOfRiskLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.RISKED));
         customerData.setNumOfFinishedLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.FINISHED));
         customerData.setNumOfNewLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.NEW));
         customerData.setNumOfActiveLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.ACTIVE));
         customerData.setNumOfPendingLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.PENDING));
-        customerData.setNumOfRiskLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.RISK));
+        customerData.setNumOfRiskLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.RISKED));
         customerData.setNumOfFinishedLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.FINISHED));
         customerData.setNumOfNewLoansRequested(customer.getNumOfRequestedLoansByStatus(LoanStatus.NEW));
         return customerData;

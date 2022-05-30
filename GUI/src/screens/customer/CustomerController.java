@@ -9,6 +9,7 @@ import com.sun.org.apache.xpath.internal.operations.Bool;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -66,6 +67,17 @@ public class CustomerController {
     private List<NotificationModel> notificationModels;
     private List<InvestmentModel> buyInvestmentModels;
     private List<InvestmentModel> sellInvestmentModels;
+    private IntegerProperty requestedLoansAmountProperty;
+    private IntegerProperty paymentsAmountProperty;
+
+    @FXML
+    private TextField balanceField;
+
+    @FXML
+    private TextField openPaymentsField;
+
+    @FXML
+    private TextField loansRequestedField;
 
     @FXML
     private TableView<LoanModel> loanerLoansTable;
@@ -418,7 +430,7 @@ public class CustomerController {
     @FXML
     void initialize() {
         setDataTables();
-
+        setSplitComps();
         amountField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
@@ -504,6 +516,12 @@ public class CustomerController {
         loansChosenTable.minWidthProperty().bind(loansFoundTable.widthProperty());
     }
 
+    private void setSplitComps() {
+        balanceField.textProperty().bind(balanceProperty.asString());
+        loansRequestedField.textProperty().bind(requestedLoansAmountProperty.asString());
+        openPaymentsField.textProperty().bind(paymentsAmountProperty.asString());
+    }
+
     private void setDataTables() {
         LoanTable.setDataTables(loanerLoansTable);
         LoanTable.setDataTables(lenderLoansTable);
@@ -539,6 +557,8 @@ public class CustomerController {
         maxOwnershipFieldProperty = new SimpleIntegerProperty();
         buyInvestmentModels = new ArrayList<>();
         sellInvestmentModels = new ArrayList<>();
+        requestedLoansAmountProperty = new SimpleIntegerProperty();
+        paymentsAmountProperty = new SimpleIntegerProperty();
     }
 
     private void setLoansIntegrationButtons() {
@@ -600,7 +620,7 @@ public class CustomerController {
         searchLoansProgressBar.setProgress(0);
     }
 
-    private List<LoanModel> makeLoanModelList(List<LoanData> loanDataList) {
+    public static List<LoanModel> makeLoanModelList(List<LoanData> loanDataList) {
         List<LoanModel> tempLoanModelList = new ArrayList<>();
         for(LoanData loanData : loanDataList) {
             LoanModel loanModel = new LoanModel.LoanModelBuilder()
@@ -614,6 +634,7 @@ public class CustomerController {
                     .investorsAmount(loanData.getInvestorsAmount())
                     .amountToActive(loanData.getAmountToActive())
                     .deriskAmount(loanData.getDeriskAmount())
+                    .missingCycles(loanData.getMissingCycles())
                     .build();
 
             tempLoanModelList.add(loanModel);
@@ -699,6 +720,7 @@ public class CustomerController {
 
             lenderModelList = tempLenderModelList;
             loanerModelList = tempLoanerModelList;
+            requestedLoansAmountProperty.set(loanerModelList.size());
 
             Platform.runLater(() -> {
                 loanerLoansTable.setItems(getLoans(loanerModelList));
@@ -722,6 +744,7 @@ public class CustomerController {
             tempLoanerModelList = makeLoanModelList(loanerDataList);
 
             loanPModelList = tempLoanerModelList;
+            paymentsAmountProperty.set(loanPModelList.size());
 
             Platform.runLater(() -> {
                 loanerLoansPTable.setItems(getLoans(loanPModelList));

@@ -7,10 +7,12 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import manager.customers.CustomersNames;
 import screens.admin.AdminController;
@@ -28,8 +30,8 @@ public class MainPageController {
     private BooleanProperty isAdminScreen;
 
     private BorderPane mainScreen;
-    private AnchorPane adminScreen;
-    private AnchorPane customerScreen;
+    private Parent adminScreen;
+    private Parent customerScreen;
 
     private AdminController adminController;
     private CustomerController customerController;
@@ -83,8 +85,9 @@ public class MainPageController {
             if(oldVal == null || newVal == null)
                 return;
             else if(newVal.equals("Admin")) {
-                updateScreenData();
                 setAdminScreen();
+                updateScreenData();
+
             }
             else {
                 customerController.accountChanged();

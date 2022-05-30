@@ -26,6 +26,7 @@ import models.LoanModel;
 import models.LoanStatusModel;
 import models.utils.LoanTable;
 import org.controlsfx.control.table.TableRowExpanderColumn;
+import screens.customer.CustomerController;
 import screens.utils.GUIUtils;
 
 import java.io.File;
@@ -117,60 +118,10 @@ public class AdminController {
 
         Thread updateLoansThread = new Thread(() -> {
             try {
-                List<LoanModel> tempLoanModelList = new ArrayList<>();
                 List<LoanData> loanDataList = bankInstance.getLoansData().getLoans();
-                for(LoanData loanData : loanDataList) {
-                    LoanModel loanModel = new LoanModel.LoanModelBuilder()
-                            .id(loanData.getName())
-                            .amount(loanData.getBaseAmount())
-                            .endYaz(loanData.getFinishedYaz())
-                            .startYaz(loanData.getStartedYaz())
-                            .nextPaymentInYaz(loanData.getNextPaymentInYaz())
-                            .finalAmount(loanData.getFinalAmount())
-                            .status(loanData.getStatus())
-                            .build();
-
-                    tempLoanModelList.add(loanModel);
-                }
-                loanModelList = tempLoanModelList;
+                loanModelList = CustomerController.makeLoanModelList(loanDataList);
                 Platform.runLater(() -> {
                     adminLoansTable.setItems(getLoans());
-//                    GUIUtils.autoFitTable(adminLoansTable); DOESNT WORK
-/*                    adminLoansTable.setRowFactory(tv -> {
-                        TableRow<LoanModel> row = new TableRow<>();
-
-                        row.setOnDragDetected(event -> {
-                            if (! row.isEmpty()) {
-                                Integer index = row.getIndex();
-                                Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
-                                db.setDragView(row.snapshot(null, null));
-                                ClipboardContent cc = new ClipboardContent();
-                                cc.put(SERIALIZED_MIME_TYPE, index);
-                                db.setContent(cc);
-                                event.consume();
-                            }
-                        });
-
-                        row.setOnDragOver(event -> {
-                            Dragboard db = event.getDragboard();
-                            if (db.hasContent(SERIALIZED_MIME_TYPE)) {
-                                if (row.getIndex() != ((Integer)db.getContent(SERIALIZED_MIME_TYPE)).intValue()) {
-                                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-                                    event.consume();
-                                }
-                            }
-                        });
-                        row.setOnDragDropped(event -> {
-                            Dragboard db = event.getDragboard();
-                            if(db.hasContent(SERIALIZED_MIME_TYPE)) {
-                                int draggedIndex = (Integer) db.getContent(SERIALIZED_MIME_TYPE);
-                                LoanModel draggedLoan = adminLoansTable.getItems().remove(draggedIndex);
-                                event.setDropCompleted(true);
-                                event.consume();
-                            }
-                        });
-                        return row;
-                    });*/
                 });
             } catch (DataNotFoundException e) {
                 e.printStackTrace();

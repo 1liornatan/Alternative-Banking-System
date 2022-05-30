@@ -8,7 +8,7 @@ import javafx.beans.property.StringProperty;
 public class LoanModel {
     private StringProperty id, status;
     private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
-    private IntegerProperty amountToActive, investorsAmount, deriskAmount;
+    private IntegerProperty amountToActive, investorsAmount, deriskAmount, missingCycles;
 
     private LoanModel(LoanModelBuilder builder) {
         this.id = builder.id;
@@ -21,6 +21,7 @@ public class LoanModel {
         this.amountToActive = builder.amountToActive;
         this.deriskAmount = builder.deriskAmount;
         this.investorsAmount = builder.investorsAmount;
+        this.missingCycles = builder.missingCycles;
     }
 
     public String getId() {
@@ -103,9 +104,18 @@ public class LoanModel {
         return deriskAmount;
     }
 
+    public int getMissingCycles() {
+        return missingCycles.get();
+    }
+
+    public IntegerProperty missingCyclesProperty() {
+        return missingCycles;
+    }
+
     public static class LoanModelBuilder {
         public IntegerProperty amountToActive, investorsAmount;
         public IntegerProperty deriskAmount;
+        public IntegerProperty missingCycles;
         private StringProperty id, status;
         private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
 
@@ -120,6 +130,12 @@ public class LoanModel {
             amountToActive = new SimpleIntegerProperty(0);
             investorsAmount = new SimpleIntegerProperty(0);
             deriskAmount = new SimpleIntegerProperty(0);
+            missingCycles = new SimpleIntegerProperty(0);
+        }
+
+        public LoanModelBuilder missingCycles(int amount) {
+            missingCycles.set(amount);
+            return this;
         }
 
         public LoanModelBuilder id(String id) {
