@@ -451,8 +451,8 @@ public class CustomerController {
                 if (!newValue.matches("\\d*")) {
                     minInterestField.setText(newValue.replaceAll("[^\\d]", ""));
                 }
-                else if(Integer.valueOf(newValue) < 0) {
-                    minInterestField.setText("0");
+                else if(newValue.isEmpty() || Integer.valueOf(newValue) < 1) {
+                    minInterestField.setText("1");
                 }
             }
         });
@@ -463,7 +463,7 @@ public class CustomerController {
                 if (!newValue.matches("\\d*")) {
                     minYazField.setText(newValue.replaceAll("[^\\d]", ""));
                 }
-                else if(Integer.valueOf(newValue) < 1) {
+                else if(newValue.isEmpty() || Integer.valueOf(newValue) < 1) {
                     minYazField.setText("1");
                 }
             }
@@ -475,6 +475,8 @@ public class CustomerController {
                 if (!newValue.matches("\\d*")) {
                     maxLoanerLoansField.setText(newValue.replaceAll("[^\\d]", ""));
                 }
+                else if(newValue.isEmpty())
+                    maxLoanerLoansField.setText("0");
             }
         });
         maxOwnershipField.textProperty().addListener(new ChangeListener<String>() {
@@ -484,6 +486,8 @@ public class CustomerController {
                 if (!newValue.matches("\\d*")) {
                     maxOwnershipField.setText(newValue.replaceAll("[^\\d]", ""));
                 }
+                else if(newValue.isEmpty())
+                    maxOwnershipField.setText("0");
             }
         });
         debtAmountField.textProperty().addListener(new ChangeListener<String>() {
@@ -513,7 +517,7 @@ public class CustomerController {
         setLoansIntegrationButtons();
         debtPaymentHBox.setDisable(true);
 
-        loansChosenTable.minWidthProperty().bind(loansFoundTable.widthProperty());
+        /*loansChosenTable.minWidthProperty().bind(loansFoundTable.widthProperty());*/
     }
 
     private void setSplitComps() {

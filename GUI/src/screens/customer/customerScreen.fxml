@@ -169,13 +169,13 @@
                                     </AnchorPane>
                                  </top>
                                  <center>
-                                    <ScrollPane fitToHeight="true" fitToWidth="true" minHeight="191.0">
+                                    <ScrollPane fitToHeight="true" fitToWidth="true">
                                        <content>
-                                          <GridPane prefHeight="191.0" prefWidth="718.0">
+                                          <GridPane alignment="CENTER">
                                              <columnConstraints>
-                                                <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
-                                                <ColumnConstraints hgrow="NEVER" maxWidth="107.0" minWidth="107.0" prefWidth="107.0" />
-                                                <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="283.0" prefWidth="283.0" />
+                                                <ColumnConstraints hgrow="NEVER" maxWidth="123.0" minWidth="73.0" prefWidth="107.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="266.0" prefWidth="282.0" />
                                              </columnConstraints>
                                              <rowConstraints>
                                                 <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />

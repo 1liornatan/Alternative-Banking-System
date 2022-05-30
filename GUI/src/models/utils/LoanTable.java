@@ -147,12 +147,12 @@ public class LoanTable {
         TableColumn<LoanModel, String> statusField = new TableColumn<>("Status");
         statusField.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        loanNameColumn.minWidthProperty().bind(dataTable.widthProperty().multiply(0.5));
-        amountColumn.minWidthProperty().bind(dataTable.widthProperty().multiply(0.2));
-        statusField.minWidthProperty().bind(dataTable.widthProperty().multiply(0.2));
-        loanExpanderColumn.minWidthProperty().bind(dataTable.widthProperty().multiply(0.1));
+        loanNameColumn.prefWidthProperty().bind(dataTable.widthProperty().multiply(0.4));
+        amountColumn.prefWidthProperty().bind(dataTable.widthProperty().multiply(0.2));
+        statusField.prefWidthProperty().bind(dataTable.widthProperty().multiply(0.2));
+        loanExpanderColumn.prefWidthProperty().bind(dataTable.widthProperty().multiply(0.196));
 
-        amountColumn.setStyle("-fx-alignment: CENTER;");
+        amountColumn.setStyle("-fx-alignment: TOP_CENTER;");
         loanExpanderColumn.setStyle("-fx-alignment: TOP_CENTER;");
         statusField.setStyle("-fx-alignment: TOP_CENTER;");
 
