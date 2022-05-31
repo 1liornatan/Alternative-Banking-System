@@ -64,6 +64,8 @@ public class LoanTable {
     }
 
     private static void setRiskedField(GridPane expander, LoanModel loan) {
+        TextField paymentAmount = new TextField(String.valueOf(loan.getPaymentAmount()));
+        TextField closeAmount = new TextField(String.valueOf(loan.getAmountLeftToPay()));
         TextField startYazField = new TextField(String.valueOf(loan.getStartYaz()));
         TextField nextPaymentField = new TextField(String.valueOf(loan.getNextPaymentInYaz()));
         TextField baseAmountField = new TextField(String.valueOf(loan.getAmount()));
@@ -77,6 +79,8 @@ public class LoanTable {
         bindField(fullAmountField);
         bindField(deriskAmountField);
         bindField(missingCyclesField);
+        bindField(closeAmount);
+        bindField(paymentAmount);
 
         expander.addRow(0, new VBox(new Label("Started Yaz"), startYazField));
         expander.addRow(0, new VBox(new Label("Next Payment in"), nextPaymentField));
@@ -84,8 +88,11 @@ public class LoanTable {
         expander.addRow(1, new VBox(new Label("Debt Amount"), deriskAmountField));
         expander.addRow(2, new VBox(new Label("Base Amount"), baseAmountField));
         expander.addRow(2, new VBox(new Label("Final Amount"), fullAmountField));
+        expander.addRow(3, new VBox(new Label("Next Payment"),  paymentAmount));
+        expander.addRow(3, new VBox(new Label("Close Price"),  closeAmount));
     }
     private static void setPendingField(GridPane expander, LoanModel loan) {
+        //TextField paymentField = new TextField(String.valueOf(loan.get))
         TextField baseAmountField = new TextField(String.valueOf(loan.getAmount()));
         TextField fullAmountField = new TextField(String.valueOf(loan.getFinalAmount()));
         TextField investorsField = new TextField(String.valueOf(loan.getInvestorsAmount()));
@@ -120,6 +127,8 @@ public class LoanTable {
     }
 
     private static void setActiveField(GridPane expander, LoanModel loan) {
+        TextField paymentAmount = new TextField(String.valueOf(loan.getPaymentAmount()));
+        TextField closeAmount = new TextField(String.valueOf(loan.getAmountLeftToPay()));
         TextField startYazField = new TextField(String.valueOf(loan.getStartYaz()));
         TextField nextPaymentField = new TextField(String.valueOf(loan.getNextPaymentInYaz()));
         TextField baseAmountField = new TextField(String.valueOf(loan.getAmount()));
@@ -129,11 +138,15 @@ public class LoanTable {
         bindField(nextPaymentField);
         bindField(baseAmountField);
         bindField(fullAmountField);
+        bindField(closeAmount);
+        bindField(paymentAmount);
 
         expander.addRow(0, new VBox(new Label("Started Yaz"), startYazField));
         expander.addRow(0, new VBox(new Label("Next Payment in"), nextPaymentField));
         expander.addRow(1, new VBox(new Label("Base Amount"), baseAmountField));
         expander.addRow(1, new VBox(new Label("Final Amount"), fullAmountField));
+        expander.addRow(2, new VBox(new Label("Next Payment"),  paymentAmount));
+        expander.addRow(2, new VBox(new Label("Close Price"),  closeAmount));
     }
 
     public static void setDataTables(TableView<LoanModel> dataTable) {

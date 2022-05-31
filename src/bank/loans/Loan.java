@@ -60,4 +60,8 @@ public interface Loan extends Singular {
     int getDeriskAmount();
 
     boolean isInvestable();
+
+    int getNextPayment();
+
+    int getAmountToCloseLoan();
 }

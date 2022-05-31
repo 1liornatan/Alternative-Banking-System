@@ -9,6 +9,7 @@ public class LoanModel {
     private StringProperty id, status;
     private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
     private IntegerProperty amountToActive, investorsAmount, deriskAmount, missingCycles;
+    private IntegerProperty paymentAmount, amountLeftToPay;
 
     private LoanModel(LoanModelBuilder builder) {
         this.id = builder.id;
@@ -22,6 +23,24 @@ public class LoanModel {
         this.deriskAmount = builder.deriskAmount;
         this.investorsAmount = builder.investorsAmount;
         this.missingCycles = builder.missingCycles;
+        this.paymentAmount = builder.paymentAmount;
+        this.amountLeftToPay = builder.amountLeftToPay;
+    }
+
+    public int getPaymentAmount() {
+        return paymentAmount.get();
+    }
+
+    public IntegerProperty paymentAmountProperty() {
+        return paymentAmount;
+    }
+
+    public int getAmountLeftToPay() {
+        return amountLeftToPay.get();
+    }
+
+    public IntegerProperty amountLeftToPayProperty() {
+        return amountLeftToPay;
     }
 
     public String getId() {
@@ -118,6 +137,7 @@ public class LoanModel {
         public IntegerProperty missingCycles;
         private StringProperty id, status;
         private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
+        IntegerProperty paymentAmount, amountLeftToPay;
 
         public LoanModelBuilder() {
             id = new SimpleStringProperty(null);
@@ -131,6 +151,19 @@ public class LoanModel {
             investorsAmount = new SimpleIntegerProperty(0);
             deriskAmount = new SimpleIntegerProperty(0);
             missingCycles = new SimpleIntegerProperty(0);
+            paymentAmount = new SimpleIntegerProperty(0);
+            amountLeftToPay = new SimpleIntegerProperty(0);
+        }
+
+        public LoanModelBuilder payment(int amount) {
+            paymentAmount.set(amount);
+            return this;
+
+        }
+
+        public LoanModelBuilder left(int amount) {
+            amountLeftToPay.set(amount);
+            return this;
         }
 
         public LoanModelBuilder missingCycles(int amount) {

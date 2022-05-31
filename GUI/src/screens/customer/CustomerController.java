@@ -639,6 +639,8 @@ public class CustomerController {
                     .amountToActive(loanData.getAmountToActive())
                     .deriskAmount(loanData.getDeriskAmount())
                     .missingCycles(loanData.getMissingCycles())
+                    .payment(loanData.getNextPaymentAmount())
+                    .left(loanData.getCloseAmount())
                     .build();
 
             tempLoanModelList.add(loanModel);

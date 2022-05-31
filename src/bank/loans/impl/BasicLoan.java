@@ -126,6 +126,21 @@ public class BasicLoan implements Loan {
     }
 
     @Override
+    public int getNextPayment() {
+        int currPayment = getPaymentNeeded();
+        if(getPaymentNeeded() >= payments.size())
+            return 0;
+
+        return payments.get(currPayment);
+    }
+
+    @Override
+    public int getAmountToCloseLoan() {
+        int sum = payments.subList(getCurrentPayment(), payments.size()).stream().mapToInt(Integer::intValue).sum();
+        return sum;
+    }
+
+    @Override
     public int getFinishedYaz() {
         return finishedYaz;
     }
@@ -246,5 +261,10 @@ public class BasicLoan implements Loan {
     @Override
     public boolean isInvestable() {
         return (status == LoanStatus.NEW || status == LoanStatus.PENDING);
+    }
+
+    private int getPaymentNeeded() {
+        int duration = timeHandler.getCurrentTime() - getStartedYaz();
+        return duration / getCyclesPerPayment();
     }
 }

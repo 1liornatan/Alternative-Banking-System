@@ -196,11 +196,42 @@ public class BankImpl implements Bank {
 
     @Override
     public void advanceOneYaz() {
+        makePaymentNotifications();
         timeHandler.advanceTime();
         updateLoansStatus();
     }
 
+    private void makePaymentNotifications() {
+        int notificationYaz = getCurrentYaz() + 1;
+        Collection<Pair<Loan, Integer>> allPairs = loans.getAllPairs();
+        allPairs.stream()
+                .filter(p -> {
+                    Loan currLoan = p.getKey();
+                    LoanStatus status = currLoan.getStatus();
+                    return (status == LoanStatus.ACTIVE) || (status == LoanStatus.RISKED);
+                })
+                .filter(p -> {
+                    Loan currLoan = p.getKey();
+                    return (currLoan.getNextYaz() == 1);
+                })
+                .forEach(p -> {
+                    Loan currLoan = p.getKey();
+                    try {
+                        CustomerAccount loanRequester = customersAccounts.getDataById(currLoan.getOwnerId());
+                        int paymentAmount = currLoan.getNextPayment();
+                        if(paymentAmount > 0) {
+                            loanRequester.addNotification(new BankNotification(
+                                    "New payment of " + paymentAmount + " from loan '" + currLoan.getId() + "'",
+                                    notificationYaz));
+                        }
+                    } catch (DataNotFoundException e) {
+                        System.out.println("Account '" + currLoan.getOwnerId() + "' was not found.");
+                    }
+                });
+    }
+
     private void updateLoansStatus() {
+        int notificationYaz = getCurrentYaz();
         Collection<Pair<Loan, Integer>> allPairs = loans.getAllPairs();
         allPairs.stream()
                 .filter(pair -> {
@@ -212,7 +243,29 @@ public class BankImpl implements Bank {
                     Loan loan = pair.getKey();
                     return getMissingCycles(loan) > 1;
                 })
-                .forEach(pair -> pair.getKey().setStatus(LoanStatus.RISKED));
+                .forEach(pair -> {
+                    Loan loan = pair.getKey();
+                    loan.setStatus(LoanStatus.RISKED);
+                    Set<String> investors = new HashSet<>();
+                    loan.getInvestments().stream().forEach(inv -> {
+                        investors.add(inv.getInvestorId());
+                    });
+                    investors.stream().forEach(investor -> {
+                        try {
+                            CustomerAccount investorAcc = customersAccounts.getDataById(investor);
+                            investorAcc.addNotification(new BankNotification(
+                                    "Loan '" + loan.getId() + "' is in Risk", notificationYaz));
+                        } catch (DataNotFoundException e) {
+                            System.out.println(e.getMessage());
+                        }
+                    });
+                    try {
+                        CustomerAccount owner = customersAccounts.getDataById(loan.getOwnerId());
+                        owner.addNotification(new BankNotification("Your loan '" + loan.getId() + "' is now in risk!", notificationYaz + 1));
+                    } catch (DataNotFoundException e) {
+                        System.out.println(e.getMessage());
+                    }
+                });
     }
 
     private int getMissingCycles(Loan loan) {
@@ -592,6 +645,8 @@ public class BankImpl implements Bank {
         loanData.setStartedYaz(loan.getStartedYaz());
         loanData.setInvestorsAmount(getInvestorsAmount(loan));
         loanData.setMissingCycles(getMissingCycles(loan));
+        loanData.setNextPaymentAmount(loan.getNextPayment());
+        loanData.setCloseAmount(loan.getAmountToCloseLoan());
         return loanData;
     }
 
