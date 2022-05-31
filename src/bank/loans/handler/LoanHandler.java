@@ -16,4 +16,5 @@ public interface LoanHandler {
 
     void addInvestment(Loan loan, Investment investment, CustomerAccount srcAcc) throws NonPositiveAmountException, NoMoneyException, DataNotFoundException;
 
+    void payLoanByAmount(Loan loanId, int amount) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException;
 }

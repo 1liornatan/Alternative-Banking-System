@@ -5,6 +5,7 @@ import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.interest.exceptions.InvalidPercentException;
+import com.sun.deploy.util.BlackList;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -69,6 +70,7 @@ public class CustomerController {
     private List<InvestmentModel> sellInvestmentModels;
     private IntegerProperty requestedLoansAmountProperty;
     private IntegerProperty paymentsAmountProperty;
+    private LoanModel selectedDebtLoan;
 
     @FXML
     private TextField balanceField;
@@ -186,6 +188,7 @@ public class CustomerController {
 
     @FXML
     private Label sellErrorLabel;
+    private IntegerProperty debtAmountProperty;
 
     @FXML
     void buyInvestmentButtonAction(ActionEvent event) {
@@ -397,7 +400,9 @@ public class CustomerController {
 
     @FXML
     void closeLoanButtonAction(ActionEvent event) {
-
+        LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
+        bankInstance.closeLoan(selectedLoan.getId());
+        updateData();
     }
 
     @FXML
@@ -413,16 +418,26 @@ public class CustomerController {
 
     @FXML
     void payDebtButtonAction(ActionEvent event) {
-        debtPaymentHBox.setDisable(false);
+        selectedDebtLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
+
+        if (selectedDebtLoan == null) {
+            paymentErrorLabel.setText("You must select a loan first!");
+            paymentErrorLabel.setTextFill(Color.RED);
+            debtPaymentHBox.setDisable(true);
+        }
+        else {
+            debtPaymentHBox.setDisable(false);
+        }
     }
 
     @FXML
     void submitDebtButtonAction(ActionEvent event) {
-        LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
+        debtAmountProperty.set(Integer.valueOf(debtAmountField.getText()));
         try {
-            bankInstance.deriskLoanRequest(selectedLoan.getId());
+            bankInstance.deriskLoanByAmount(selectedDebtLoan.getId(), debtAmountProperty.get());
         } catch (Exception e) {
-            e.printStackTrace();
+            paymentErrorLabel.setText(e.getMessage());
+            paymentErrorLabel.setTextFill(Color.RED);
         }
         updateData();
     }
@@ -563,6 +578,7 @@ public class CustomerController {
         sellInvestmentModels = new ArrayList<>();
         requestedLoansAmountProperty = new SimpleIntegerProperty();
         paymentsAmountProperty = new SimpleIntegerProperty();
+        debtAmountProperty = new SimpleIntegerProperty();
     }
 
     private void setLoansIntegrationButtons() {

@@ -231,7 +231,6 @@ public class BankImpl implements Bank {
     }
 
     private void updateLoansStatus() {
-        int notificationYaz = getCurrentYaz();
         Collection<Pair<Loan, Integer>> allPairs = loans.getAllPairs();
         allPairs.stream()
                 .filter(pair -> {
@@ -244,30 +243,33 @@ public class BankImpl implements Bank {
                     return getMissingCycles(loan) > 1;
                 })
                 .forEach(pair -> {
-                    Loan loan = pair.getKey();
-                    loan.setStatus(LoanStatus.RISKED);
-                    Set<String> investors = new HashSet<>();
-                    loan.getInvestments().stream().forEach(inv -> {
-                        investors.add(inv.getInvestorId());
-                    });
-                    investors.stream().forEach(investor -> {
-                        try {
-                            CustomerAccount investorAcc = customersAccounts.getDataById(investor);
-                            investorAcc.addNotification(new BankNotification(
-                                    "Loan '" + loan.getId() + "' is in Risk", notificationYaz));
-                        } catch (DataNotFoundException e) {
-                            System.out.println(e.getMessage());
-                        }
-                    });
-                    try {
-                        CustomerAccount owner = customersAccounts.getDataById(loan.getOwnerId());
-                        owner.addNotification(new BankNotification("Your loan '" + loan.getId() + "' is now in risk!", notificationYaz + 1));
-                    } catch (DataNotFoundException e) {
-                        System.out.println(e.getMessage());
-                    }
+                    updateRiskStatus(pair.getKey());
                 });
     }
 
+    private void updateRiskStatus(Loan loan) {
+        int notificationYaz = getCurrentYaz();
+        loan.setStatus(LoanStatus.RISKED);
+        Set<String> investors = new HashSet<>();
+        loan.getInvestments().stream().forEach(inv -> {
+            investors.add(inv.getInvestorId());
+        });
+        investors.stream().forEach(investor -> {
+            try {
+                CustomerAccount investorAcc = customersAccounts.getDataById(investor);
+                investorAcc.addNotification(new BankNotification(
+                        "Loan '" + loan.getId() + "' is in Risk", notificationYaz));
+            } catch (DataNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
+        });
+        try {
+            CustomerAccount owner = customersAccounts.getDataById(loan.getOwnerId());
+            owner.addNotification(new BankNotification("Your loan '" + loan.getId() + "' is now in risk!", notificationYaz + 1));
+        } catch (DataNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+    }
     private int getMissingCycles(Loan loan) {
         int cyclesHadToPay = (getCurrentYaz() - loan.getStartedYaz()) / loan.getCyclesPerPayment();
         int cyclesPaid = loan.getFullPaidCycles();
@@ -789,5 +791,48 @@ public class BankImpl implements Bank {
                         .build());});
         notificationsData.setNotificationsList(notificationDataList);
         return notificationsData;
+    }
+
+    @Override
+    public void deriskLoanByAmount(String id, int amount) {
+        try {
+            Loan loan = loans.getDataById(id);
+            loanHandler.payLoanByAmount(loan, amount);
+            updateActiveStatus(loan);
+        } catch (DataNotFoundException | NoMoneyException | NonPositiveAmountException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void updateActiveStatus(Loan loan) throws DataNotFoundException {
+        if(loan.getMissingCycles() <= 1) { // TODO: CHECK CLOSE LOAN
+            int messageYaz = getCurrentYaz();
+            CustomerAccount ownerAcc = customersAccounts.getDataById(loan.getOwnerId());
+
+            Set<String> investors = new HashSet<>();
+            loan.getInvestments().stream().forEach(inv -> investors.add(inv.getInvestorId()));
+
+            ownerAcc.addNotification(new BankNotification("Your Loan '" + loan.getId() + "' is not in risk and is active again!", messageYaz));
+            investors.stream().forEach(investor -> {
+                try {
+                    CustomerAccount invAcc = customersAccounts.getDataById(investor);
+                    invAcc.addNotification(new BankNotification("The Loan '" + loan.getId() + "' is not in risk and is active again!", messageYaz));
+                } catch (DataNotFoundException e) {
+                    System.out.println(e.getMessage());
+                }
+            });
+            loan.setStatus(LoanStatus.ACTIVE);
+        }
+    }
+
+    @Override
+    public void closeLoan(String id) {
+        try {
+            Loan loan = loans.getDataById(id);
+            int amountToCloseLoan = loan.getAmountToCloseLoan();
+            loanHandler.payLoanByAmount(loan, amountToCloseLoan);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

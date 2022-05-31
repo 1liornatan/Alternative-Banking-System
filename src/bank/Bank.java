@@ -114,4 +114,8 @@ public interface Bank {
     TransactionsData getTransactionsData(String cutsomerId);
 
     NotificationsData getNotificationsData(String customerId) throws DataNotFoundException;
+
+    void deriskLoanByAmount(String id, int amount);
+
+    void closeLoan(String id);
 }

@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -52,6 +53,27 @@ public class MainPageController {
 
     @FXML
     private Button loadFileButton;
+
+    @FXML
+    void styleDiscountAction(ActionEvent event) {
+        mainScreen.getStylesheets().clear();
+        mainScreen.getStylesheets().add(getClass().getResource("/screens/resources/discount/styleDiscount.css").toExternalForm());
+        mainScreen.applyCss();
+    }
+
+    @FXML
+    void styleHapoalimAction(ActionEvent event) {
+        mainScreen.getStylesheets().clear();
+        mainScreen.getStylesheets().add(getClass().getResource("/screens/resources/hapoalim/styleHapoalim.css").toExternalForm());
+        mainScreen.applyCss();
+    }
+
+    @FXML
+    void styleIsraelAction(ActionEvent event) {
+        mainScreen.getStylesheets().clear();
+        mainScreen.getStylesheets().add(getClass().getResource("/screens/resources/israel/styleIsrael.css").toExternalForm());
+        mainScreen.applyCss();
+    }
 
     public MainPageController() throws IOException {
         isAdminScreen = new SimpleBooleanProperty();

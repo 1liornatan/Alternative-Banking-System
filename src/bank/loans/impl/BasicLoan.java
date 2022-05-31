@@ -32,6 +32,7 @@ public class BasicLoan implements Loan {
     @Override
     public void fullPaymentCycle() {
         fullPaidCycles++;
+        currentPayment++;
     }
 
     @Override
@@ -247,12 +248,14 @@ public class BasicLoan implements Loan {
     @Override
     public int getDeriskAmount() {
         int startingYaz = startedYaz;
-        int cycles = (timeHandler.getCurrentTime() - startingYaz) / getCyclesPerPayment();
+        int cycles = ((timeHandler.getCurrentTime() - startingYaz) / getCyclesPerPayment()) - 1;
         int sum = 0;
 
-        for (Investment investment : investments) {
-            for (int i = investment.getPaymentsReceived(); i < cycles; i++) {
-                sum += investment.getPayment(i);
+        if(cycles > 0) {
+            for (Investment investment : investments) {
+                for (int i = investment.getPaymentsReceived(); i < cycles; i++) {
+                    sum += investment.getPayment(i);
+                }
             }
         }
         return sum;
