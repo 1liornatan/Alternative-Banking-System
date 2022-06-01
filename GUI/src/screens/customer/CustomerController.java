@@ -636,6 +636,7 @@ public class CustomerController {
     }
 
     public void accountChanged() {
+        clearAllFields();
         updateData();
         progressBarStatusLabel.textProperty().unbind();
         progressBarStatusLabel.setText("");
@@ -867,6 +868,10 @@ public class CustomerController {
         yazMadeColumn.setStyle("-fx-alignment: CENTER;");
         notificationMessageColumn.maxWidthProperty().bind(notificationsTable.widthProperty().multiply(0.9));
         notificationsTable.getColumns().addAll(notificationMessageColumn, yazMadeColumn);
+        yazMadeColumn.setSortType(TableColumn.SortType.DESCENDING);
+        notificationsTable.getSortOrder().clear();
+        notificationsTable.getSortOrder().add(yazMadeColumn);
+
     }
 
     private void updateNotifications() {
@@ -887,7 +892,10 @@ public class CustomerController {
                         .build());
             }
             notificationModels = tempNotificationModels;
-            Platform.runLater(() -> notificationsTable.setItems(getNotiications()));
+            Platform.runLater(() -> {
+                notificationsTable.setItems(getNotiications());
+                notificationsTable.sort();
+            });
         });
         updateNotifications.start();
     }
@@ -995,20 +1003,29 @@ public class CustomerController {
             PaymentsData data = bankInstance.getPaymentsData(customerId.get());
 
             XYChart.Series series = new XYChart.Series();
-            series.setName("Incoming Payments");
+            XYChart.Series forecasting = new XYChart.Series();
+            series.setName("Payments Received");
+            forecasting.setName("Forecasting");
             //populating the series with data
 
             List<Integer> payments = data.getPayments();
             List<Integer> amounts = data.getAmount();
 
             int yaz = payments.size();
+            int sum = 0;
 
             for(i = 0; i < yaz; i++) {
-                series.getData().add(new XYChart.Data(String.valueOf(i), amounts.get(i)));
+                sum += amounts.get(i);
+                series.getData().add(new XYChart.Data(String.valueOf(i+1), amounts.get(i)));
+            }
+
+            int avg = sum / (i+1);
+            for(int j = 0; j < i + 5; j++) {
+                forecasting.getData().add(new XYChart.Data(String.valueOf(j+1), avg*j));
             }
 
             timeLineChart.getData().clear();
-            timeLineChart.getData().add(series);
+            timeLineChart.getData().addAll(series, forecasting);
         } catch (DataNotFoundException e) {
             System.out.println(e.getMessage());
         }

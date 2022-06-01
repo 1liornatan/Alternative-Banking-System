@@ -250,6 +250,17 @@ public class BankImpl implements Bank {
         Set<String> investors = new HashSet<>();
         loan.getInvestments().stream().forEach(inv -> {
             investors.add(inv.getInvestorId());
+            if(sellInvestmentsDataStorage.isDataExists(inv.getId())) {
+                try {
+                    sellInvestmentsDataStorage.remove(inv.getId());
+                    CustomerAccount invAcc = customersAccounts.getDataById(inv.getInvestorId());
+                    invAcc.addNotification(new BankNotification(
+                            "Investment in '" + loan.getId() + "' is unlisted from trading (loan in risk)",
+                            notificationYaz));
+                } catch (DataNotFoundException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
         });
         investors.stream().forEach(investor -> {
             try {
@@ -262,10 +273,11 @@ public class BankImpl implements Bank {
         });
         try {
             CustomerAccount owner = customersAccounts.getDataById(loan.getOwnerId());
-            owner.addNotification(new BankNotification("Your loan '" + loan.getId() + "' is now in risk!", notificationYaz + 1));
+            owner.addNotification(new BankNotification("Your loan '" + loan.getId() + "' is now in risk!", notificationYaz));
         } catch (DataNotFoundException e) {
             System.out.println(e.getMessage());
         }
+
     }
     private int getMissingCycles(Loan loan) {
         int cyclesHadToPay = (getCurrentYaz() - loan.getStartedYaz()) / loan.getCyclesPerPayment();
@@ -791,7 +803,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public void deriskLoanByAmount(String id, int amount) {
+    public void deriskLoanByAmount(String id, int amount) { //TODO: DTO
         try {
             Loan loan = loans.getDataById(id);
             loanHandler.payLoanByAmount(loan, amount);

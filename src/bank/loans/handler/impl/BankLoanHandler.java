@@ -67,7 +67,7 @@ public class BankLoanHandler implements LoanHandler {
         Account srcAcc = customers.getDataById(loan.getOwnerId());
 
         transactions.addData(srcAcc.withdraw(amount, "Derisk Loan Payment"));
-        customers.getDataById(srcAcc.getId()).addNotification(new BankNotification("Derisk Loan Payment",timeHandler.getCurrentTime()));
+        customers.getDataById(srcAcc.getId()).addNotification(new BankNotification("Payment of " + amount + " for loan '" + loan.getId() + "'",timeHandler.getCurrentTime()));
         //int missingCycles = (loan.getCurrentPayment() - loan.getFullPaidCycles());
         int cyclesToPay = amount / loan.getPayment();
         for(int i = 0; i < cyclesToPay; i++)
@@ -77,7 +77,7 @@ public class BankLoanHandler implements LoanHandler {
         // int cycles = (timeHandler.getCurrentTime() - loan.getStartedYaz()) / loan.getCyclesPerPayment();
 
         for(Investment investment : investments) {
-            for(int i = investment.getPaymentsReceived(); i < cyclesToPay; i++) {
+            for(int i = 0; i < cyclesToPay; i++) {
                 investmentPayment(investment);
             }
         }
@@ -160,7 +160,7 @@ public class BankLoanHandler implements LoanHandler {
 
     private void investmentPayment(Investment investment) throws DataNotFoundException, NonPositiveAmountException {
         Account investor = customers.getDataById(investment.getInvestorId());
-        transactions.addData(investor.deposit(investment.getPayment(), "Loan Cycle"));
+        transactions.addData(investor.deposit(investment.getPayment(), "Loan Payment Cycle of '" + investment.getLoanId() + "'"));
         investment.payment();
     }
 
