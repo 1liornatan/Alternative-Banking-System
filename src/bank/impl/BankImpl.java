@@ -291,6 +291,11 @@ public class BankImpl implements Bank {
         loanHandler.oneCycle();
     }
 
+    public void advanceCycle(String loanId) throws DataNotFoundException, NonPositiveAmountException {
+        Loan loan = loans.getDataById(loanId);
+        loanHandler.payOneCycle(loan);
+    }
+
     @Override
     public int getCurrentYaz() {
         return timeHandler.getCurrentTime();

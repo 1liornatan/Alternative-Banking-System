@@ -124,6 +124,10 @@ public class BankLoanHandler implements LoanHandler {
 
     }
 
+    public void payOneCycle(Loan loan) throws DataNotFoundException, NonPositiveAmountException {
+            makePayment(loan);
+        }
+
     private void makePayment(Loan loan) throws DataNotFoundException, NonPositiveAmountException {
         CustomerAccount srcAcc = customers.getDataById(loan.getOwnerId());
         int payment = loan.getPayment();

@@ -425,7 +425,7 @@ public class CustomerController {
     void payCycleButtonAction(ActionEvent event) {
         LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
         try {
-            bankInstance.advanceOneCycle();
+            bankInstance.advanceCycle(selectedLoan.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }
