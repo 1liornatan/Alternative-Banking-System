@@ -72,6 +72,7 @@ public class CustomerController {
     private IntegerProperty paymentsAmountProperty;
     private LoanModel selectedDebtLoan;
 
+
     @FXML
     private TextField balanceField;
 
@@ -336,12 +337,12 @@ public class CustomerController {
 
     @FXML
     void withdrawButtonAction(ActionEvent event) {
-
+        createWithdraw(Integer.valueOf(infAmountField.getText()));
     }
 
     @FXML
     void chargeButtonAction(ActionEvent event) {
-
+        createDeposit(Integer.valueOf(infAmountField.getText()));
     }
 
     @FXML
