@@ -22,6 +22,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
@@ -30,10 +33,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import manager.investments.InvestmentData;
-import manager.investments.InvestmentsData;
-import manager.investments.InvestmentsSellData;
-import manager.investments.RequestDTO;
+import manager.investments.*;
 import manager.loans.LoanData;
 import manager.loans.LoansData;
 import manager.messages.NotificationData;
@@ -189,6 +189,9 @@ public class CustomerController {
     @FXML
     private Label sellErrorLabel;
     private IntegerProperty debtAmountProperty;
+
+    @FXML
+    private LineChart<String, Number> timeLineChart;
 
     @FXML
     void buyInvestmentButtonAction(ActionEvent event) {
@@ -531,7 +534,6 @@ public class CustomerController {
         tablesRightButton.setDisable(true);
         setLoansIntegrationButtons();
         debtPaymentHBox.setDisable(true);
-
         /*loansChosenTable.minWidthProperty().bind(loansFoundTable.widthProperty());*/
     }
 
@@ -671,6 +673,7 @@ public class CustomerController {
         updateTransactions();
         updateNotifications();
         updateOwnedInvestments();
+        updateTimeChart();
     }
 
     private void updateLoansExpander() {
@@ -984,6 +987,32 @@ public class CustomerController {
 
     private ObservableList<InvestmentModel> getSellInvestments() {
         return FXCollections.observableArrayList(sellInvestmentModels);
+    }
+
+    private void updateTimeChart() {
+        int i = 0;
+        try {
+            PaymentsData data = bankInstance.getPaymentsData(customerId.get());
+
+            XYChart.Series series = new XYChart.Series();
+            series.setName("Incoming Payments");
+            //populating the series with data
+
+            List<Integer> payments = data.getPayments();
+            List<Integer> amounts = data.getAmount();
+
+            int yaz = payments.size();
+
+            for(i = 0; i < yaz; i++) {
+                series.getData().add(new XYChart.Data(String.valueOf(i), amounts.get(i)));
+            }
+
+            timeLineChart.getData().clear();
+            timeLineChart.getData().add(series);
+        } catch (DataNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
 }

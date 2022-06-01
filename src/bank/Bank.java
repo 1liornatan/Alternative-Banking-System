@@ -14,6 +14,7 @@ import files.xmls.exceptions.*;
 import manager.customers.*;
 import manager.investments.InvestDTO;
 import manager.investments.InvestmentsSellData;
+import manager.investments.PaymentsData;
 import manager.investments.RequestDTO;
 import manager.loans.LoanDTO;
 import manager.categories.CategoriesDTO;
@@ -118,4 +119,6 @@ public interface Bank {
     void deriskLoanByAmount(String id, int amount);
 
     void closeLoan(String id);
+
+    PaymentsData getPaymentsData(String customerId) throws DataNotFoundException;
 }

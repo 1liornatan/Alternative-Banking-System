@@ -28,10 +28,7 @@ import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.accounts.AccountDTO;
 import manager.customers.*;
-import manager.investments.InvestmentData;
-import manager.investments.InvestmentsData;
-import manager.investments.InvestmentsSellData;
-import manager.investments.RequestDTO;
+import manager.investments.*;
 import manager.loans.LoanDTO;
 import manager.loans.LoanData;
 import manager.loans.LoansDTO;
@@ -834,5 +831,36 @@ public class BankImpl implements Bank {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    @Override
+    public PaymentsData getPaymentsData(String customerId) throws DataNotFoundException {
+        List<Integer> payments = new ArrayList<>();
+        List<Integer> amounts = new ArrayList<>();
+
+        int currentYaz = getCurrentYaz();
+        for (int i = 0; i < currentYaz; i++) {
+            payments.add(0);
+            amounts.add(0);
+        }
+
+        CustomerAccount customer = customersAccounts.getDataById(customerId);
+        customer.getTransactions().stream()
+                .filter(transaction -> {
+                    return transaction.getDescription().contains("Loan Payment");
+                })
+                .filter(transaction -> {
+                    return transaction.getAmount() > 0;
+                })
+                .forEach(transaction -> {
+                    try {
+                        Integer yazIndex = transactions.getDataPair(transaction.getId()).getValue() - 1;
+                        payments.set(yazIndex, payments.get(yazIndex) + 1);
+                        amounts.set(yazIndex, amounts.get(yazIndex) + transaction.getAmount());
+                    } catch (DataNotFoundException e) {
+                        System.out.println(e.getMessage());
+                    }
+                });
+        return new PaymentsData.PaymentsDataBuilder().payments(payments).amount(amounts).build();
     }
 }
