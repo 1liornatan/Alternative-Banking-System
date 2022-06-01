@@ -1,5 +1,6 @@
 package screens.main;
 
+import bank.accounts.impl.Customer;
 import bank.impl.BankImpl;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -75,6 +76,15 @@ public class MainPageController {
         mainScreen.applyCss();
     }
 
+    @FXML
+    void animationOffAction(ActionEvent event) {
+        customerController.animationOff();
+    }
+
+    @FXML
+    void animationOnAction(ActionEvent event) {
+        customerController.animationOn();
+    }
     public MainPageController() throws IOException {
         isAdminScreen = new SimpleBooleanProperty();
         isFileSelected = new SimpleBooleanProperty();

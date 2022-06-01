@@ -25,6 +25,12 @@
                         <MenuItem mnemonicParsing="false" onAction="#styleDiscountAction" text="Discount" />
                   </items>
                 </Menu>
+                  <Menu mnemonicParsing="false" text="Animation">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#animationOnAction" text="Play" />
+                        <MenuItem mnemonicParsing="false" onAction="#animationOffAction" text="Stop" />
+                    </items>
+                  </Menu>
               </menus>
             </MenuBar>
             <AnchorPane prefHeight="51.0" prefWidth="600.0">
