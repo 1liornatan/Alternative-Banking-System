@@ -137,5 +137,5 @@
 }
 
 .progress-bar {
-    -fx-text-fill: transparent;
+    -fx-accent: #238db7;
 }

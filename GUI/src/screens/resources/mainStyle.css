@@ -28,13 +28,16 @@
     -fx-rotate: 180;
 }
 
+#loansChosenLabel,
 #loansFoundLabel {
-    -fx-font-size: 14;
+    -fx-font-size: 16;
+    -fx-text-fill: #50a0c0;
     -fx-font-weight: BOLD;
 }
 
-#loansChosenLabel {
-    -fx-font-size: 14;
-    -fx-font-weight: BOLD;
+#increaseYazButton,
+#loadFileButton {
+    -fx-background-color: #50a0c0;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 16;
 }
-

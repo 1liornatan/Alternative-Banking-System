@@ -14,14 +14,14 @@
 }
 
 #tablesRightButton {
-    -fx-background-image: url('/screens/resources/icons/rightArrow.png');
+    -fx-background-image: url('/screens/resources/discount/rightArrow.png');
     -fx-background-size: 32px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: 100%;
 }
 
 #tablesLeftButton {
-    -fx-background-image: url('/screens/resources/icons/rightArrow.png');
+    -fx-background-image: url('/screens/resources/discount/rightArrow.png');
     -fx-background-size: 32px;
     -fx-background-repeat: no-repeat;
     -fx-background-position: 100%;
@@ -38,3 +38,110 @@
     -fx-font-weight: BOLD;
 }
 
+.button {
+    -fx-background-color: #129a13;
+    -fx-text-fill: WHITE;
+}
+
+.text-field {
+    -fx-text-fill: #129a13;
+}
+
+.table-view {
+    -fx-text-fill: WHITE;
+    -fx-background-image: url('/screens/resources/discount/background.jpg');
+    -fx-background-size: 600px;
+}
+.table-row-cell {
+    -fx-background-color: transparent;
+}
+.table-cell {
+    -fx-text-fill: WHITE;
+}
+.label {
+    -fx-background-color: WHITE;
+    -fx-text-fill: #129a13;
+}
+
+.anchor-pane {
+    -fx-background-color: WHITE;
+}
+
+.tab .tab-label {
+    -fx-text-fill: #129a13;
+    -fx-background-color: WHITE;
+}
+
+.tab {
+    -fx-background-color: WHITE;
+}
+
+.combo-box {
+    -fx-background-color: #129a13;
+    -fx-text-fill: WHITE;
+}
+
+
+.scroll-bar:horizontal .track,
+.scroll-bar:vertical .track{
+    -fx-background-color :transparent;
+    -fx-border-color :transparent;
+    -fx-background-radius : 0.0em;
+    -fx-border-radius :2.0em;
+}
+
+
+.scroll-bar:horizontal .increment-button ,
+.scroll-bar:horizontal .decrement-button {
+    -fx-background-color :transparent;
+    -fx-background-radius : 0.0em;
+    -fx-padding :0.0 0.0 10.0 0.0;
+
+}
+
+.scroll-bar:vertical .increment-button ,
+.scroll-bar:vertical .decrement-button {
+    -fx-background-color :transparent;
+    -fx-background-radius : 0.0em;
+    -fx-padding :0.0 10.0 0.0 0.0;
+
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow{
+    -fx-shape : " ";
+    -fx-padding :0.15em 0.0;
+}
+
+.scroll-bar:vertical .increment-arrow,
+.scroll-bar:vertical .decrement-arrow{
+    -fx-shape : " ";
+    -fx-padding :0.0 0.15em;
+}
+
+.scroll-bar:horizontal .thumb,
+.scroll-bar:vertical .thumb {
+    -fx-background-color :derive(#129a13,90.0%);
+    -fx-background-insets : 2.0, 0.0, 0.0;
+    -fx-background-radius : 2.0em;
+}
+
+.scroll-bar:horizontal .thumb:hover,
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color :derive(#17790b,10.0%);
+    -fx-background-insets : 2.0, 0.0, 0.0;
+    -fx-background-radius : 2.0em;
+}
+
+.table-view .button {
+    -fx-background-image: url('/screens/resources/discount/plusSign.jpg');
+    -fx-background-size: 16px;
+    -fx-background-repeat: no-repeat;
+    -fx-text-fill: transparent;
+    -fx-background-color: transparent;
+}
+
+
+.progress-bar {
+    -fx-accent: rgba(52, 159, 26, 0.85);
+}

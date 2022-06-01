@@ -22,10 +22,10 @@ public class TradeTable {
         TableColumn<InvestmentModel, Integer> yazColumn = new TableColumn<>("Yaz Placed");
         yazColumn.setCellValueFactory(new PropertyValueFactory<>("yazMade"));
 
-        loanNameColumn.minWidthProperty().bind(dataTable.widthProperty().multiply(0.4));
-        ownerNameColumn.minWidthProperty().bind(dataTable.widthProperty().multiply(0.2));
-        amountColumn.minWidthProperty().bind(dataTable.widthProperty().multiply(0.2));
-        yazColumn.minWidthProperty().bind(dataTable.widthProperty().multiply(0.2));
+        loanNameColumn.prefWidthProperty().bind(dataTable.widthProperty().multiply(0.4));
+        ownerNameColumn.prefWidthProperty().bind(dataTable.widthProperty().multiply(0.2));
+        amountColumn.prefWidthProperty().bind(dataTable.widthProperty().multiply(0.2));
+        yazColumn.prefWidthProperty().bind(dataTable.widthProperty().multiply(0.2));
 
         amountColumn.setStyle("-fx-alignment: CENTER;");
         yazColumn.setStyle("-fx-alignment: CENTER;");

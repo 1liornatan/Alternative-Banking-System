@@ -326,6 +326,7 @@ public class AdminController {
     private void setDataTables() {
         TableRowExpanderColumn<CustomerModel> customerExpanderColumn = new TableRowExpanderColumn<>(this::createCustomerExpander);
         customerExpanderColumn.setText("Loans");
+        customerExpanderColumn.setStyle("-fx-alignment: TOP_CENTER;");
 
         TableColumn<CustomerModel, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -378,6 +379,11 @@ public class AdminController {
         loansButton.disableProperty().bind(isFileSelected.not());
         transactionsButton.disableProperty().bind(isFileSelected.not());
         customersButton.disableProperty().bind(isFileSelected.not());
+        increaseYazButton.setText("Increase\nYaz");
+        increaseYazButton.setStyle("-fx-text-alignment: CENTER;");
+        loadFileButton.setText("Load\nFile");
+        loadFileButton.setStyle("-fx-text-alignment: CENTER;");
+
 
     }
 

@@ -652,8 +652,8 @@ public class CustomerController {
         isListed.setStyle("-fx-alignment: CENTER;");
 
         sellInvestmentTable.getColumns().add(isListed);
-        sellInvestmentTable.getColumns().get(3).minWidthProperty().bind(sellInvestmentTable.widthProperty().multiply(0.1));
-        isListed.minWidthProperty().bind(sellInvestmentTable.widthProperty().multiply(0.1));
+        sellInvestmentTable.getColumns().get(3).prefWidthProperty().bind(sellInvestmentTable.widthProperty().multiply(0.1));
+        isListed.prefWidthProperty().bind(sellInvestmentTable.widthProperty().multiply(0.1));
 
         setNotificationsTable();
         setTransactionsTable();
