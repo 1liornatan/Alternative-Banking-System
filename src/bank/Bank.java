@@ -118,7 +118,7 @@ public interface Bank {
 
     void deriskLoanByAmount(String id, int amount);
 
-    void closeLoan(String id);
+    void closeLoan(String id) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
 
     PaymentsData getPaymentsData(String customerId) throws DataNotFoundException;
 }

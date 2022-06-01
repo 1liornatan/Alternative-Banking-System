@@ -68,12 +68,19 @@
                                     <VBox alignment="CENTER" spacing="10.0">
                                        <children>
                                           <TableView fx:id="transactionsTable" />
+                                          <VBox alignment="CENTER">
+                                             <children>
+                                                <Label text="Amount" />
+                                                <TextField fx:id="infAmountField" maxWidth="100.0" />
+                                             </children>
+                                          </VBox>
                                           <HBox alignment="CENTER" spacing="30.0">
                                              <children>
-                                                <Button fx:id="chargeButton" minWidth="80.0" mnemonicParsing="false" text="Charge" />
-                                                <Button fx:id="withdrawButton" minWidth="80.0" mnemonicParsing="false" prefHeight="25.0" text="Withdraw" />
+                                                <Button fx:id="chargeButton" minWidth="80.0" mnemonicParsing="false" onAction="#chargeButtonAction" text="Charge" />
+                                                <Button fx:id="withdrawButton" minWidth="80.0" mnemonicParsing="false" onAction="#withdrawButtonAction" prefHeight="25.0" text="Withdraw" />
                                              </children>
                                           </HBox>
+                                          <Label fx:id="infErrorLabel" />
                                        </children>
                                     </VBox>
                                  </items>

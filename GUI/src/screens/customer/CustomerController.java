@@ -420,19 +420,56 @@ public class CustomerController {
     @FXML
     void closeLoanButtonAction(ActionEvent event) {
         LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
-        bankInstance.closeLoan(selectedLoan.getId());
-        updateData();
+        if (selectedLoan == null) {
+            paymentErrorLabel.setText("You must select a loan first!");
+            paymentErrorLabel.setTextFill(Color.RED);
+        }
+        else {
+            Thread closeLoanThread = new Thread(() -> {
+                try {
+                    bankInstance.closeLoan(selectedLoan.getId());
+                    Platform.runLater(() -> {
+                        updateData();
+                        paymentErrorLabel.setText("Successfully Closed Loan!");
+                        paymentErrorLabel.setTextFill(Color.GREEN);
+                    });
+                } catch (DataNotFoundException | NoMoneyException | NonPositiveAmountException e) {
+                    Platform.runLater(() -> {
+                        paymentErrorLabel.setText(e.getMessage());
+                        paymentErrorLabel.setTextFill(Color.RED);
+                    });
+                }
+            });
+            closeLoanThread.start();
+        }
     }
 
     @FXML
     void payCycleButtonAction(ActionEvent event) {
         LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
-        try {
-            bankInstance.advanceCycle(selectedLoan.getId());
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (selectedLoan == null) {
+            paymentErrorLabel.setText("You must select a loan first!");
+            paymentErrorLabel.setTextFill(Color.RED);
         }
-        updateData();
+        else {
+            Thread payCycleThread = new Thread(() -> {
+                try {
+                    bankInstance.advanceCycle(selectedLoan.getId());
+                    Platform.runLater(() -> {
+                        updateData();
+                        paymentErrorLabel.setText("Successfully paid " + selectedLoan.getPaymentAmount());
+                        paymentErrorLabel.setTextFill(Color.GREEN);
+                    });
+                } catch (Exception e) {
+                    Platform.runLater(() -> {
+                        paymentErrorLabel.setText(e.getMessage());
+                        paymentErrorLabel.setTextFill(Color.RED);
+                    });
+                }
+
+                });
+            payCycleThread.start();
+        }
     }
 
     @FXML
@@ -452,13 +489,19 @@ public class CustomerController {
     @FXML
     void submitDebtButtonAction(ActionEvent event) {
         debtAmountProperty.set(Integer.valueOf(debtAmountField.getText()));
-        try {
-            bankInstance.deriskLoanByAmount(selectedDebtLoan.getId(), debtAmountProperty.get());
-        } catch (Exception e) {
-            paymentErrorLabel.setText(e.getMessage());
-            paymentErrorLabel.setTextFill(Color.RED);
-        }
-        updateData();
+        Thread debtThread = new Thread(() -> {
+            try {
+                bankInstance.deriskLoanByAmount(selectedDebtLoan.getId(), debtAmountProperty.get());
+                Platform.runLater(() -> {
+                    updateData();
+                    paymentErrorLabel.setText("Successfully paid " + debtAmountProperty.get());
+                    paymentErrorLabel.setTextFill(Color.GREEN);
+                });
+            } catch (Exception e) {
+                paymentErrorLabel.setText(e.getMessage());
+                paymentErrorLabel.setTextFill(Color.RED);
+            }
+        });
     }
 
     @FXML

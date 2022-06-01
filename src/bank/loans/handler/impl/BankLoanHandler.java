@@ -56,8 +56,8 @@ public class BankLoanHandler implements LoanHandler {
     public void addInvestment(Loan loan, Investment investment, CustomerAccount srcAcc) throws NonPositiveAmountException, NoMoneyException, DataNotFoundException {
         int amount = investment.getBaseAmount();
         loan.addInvestment(investment);
-        transactions.addData(loan.getLoanAccount().deposit(amount, "Loan"));
-        transactions.addData(srcAcc.withdraw(amount, "Loan"));
+        transactions.addData(loan.getLoanAccount().deposit(amount, "Loan of " + amount + "for '" + loan.getId() + "' received"));
+        transactions.addData(srcAcc.withdraw(amount, "Investment in '" + loan.getId()));
         srcAcc.addInvestedLoan(loan);
 
         checkLoanStatus(loan);
@@ -100,7 +100,7 @@ public class BankLoanHandler implements LoanHandler {
         if(loanAmount == loan.getLoanAccount().getBalance()) {
             requester = customers.getDataById(loan.getOwnerId());
             transactions.addData(loanAccount.withdraw(loanAmount, "Loan started"));
-            transactions.addData(requester.deposit(loanAmount, "Loan started"));
+            transactions.addData(requester.deposit(loanAmount, "Loan '" + loan.getId() + "' started"));
             loan.setPayments();
             loan.setStatus(LoanStatus.ACTIVE);
             loan.setStartedYaz(timeHandler.getCurrentTime());
@@ -132,15 +132,17 @@ public class BankLoanHandler implements LoanHandler {
         CustomerAccount srcAcc = customers.getDataById(loan.getOwnerId());
         int payment = loan.getPayment();
         try {
-            transactions.addData(srcAcc.withdraw(payment, "Loan Cycle"));
-            srcAcc.addNotification(new BankNotification("Loan Cycle", timeHandler.getCurrentTime()));
+            int currYaz = timeHandler.getCurrentTime();
+            transactions.addData(srcAcc.withdraw(payment, "Loan '" + loan.getId() + "' Payment of " + payment));
+            srcAcc.addNotification(new BankNotification("Loan '" + loan.getId() + "' Payment of " + payment, currYaz));
             loan.fullPaymentCycle();
             Collection<Investment> investments = loan.getInvestments();
             boolean isFinished = true;
 
             for(Investment investment : investments) {
                 Account investor = customers.getDataById(investment.getInvestorId());
-                transactions.addData(investor.deposit(investment.getPayment(), "Loan Cycle"));
+                int payment1 = investment.getPayment();
+                transactions.addData(investor.deposit(payment1, "Received " + payment1 + " from '" + loan.getId() + "'"));
                 investment.payment();
                 if(!investment.isFullyPaid())
                     isFinished = false;
@@ -152,13 +154,11 @@ public class BankLoanHandler implements LoanHandler {
             }
 
         } catch (NonPositiveAmountException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         } catch (NoMoneyException e) {
             loan.setStatus(LoanStatus.RISKED);
             addRiskedNotification(loan);
             partiallyPayment(loan);
-        } finally {
-            loan.nextPayment();
         }
     }
 
@@ -199,8 +199,7 @@ public class BankLoanHandler implements LoanHandler {
         int amount = loan.getDeriskAmount();
         Account srcAcc = customers.getDataById(loan.getOwnerId());
 
-        transactions.addData(srcAcc.withdraw(amount, "Derisk Loan"));
-        customers.getDataById(srcAcc.getId()).addNotification(new BankNotification("Derisk Loan",timeHandler.getCurrentTime()));
+        transactions.addData(srcAcc.withdraw(amount, "Debt payment for '" + loan.getId() + "'"));
         int missingCycles = (loan.getCurrentPayment() - loan.getFullPaidCycles());
 
         for(int i = 0; i < missingCycles; i++)

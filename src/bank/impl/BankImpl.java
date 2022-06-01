@@ -109,7 +109,7 @@ public class BankImpl implements Bank {
         CustomerAccount account = customersAccounts.getDataById(customerId);
         List<Investment> investments = new ArrayList<>();
 
-        account.getLoansInvested().stream().forEach(loan -> {
+        account.getLoansInvested().stream().filter(loan -> loan.getStatus() == LoanStatus.ACTIVE).forEach(loan -> {
             loan.getInvestments().stream().filter(investment -> investment.getInvestorId().equals(customerId)).forEach(investment -> {
                 investments.add(investment);
             });
@@ -361,7 +361,7 @@ public class BankImpl implements Bank {
             Investment investment = invPair.getKey();
             String investorId = investment.getInvestorId();
 
-            if(investorId.equals(requesterId)) // filter all owned investments
+            if(investorId.equals(requesterId) || investment.isFullyPaid()) // filter all owned investments or finished
                 continue;
 
             investors.add(investorId);
@@ -840,14 +840,12 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public void closeLoan(String id) {
-        try {
-            Loan loan = loans.getDataById(id);
-            int amountToCloseLoan = loan.getAmountToCloseLoan();
-            loanHandler.payLoanByAmount(loan, amountToCloseLoan);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+    public void closeLoan(String id) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
+        Loan loan = loans.getDataById(id);
+        int amountToCloseLoan = loan.getAmountToCloseLoan();
+        loanHandler.payLoanByAmount(loan, amountToCloseLoan);
+        CustomerAccount customer = customersAccounts.getDataById(loan.getOwnerId());
+        customer.addNotification(new BankNotification("Closed '" + loan.getId() + "' for " + amountToCloseLoan, getCurrentYaz()));
     }
 
     @Override
@@ -879,6 +877,71 @@ public class BankImpl implements Bank {
                         System.out.println(e.getMessage());
                     }
                 });
+        return new PaymentsData.PaymentsDataBuilder().payments(payments).amount(amounts).build();
+    }
+
+    public PaymentsData getAllTransactionsData() {
+        List<Integer> payments = new ArrayList<>();
+        List<Integer> amounts = new ArrayList<>();
+
+        int time = getCurrentYaz();
+        for(int i = 0; i <= time; i++) {
+            payments.add(0);
+            amounts.add(0);
+        }
+
+        transactions.getAllPairs().stream()
+                .forEach(pair -> {
+                    int yazIndex = pair.getValue();
+                    int amount = Math.abs(pair.getKey().getAmount());
+                    amounts.set(yazIndex, amounts.get(yazIndex) + amount);
+                    payments.set(yazIndex, payments.get(yazIndex) + 1);
+                });
+
+        amounts.stream().forEach(number -> number = number / 2);
+
+        return new PaymentsData.PaymentsDataBuilder().payments(payments).amount(amounts).build();
+    }
+
+    public PaymentsData getAllLoansData() {
+        List<Integer> payments = new ArrayList<>();
+        List<Integer> amounts = new ArrayList<>();
+
+        int time = getCurrentYaz();
+        for(int i = 0; i <= time; i++) {
+            payments.add(0);
+            amounts.add(0);
+        }
+
+        loans.getAllPairs().stream()
+                .forEach(pair -> {
+                    int yazIndex = pair.getValue();
+                    int amount = Math.abs(pair.getKey().getBaseAmount());
+                    amounts.set(yazIndex, amounts.get(yazIndex) + amount);
+                    payments.set(yazIndex, payments.get(yazIndex) + 1);
+                });
+
+        return new PaymentsData.PaymentsDataBuilder().payments(payments).amount(amounts).build();
+    }
+
+    public PaymentsData getAllCustomersData() {
+        List<Integer> payments = new ArrayList<>();
+        List<Integer> amounts = new ArrayList<>();
+
+        int time = getCurrentYaz();
+        for(int i = 0; i <= time; i++) {
+            payments.add(0);
+            amounts.add(0);
+        }
+
+        customersAccounts.getAllPairs().stream()
+                .forEach(pair -> {
+                    int yazIndex = pair.getValue();
+                    int amount = Math.abs(pair.getKey().getBalance());
+                    amounts.set(yazIndex, amounts.get(yazIndex) + amount);
+                    payments.set(yazIndex, payments.get(yazIndex) + 1);
+                });
+
         return new PaymentsData.PaymentsDataBuilder().payments(payments).amount(amounts).build();
     }
 }

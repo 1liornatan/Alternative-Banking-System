@@ -1,6 +1,5 @@
 package screens.admin;
 
-import bank.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import files.xmls.exceptions.*;
@@ -11,15 +10,15 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import manager.customers.CustomerData;
+import manager.investments.PaymentsData;
 import manager.loans.LoanData;
 import models.CustomerModel;
 import models.LoanModel;
@@ -27,7 +26,7 @@ import models.LoanStatusModel;
 import models.utils.LoanTable;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import screens.customer.CustomerController;
-import screens.utils.GUIUtils;
+import screens.utils.HoveredThresholdNode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -52,10 +51,142 @@ public class AdminController {
     private Button loadFileButton;
 
     @FXML
+    private Button customersButton;
+
+    @FXML
+    private Button loansButton;
+
+    @FXML
+    private Button transactionsButton;
+
+    @FXML
     private TableView<LoanModel> adminLoansTable;
 
     @FXML
     private TableView<CustomerModel> adminsCustomersTable;
+
+    @FXML
+    private LineChart<String, Integer> timeLineChart;
+
+    @FXML
+    void customersButtonAction(ActionEvent event) {
+        PaymentsData data = bankInstance.getAllCustomersData();
+
+        int i = 0;
+        XYChart.Series series = new XYChart.Series();
+        XYChart.Series forecasting = new XYChart.Series();
+        XYChart.Series seriesA = new XYChart.Series();
+        XYChart.Series forecastingA = new XYChart.Series();
+        seriesA.setName("Balance in ABS");
+        forecasting.setName("Forecasting balance");
+        series.setName("Customers in ABS");
+        forecasting.setName("Forecasting customers");
+        //populating the series with data
+
+        List<Integer> payments = data.getPayments();
+        List<Integer> amounts = data.getAmount();
+
+        int yaz = payments.size();
+        int sum = 0;
+        int sumBalance = 0;
+
+        for(i = 0; i < yaz; i++) {
+            sum += payments.get(i);
+            sumBalance += amounts.get(i);
+            series.getData().add(new XYChart.Data(String.valueOf(i+1), payments.get(i)));
+            seriesA.getData().add(new XYChart.Data(String.valueOf(i+1), amounts.get(i)));
+        }
+
+        int avg = sum / (i+1);
+        int avgBalance = sumBalance / (i+1);
+        for(int j = 0; j < i + 5; j++) {
+            forecasting.getData().add(new XYChart.Data(String.valueOf(j+1), avg*j));
+            forecastingA.getData().add(new XYChart.Data(String.valueOf(j+1), avg*(i+1)));
+        }
+
+        timeLineChart.getData().clear();
+        timeLineChart.getData().addAll(series, forecasting/*, seriesA, forecastingA*/);
+    }
+
+    @FXML
+    void transactionsButtonAction(ActionEvent event) {
+        PaymentsData data = bankInstance.getAllTransactionsData();
+
+        int i = 0;
+        XYChart.Series series = new XYChart.Series();
+        XYChart.Series forecasting = new XYChart.Series();
+        XYChart.Series seriesA = new XYChart.Series();
+        XYChart.Series forecastingA = new XYChart.Series();
+        seriesA.setName("Transactions Amount");
+        forecasting.setName("Forecasting #Transactions");
+        series.setName("#Transactions");
+        forecasting.setName("Forecasting Amount");
+        //populating the series with data
+
+        List<Integer> payments = data.getPayments();
+        List<Integer> amounts = data.getAmount();
+
+        int yaz = payments.size();
+        int sum = 0;
+        int sumBalance = 0;
+
+        for(i = 0; i < yaz; i++) {
+            sum += payments.get(i);
+            sumBalance += amounts.get(i);
+            series.getData().add(new XYChart.Data(String.valueOf(i+1), payments.get(i)));
+            seriesA.getData().add(new XYChart.Data(String.valueOf(i+1), amounts.get(i)));
+        }
+
+        int avg = sum / (i+1);
+        int avgBalance = sumBalance / (i+1);
+        for(int j = 0; j < i + 5; j++) {
+            forecasting.getData().add(new XYChart.Data(String.valueOf(j+1), avg*j));
+            forecastingA.getData().add(new XYChart.Data(String.valueOf(j+1), avg*(i+1)));
+        }
+
+        timeLineChart.getData().clear();
+        timeLineChart.getData().addAll(series, forecasting/*, seriesA, forecastingA*/);
+    }
+
+    @FXML
+    void loansButtonAction(ActionEvent event) {
+        PaymentsData data = bankInstance.getAllLoansData();
+
+        int i = 0;
+        XYChart.Series series = new XYChart.Series();
+        XYChart.Series forecasting = new XYChart.Series();
+        XYChart.Series seriesA = new XYChart.Series();
+        XYChart.Series forecastingA = new XYChart.Series();
+        seriesA.setName("Loans Amount");
+        forecasting.setName("Forecasting Amount");
+        series.setName("#Loans");
+        forecasting.setName("Forecasting #Loans");
+        //populating the series with data
+
+        List<Integer> payments = data.getPayments();
+        List<Integer> amounts = data.getAmount();
+
+        int yaz = payments.size();
+        int sum = 0;
+        int sumBalance = 0;
+
+        for(i = 0; i < yaz; i++) {
+            sum += payments.get(i);
+            sumBalance += amounts.get(i);
+            series.getData().add(new XYChart.Data(String.valueOf(i+1), payments.get(i)));
+            seriesA.getData().add(new XYChart.Data(String.valueOf(i+1), amounts.get(i)));
+        }
+
+        int avg = sum / (i+1);
+        int avgBalance = sumBalance / (i+1);
+        for(int j = 0; j < i + 5; j++) {
+            forecasting.getData().add(new XYChart.Data(String.valueOf(j+1), avg*j));
+            forecastingA.getData().add(new XYChart.Data(String.valueOf(j+1), avg*(i+1)));
+        }
+
+        timeLineChart.getData().clear();
+        timeLineChart.getData().addAll(series, forecasting/*, seriesA, forecastingA*/);
+    }
 
     @FXML
     void increaseYazButtonAction(ActionEvent event) {
@@ -244,6 +375,10 @@ public class AdminController {
         increaseYazButton.disableProperty().bind(isFileSelected.not());
         adminsCustomersTable.disableProperty().bind(isFileSelected.not());
         adminLoansTable.disableProperty().bind(isFileSelected.not());
+        loansButton.disableProperty().bind(isFileSelected.not());
+        transactionsButton.disableProperty().bind(isFileSelected.not());
+        customersButton.disableProperty().bind(isFileSelected.not());
+
     }
 
     public void updateCustomersData() {
@@ -289,5 +424,26 @@ public class AdminController {
     public void setBankInstance(BankImpl bankInstance) {
         this.bankInstance = bankInstance;
     }
+
+/*
+    public ObservableList<XYChart.Data<Integer, Integer>> plot(int... y) {
+        final ObservableList<XYChart.Data<Integer, Integer>> dataset = FXCollections.observableArrayList();
+        int i = 0;
+        while (i < y.length) {
+            final XYChart.Data<Integer, Integer> data = new XYChart.Data<>(i + 1, y[i]);
+            data.setNode(
+                    new HoveredThresholdNode(
+                            (i == 0) ? 0 : y[i-1],
+                            y[i]
+                    )
+            );
+
+            dataset.add(data);
+            i++;
+        }
+
+        return dataset;
+    }
+*/
 
 }
