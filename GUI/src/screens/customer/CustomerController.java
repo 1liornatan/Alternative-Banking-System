@@ -340,12 +340,34 @@ public class CustomerController {
 
     @FXML
     void withdrawButtonAction(ActionEvent event) {
-        createWithdraw(Integer.valueOf(infAmountField.getText()));
+        int amount = Integer.valueOf(infAmountField.getText());
+        if(amount == 0) {
+            infErrorLabel.setText("Amount must be higher than 0! ");
+            infErrorLabel.setTextFill(Color.RED);
+        }
+        else {
+            createWithdraw(amount);
+            infAmountField.setText("0");
+            updateData();
+            infErrorLabel.setText("Successfully Withdrew " + amount);
+            infErrorLabel.setTextFill(Color.GREEN);
+        }
     }
 
     @FXML
     void chargeButtonAction(ActionEvent event) {
-        createDeposit(Integer.valueOf(infAmountField.getText()));
+        int amount = Integer.valueOf(infAmountField.getText());
+        if(amount == 0) {
+            infErrorLabel.setText("Amount must be higher than 0! ");
+            infErrorLabel.setTextFill(Color.RED);
+        }
+        else {
+            createDeposit(amount);
+            infAmountField.setText("0");
+            updateData();
+            infErrorLabel.setText("Successfully Deposited " + amount);
+            infErrorLabel.setTextFill(Color.GREEN);
+        }
     }
 
     @FXML

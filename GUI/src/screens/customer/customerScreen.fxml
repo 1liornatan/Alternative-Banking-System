@@ -76,7 +76,7 @@
                                           </VBox>
                                           <HBox alignment="CENTER" spacing="30.0">
                                              <children>
-                                                <Button fx:id="chargeButton" minWidth="80.0" mnemonicParsing="false" onAction="#chargeButtonAction" text="Charge" />
+                                                <Button fx:id="chargeButton" minWidth="80.0" mnemonicParsing="false" onAction="#chargeButtonAction" text="Deposit" />
                                                 <Button fx:id="withdrawButton" minWidth="80.0" mnemonicParsing="false" onAction="#withdrawButtonAction" prefHeight="25.0" text="Withdraw" />
                                              </children>
                                           </HBox>
