@@ -859,7 +859,8 @@ public class BankImpl implements Bank {
         CustomerAccount customer = customersAccounts.getDataById(customerId);
         customer.getTransactions().stream()
                 .filter(transaction -> {
-                    return transaction.getDescription().contains("Loan Payment");
+                    String description = transaction.getDescription().toLowerCase();
+                    return description.contains("loan") && description.contains("payment");
                 })
                 .filter(transaction -> {
                     return transaction.getAmount() > 0;

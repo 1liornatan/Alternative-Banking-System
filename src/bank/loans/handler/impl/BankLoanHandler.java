@@ -1,5 +1,6 @@
 package bank.loans.handler.impl;
 
+import bank.Bank;
 import bank.accounts.Account;
 import bank.accounts.CustomerAccount;
 import bank.accounts.impl.exceptions.NoMoneyException;
@@ -64,9 +65,9 @@ public class BankLoanHandler implements LoanHandler {
 
     @Override
     public void payLoanByAmount(Loan loan, int amount) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
-        Account srcAcc = customers.getDataById(loan.getOwnerId());
+        CustomerAccount srcAcc = customers.getDataById(loan.getOwnerId());
 
-        transactions.addData(srcAcc.withdraw(amount, "Derisk Loan Payment"));
+        transactions.addData(srcAcc.withdraw(amount, "Loan '" + loan.getId() + "' Debt Payment"));
         customers.getDataById(srcAcc.getId()).addNotification(new BankNotification("Payment of " + amount + " for loan '" + loan.getId() + "'",timeHandler.getCurrentTime()));
         //int missingCycles = (loan.getCurrentPayment() - loan.getFullPaidCycles());
         int cyclesToPay = amount / loan.getPayment();
@@ -84,6 +85,8 @@ public class BankLoanHandler implements LoanHandler {
 
         if(loan.getAmountToCloseLoan() == 0) {
             loan.setStatus(LoanStatus.FINISHED);
+            srcAcc.addNotification(new BankNotification("Loan '" + loan.getId() + "' is now finished", timeHandler.getCurrentTime()));
+            loan.setFinishedYaz(timeHandler.getCurrentTime());
         }
     }
 

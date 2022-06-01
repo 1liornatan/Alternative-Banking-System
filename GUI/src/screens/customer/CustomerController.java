@@ -76,6 +76,9 @@ public class CustomerController {
     private TextField balanceField;
 
     @FXML
+    private TextField infAmountField;
+
+    @FXML
     private TextField openPaymentsField;
 
     @FXML
@@ -332,6 +335,16 @@ public class CustomerController {
     }
 
     @FXML
+    void withdrawButtonAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void chargeButtonAction(ActionEvent event) {
+
+    }
+
+    @FXML
     void searchLoansButtonAction(ActionEvent event) {
         investAmount.set(Integer.valueOf(amountField.getText()));
         minInterestProperty.set(Integer.valueOf(minInterestField.getText()));
@@ -459,6 +472,19 @@ public class CustomerController {
                     amountField.setText("0");
                 } else if (Integer.valueOf(newValue) > balanceProperty.get()) {
                     amountField.setText(String.valueOf(balanceProperty.get()));
+                }
+            }
+        });
+        infAmountField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    infAmountField.setText(newValue.replaceAll("[^\\d]", ""));
+                } else if (newValue.isEmpty()) {
+                    infAmountField.setText("0");
+                } else if (Integer.valueOf(newValue) > balanceProperty.get()) {
+                    infAmountField.setText(String.valueOf(balanceProperty.get()));
                 }
             }
         });
@@ -849,6 +875,11 @@ public class CustomerController {
 
         TableColumn<TransactionModel, Integer> yazMadeColumn = new TableColumn<>("Yaz Made");
         yazMadeColumn.setCellValueFactory(new PropertyValueFactory<>("yazMade"));
+
+        descriptionColumn.prefWidthProperty().bind(transactionsTable.widthProperty().multiply(0.5));
+        balanceColumn.prefWidthProperty().bind(transactionsTable.widthProperty().multiply(0.2));
+        previousBalanceColumn.prefWidthProperty().bind(transactionsTable.widthProperty().multiply(0.2));
+        yazMadeColumn.prefWidthProperty().bind(transactionsTable.widthProperty().multiply(0.1));
 
         transactionsTable.getColumns().addAll(descriptionColumn, balanceColumn, previousBalanceColumn, yazMadeColumn);
 
