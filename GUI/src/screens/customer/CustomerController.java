@@ -73,6 +73,9 @@ public class CustomerController {
     private LoanModel selectedDebtLoan;
 
     @FXML
+    private Label infErrorLabel;
+    
+    @FXML
     private TextField balanceField;
 
     @FXML
