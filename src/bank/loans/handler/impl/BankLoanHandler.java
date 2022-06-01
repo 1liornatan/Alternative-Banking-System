@@ -81,6 +81,10 @@ public class BankLoanHandler implements LoanHandler {
                 investmentPayment(investment);
             }
         }
+
+        if(loan.getAmountToCloseLoan() == 0) {
+            loan.setStatus(LoanStatus.FINISHED);
+        }
     }
 
     private void checkLoanStatus(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
