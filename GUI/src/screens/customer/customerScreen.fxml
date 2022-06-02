@@ -162,7 +162,7 @@
                                                       </VBox>
                                                       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                                          <children>
-                                                            <Label alignment="CENTER" prefWidth="120.0" text="Max Loan Ownership" />
+                                                            <Label alignment="CENTER" prefWidth="120.0" text="Max Ownership" />
                                                             <TextField fx:id="maxOwnershipField" alignment="CENTER" />
                                                          </children>
                                                          <opaqueInsets>

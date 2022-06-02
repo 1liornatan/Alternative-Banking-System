@@ -15,6 +15,7 @@ public class MainPage extends Application {
 
 
 
+    @SuppressWarnings("unchecked")
     @Override
     public void start(Stage primaryStage) throws Exception {
         //CSSFX.start();

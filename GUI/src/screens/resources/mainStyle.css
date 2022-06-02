@@ -42,6 +42,14 @@
     -fx-font-size: 16;
 }
 
+.tab .tab-label {
+    -fx-text-fill: #3a73dc;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #3a73dc;
+}
+
 .button {
     -fx-background-color: #50a0c0;
     -fx-text-fill: #ffffff;
