@@ -1,16 +1,10 @@
 package screens;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import screens.main.MainPageController;
 import screens.resources.BankScreenConsts;
 
@@ -47,8 +41,9 @@ public class MainPage extends Application {
         scene.getStylesheets().add(getClass().getResource("/screens/resources/mainStyle.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
-
+        mainPageController.setPrimaryStage(primaryStage);
     }
+
 
     public static void main(String[] args) {
         launch(args);

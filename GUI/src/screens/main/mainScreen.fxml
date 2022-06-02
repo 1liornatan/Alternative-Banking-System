@@ -30,6 +30,7 @@
                     <items>
                       <MenuItem mnemonicParsing="false" onAction="#animationOnAction" text="Play" />
                         <MenuItem mnemonicParsing="false" onAction="#animationOffAction" text="Stop" />
+                        <MenuItem mnemonicParsing="false" onAction="#shakeScreenAction" text="Shake Screen" />
                     </items>
                   </Menu>
               </menus>

@@ -1,21 +1,23 @@
 package screens.main;
 
-import bank.accounts.impl.Customer;
 import bank.impl.BankImpl;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 import manager.customers.CustomersNames;
 import screens.admin.AdminController;
 import screens.customer.CustomerController;
@@ -32,11 +34,14 @@ public class MainPageController {
     private BooleanProperty isAdminScreen;
 
     private BorderPane mainScreen;
+    private Stage primaryStage;
     private Parent adminScreen;
     private Parent customerScreen;
 
     private AdminController adminController;
     private CustomerController customerController;
+
+    private int x, y;
 
     private BankImpl bankInstance;
 
@@ -70,7 +75,7 @@ public class MainPageController {
     @FXML
     void styleHapoalimAction(ActionEvent event) {
         mainScreen.getStylesheets().clear();
-        mainScreen.getStylesheets().add(STYLE_ISRAEL);
+        mainScreen.getStylesheets().add(STYLE_HAPOALIM);
         mainScreen.applyCss();
     }
 
@@ -98,6 +103,12 @@ public class MainPageController {
     void animationOnAction(ActionEvent event) {
         customerController.animationOn();
     }
+
+    @FXML
+    void shakeScreenAction(ActionEvent event) {
+        shakeStage();
+    }
+
     public MainPageController() throws IOException {
         isAdminScreen = new SimpleBooleanProperty();
         isFileSelected = new SimpleBooleanProperty();
@@ -117,6 +128,9 @@ public class MainPageController {
         adminController = loader2.getController();
 
         bankInstance = new BankImpl();
+
+        x = 0;
+        y = 0;
     }
 
 
@@ -181,5 +195,50 @@ public class MainPageController {
 
     public void setMainScreen(BorderPane mainScreen) {
         this.mainScreen = mainScreen;
+    }
+
+    public void shakeStage() {
+        Timeline timelineX = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent t) {
+                if (x == 0) {
+                    primaryStage.setX(primaryStage.getX() + 10);
+                    x = 1;
+                } else {
+                    primaryStage.setX(primaryStage.getX() - 10);
+                    x = 0;
+                }
+            }
+        }));
+
+        timelineX.setCycleCount(22);
+        timelineX.setAutoReverse(false);
+        timelineX.play();
+
+
+        Timeline timelineY = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent t) {
+                if (y == 0) {
+                    primaryStage.setY(primaryStage.getY() + 10);
+                    y = 1;
+                } else {
+                    primaryStage.setY(primaryStage.getY() - 10);
+                    y = 0;
+                }
+            }
+        }));
+
+        timelineY.setCycleCount(22);
+        timelineY.setAutoReverse(false);
+        timelineY.play();
+    }
+
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
     }
 }

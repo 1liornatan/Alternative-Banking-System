@@ -38,6 +38,13 @@
     -fx-font-weight: BOLD;
 }
 
+#increaseYazButton,
+#loadFileButton {
+    -fx-background-color: #fa112a;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 16;
+}
+
 .button {
     -fx-background-color: #dc3a4e;
     -fx-text-fill: WHITE;
