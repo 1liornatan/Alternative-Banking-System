@@ -25,6 +25,7 @@ import files.saver.Saver;
 import files.saver.SystemSaver;
 import files.xmls.XmlReader;
 import files.xmls.exceptions.*;
+import javafx.animation.PathTransition;
 import javafx.util.Pair;
 import manager.accounts.AccountDTO;
 import manager.customers.*;
@@ -387,10 +388,7 @@ public class BankImpl implements Bank {
         for(String loanId : loansIds) {
             loansList.add(loans.getDataById(loanId));
         }
-        setInvestments(investmentsData.getInvestorId(),
-                loansList,
-                investmentsData.getAmount()
-        );
+        setInvestments(investmentsData.getInvestorId(), loansList, investmentsData.getAmount());
     }
     @Override
     public void createInvestment(String investor, Loan loan, int amount) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
@@ -472,6 +470,7 @@ public class BankImpl implements Bank {
         Collection<String> categories = requestDTO.getCategoriesDTO().getCategories();
         int minDuration = requestDTO.getMinLoanDuration();
         int maxRelatedLoans = requestDTO.getMaxRelatedLoans();
+        int ownership = requestDTO.getMaxOwnership();
 
         if(minInterest < 0 || minInterest > 100)
             throw new InvalidPercentException();
@@ -487,12 +486,22 @@ public class BankImpl implements Bank {
                         if(maxRelatedLoans == 0)
                             return true;
 
-                        int relatedLoansAmount = customersAccounts.getDataById(p.getKey().getOwnerId()).getLoansRequested().size();
+                        long relatedLoansAmount = customersAccounts.getDataById(p.getKey().getOwnerId()).getLoansRequested()
+                                .stream().filter(ownedLoan -> ownedLoan.getStatus() != LoanStatus.FINISHED).count();
+
                         return relatedLoansAmount <= maxRelatedLoans;
 
                     } catch (DataNotFoundException e) {
                         return false;
                     }
+                })
+                .filter(p -> {
+                    if(ownership == 0)
+                        return true;
+
+                    Loan loan = p.getKey();
+                    double percentLeft = (loan.getAmountToActive() / loan.getBaseAmount()) * 100;
+                    return ownership >= percentLeft;
                 })
                 .collect(Collectors.toList());
 
@@ -664,7 +673,7 @@ public class BankImpl implements Bank {
 
     private int getInvestorsAmount(Loan loan) {
         Set<String> investors = new HashSet<>();
-        loan.getInvestments().stream().forEach(inv -> investors.add(inv.getInvestorId()));
+        loan.getInvestments().forEach(inv -> investors.add(inv.getInvestorId()));
         return investors.size();
     }
 
@@ -687,7 +696,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public CustomersData getCustomersData() throws DataNotFoundException {
+    public CustomersData getCustomersData() {
         CustomersData customersData = new CustomersData();
         List<CustomerData> customersList = new ArrayList<>();
         for(Pair<CustomerAccount, Integer> customerPair : customersAccounts.getAllPairs()) {

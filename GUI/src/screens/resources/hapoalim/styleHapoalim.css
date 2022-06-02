@@ -66,7 +66,6 @@
     -fx-text-fill: WHITE;
 }
 .label {
-    -fx-background-color: WHITE;
     -fx-text-fill: #dc3a4e;
 }
 
@@ -150,4 +149,41 @@
 
 .progress-bar {
     -fx-accent: #dc3a4e;
+}
+
+#buyInvestmentLabel,
+#sellInvestmentLabel {
+    -fx-font-size: 18;
+    -fx-text-fill: #d53b3b;
+    -fx-font-weight: BOLD;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-text-fill: #ffffff;
+    -fx-background-color: #9b2527;
+}
+
+.combo-box .list-view .list-cell {
+    -fx-font-size: 14;
+    -fx-text-fill: #d53b3b;
+    -fx-font-weight: BOLD;
+}
+
+.combo-box .cell:selected {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 16;
+    -fx-font-weight: BOLD;
+}
+
+.combo-box .list-view .list-cell:focused {
+    -fx-text-fill: #ffffff;
+    -fx-background-color: #da8c9a;
+}
+
+.label {
+    -fx-font-weight: BOLD;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #cb2130;
 }

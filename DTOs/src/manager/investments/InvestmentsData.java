@@ -7,6 +7,7 @@ public class InvestmentsData {
     public static class InvestmentsBuilder {
         String investorId;
         int amount;
+
         List<String> loansIds;
 
         public InvestmentsBuilder Amount(int amount) {
@@ -58,4 +59,5 @@ public class InvestmentsData {
     public List<String> getLoansIds() {
         return loansIds;
     }
+
 }

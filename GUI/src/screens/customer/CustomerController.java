@@ -366,9 +366,9 @@ public class CustomerController {
             return;
         }
 
-        Task task = new Task() {
+        Task<String> task = new Task<String>() {
             @Override
-            protected Object call() throws Exception {
+            protected String call() throws Exception {
                 Platform.runLater(() -> {
                     searchLoansButton.setDisable(true);
                     searchLoansProgressBar.setProgress(0);
@@ -380,6 +380,7 @@ public class CustomerController {
                         .minInterest(minInterestProperty.get())
                         .minDuration(minLoanDurationProperty.get())
                         .maxLoans(maxRequestedLoansProperty.get())
+                        .maxOwnership(maxOwnershipFieldProperty.get())
                         .build();
 
                 try {
@@ -698,10 +699,9 @@ public class CustomerController {
                     clearAllFields();
                     updateData();
                 });
-                // TODO: LABEL WITH STATUS & ERROR MESSAGE
             } catch (Exception e) {
-                buyErrorLabel.setText(e.getMessage());
-                buyErrorLabel.setTextFill(Color.RED);
+                progressBarStatusLabel.setText(e.getMessage());
+                progressBarStatusLabel.setTextFill(Color.RED);
             }
         });
         setInvestmentsThread.start();

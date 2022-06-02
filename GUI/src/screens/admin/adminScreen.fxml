@@ -92,7 +92,7 @@
                            <center>
                               <LineChart fx:id="timeLineChart" title="Time Graph" BorderPane.alignment="CENTER">
                                  <xAxis>
-                                    <CategoryAxis side="BOTTOM" />
+                                    <CategoryAxis label="Yaz" side="BOTTOM" />
                                  </xAxis>
                                  <yAxis>
                                     <NumberAxis side="LEFT" />

@@ -12,6 +12,7 @@ public class RequestDTO {
     final float minInterest;
     final int minLoanDuration;
     final int maxRelatedLoans;
+    final int maxOwnership;
     final String requesterName;
 
     public RequestDTO(Builder builder) {
@@ -21,6 +22,11 @@ public class RequestDTO {
         this.minLoanDuration = builder.minLoanDuration;
         this.requesterName = builder.requesterName;
         this.maxRelatedLoans = builder.maxRelatedLoans;
+        this.maxOwnership = builder.maxOwnership;
+    }
+
+    public int getMaxOwnership() {
+        return maxOwnership;
     }
 
     public int getAmount() {
@@ -52,15 +58,22 @@ public class RequestDTO {
         float minInterest;
         int minLoanDuration;
         int maxRelatedLoans;
+        int maxOwnership;
         final String requesterName;
 
         public Builder(String requesterName, int amount) {
             this.amount = amount;
             this.minInterest = 0;
-            this.maxRelatedLoans = 100;
+            this.maxRelatedLoans = 0;
             this.minLoanDuration = 0;
+            this.maxOwnership = 0;
             categoriesDTO = null;
             this.requesterName = requesterName;
+        }
+
+        public Builder maxOwnership(int amount) {
+            this.maxOwnership = amount;
+            return this;
         }
 
         public Builder minInterest(float minInterest) {
