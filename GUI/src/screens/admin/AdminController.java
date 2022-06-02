@@ -238,7 +238,7 @@ public class AdminController {
         loadBankThread.start();
     }
 
-    private void updateBankData() {
+    public void updateBankData() {
         updateCustomersData();
         updateLoansData();
     }

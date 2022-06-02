@@ -23,6 +23,7 @@
                     <MenuItem mnemonicParsing="false" onAction="#styleIsraelAction" text="Israel" />
                         <MenuItem mnemonicParsing="false" onAction="#styleHapoalimAction" text="Hapoalim" />
                         <MenuItem mnemonicParsing="false" onAction="#styleDiscountAction" text="Discount" />
+                        <MenuItem mnemonicParsing="false" onAction="#styleDefaultAction" text="Default" />
                   </items>
                 </Menu>
                   <Menu mnemonicParsing="false" text="Animation">

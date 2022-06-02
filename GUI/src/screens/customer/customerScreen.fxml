@@ -84,6 +84,9 @@
                                           <TableView fx:id="loanerLoansTable" />
                                           <TableView fx:id="lenderLoansTable" />
                                        </children>
+                                       <padding>
+                                          <Insets bottom="10.0" top="10.0" />
+                                       </padding>
                                     </VBox>
                                     <VBox alignment="CENTER" spacing="10.0">
                                        <children>

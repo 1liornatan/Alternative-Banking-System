@@ -40,6 +40,11 @@ public class MainPageController {
 
     private BankImpl bankInstance;
 
+    private static String STYLE_DEFAULT = MainPageController.class.getResource("/screens/resources/mainStyle.css").toString();
+    private static String STYLE_DISCOUNT = MainPageController.class.getResource("/screens/resources/discount/styleDiscount.css").toString();
+    private static String STYLE_HAPOALIM = MainPageController.class.getResource("/screens/resources/hapoalim/styleHapoalim.css").toString();
+    private static String STYLE_ISRAEL = MainPageController.class.getResource("/screens/resources/israel/styleIsrael.css").toString();
+
     @FXML
     private ComboBox viewComboBox;
 
@@ -58,23 +63,31 @@ public class MainPageController {
     @FXML
     void styleDiscountAction(ActionEvent event) {
         mainScreen.getStylesheets().clear();
-        mainScreen.getStylesheets().add(getClass().getResource("/screens/resources/discount/styleDiscount.css").toExternalForm());
+        mainScreen.getStylesheets().add(STYLE_DISCOUNT);
         mainScreen.applyCss();
     }
 
     @FXML
     void styleHapoalimAction(ActionEvent event) {
         mainScreen.getStylesheets().clear();
-        mainScreen.getStylesheets().add(getClass().getResource("/screens/resources/hapoalim/styleHapoalim.css").toExternalForm());
+        mainScreen.getStylesheets().add(STYLE_ISRAEL);
         mainScreen.applyCss();
     }
 
     @FXML
     void styleIsraelAction(ActionEvent event) {
         mainScreen.getStylesheets().clear();
-        mainScreen.getStylesheets().add(getClass().getResource("/screens/resources/israel/styleIsrael.css").toExternalForm());
+        mainScreen.getStylesheets().add(STYLE_ISRAEL);
         mainScreen.applyCss();
     }
+
+    @FXML
+    void styleDefaultAction(ActionEvent event) {
+        mainScreen.getStylesheets().clear();
+        mainScreen.getStylesheets().add(STYLE_DEFAULT);
+        mainScreen.applyCss();
+    }
+
 
     @FXML
     void animationOffAction(ActionEvent event) {
@@ -105,6 +118,7 @@ public class MainPageController {
 
         bankInstance = new BankImpl();
     }
+
 
     @FXML
     void initialize() {
@@ -152,7 +166,7 @@ public class MainPageController {
 
 
     private void updateScreenData() {
-        adminController.updateCustomersData();
+        adminController.updateBankData();
     }
 
 

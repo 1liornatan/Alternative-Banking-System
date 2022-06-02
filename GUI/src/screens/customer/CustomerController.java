@@ -8,6 +8,7 @@ import bank.loans.interest.exceptions.InvalidPercentException;
 import com.sun.deploy.util.BlackList;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import javafx.animation.KeyFrame;
+import javafx.animation.PathTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -31,11 +32,14 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -53,6 +57,7 @@ import models.utils.TradeTable;
 import org.controlsfx.control.CheckComboBox;
 import screens.MainPage;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,6 +83,7 @@ public class CustomerController {
     private IntegerProperty requestedLoansAmountProperty;
     private IntegerProperty paymentsAmountProperty;
     private LoanModel selectedDebtLoan;
+    private BooleanProperty animationProperty;
 
 
     final static Image WALK_1 = new Image(MainPage.class.getResource("/screens/resources/animation/1.png").toString());
@@ -660,6 +666,7 @@ public class CustomerController {
         setLoansIntegrationButtons();
         debtPaymentHBox.setDisable(true);
         setWalkAnimation();
+
     }
 
     private void setWalkAnimation() {
@@ -781,6 +788,7 @@ public class CustomerController {
         requestedLoansAmountProperty = new SimpleIntegerProperty();
         paymentsAmountProperty = new SimpleIntegerProperty();
         debtAmountProperty = new SimpleIntegerProperty();
+        animationProperty = new SimpleBooleanProperty(true);
     }
 
     private void setLoansIntegrationButtons() {
@@ -1239,10 +1247,14 @@ public class CustomerController {
 
     public void animationOn() {
         walkTimeline.play();
+        animationProperty.set(true);
+        animationImage.setVisible(true);
     }
 
     public void animationOff() {
         walkTimeline.stop();
+        animationProperty.set(false);
+        animationImage.setVisible(false);
     }
 
 
