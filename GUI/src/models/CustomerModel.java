@@ -9,10 +9,18 @@ import javafx.scene.control.cell.PropertyValueFactory;
 
 public class CustomerModel {
 
-    IntegerProperty balance;
-    StringProperty name;
-    IntegerProperty numOfPendingLoansRequested, numOfActiveLoansRequested, numOfRiskLoansRequested, numOfFinishedLoansRequested, numOfNewLoansRequested;
-    IntegerProperty numOfPendingLoansInvested, numOfActiveLoansInvested, numOfRiskLoansInvested, numOfFinishedLoansInvested, numOfNewLoansInvested;
+    final IntegerProperty balance;
+    final StringProperty name;
+    final IntegerProperty numOfPendingLoansRequested;
+    final IntegerProperty numOfActiveLoansRequested;
+    final IntegerProperty numOfRiskLoansRequested;
+    final IntegerProperty numOfFinishedLoansRequested;
+    final IntegerProperty numOfNewLoansRequested;
+    final IntegerProperty numOfPendingLoansInvested;
+    final IntegerProperty numOfActiveLoansInvested;
+    final IntegerProperty numOfRiskLoansInvested;
+    final IntegerProperty numOfFinishedLoansInvested;
+    final IntegerProperty numOfNewLoansInvested;
 
     public CustomerModel() {
         balance = new SimpleIntegerProperty();

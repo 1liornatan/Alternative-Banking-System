@@ -4,11 +4,11 @@ import manager.customers.CustomerDTO;
 import manager.loans.details.*;
 
 public class LoanDTO {
-    LoanDetailsDTO details;
-    InterestDTO interest;
-    YazDTO yazDetails;
-    LoanPaymentDTO paymentDetails;
-    ActiveLoanDTO activeLoanDTO;
+    final LoanDetailsDTO details;
+    final InterestDTO interest;
+    final YazDTO yazDetails;
+    final LoanPaymentDTO paymentDetails;
+    final ActiveLoanDTO activeLoanDTO;
 
     public LoanDTO(LoanDetailsDTO details, InterestDTO interest, YazDTO yazDetails,
                    LoanPaymentDTO paymentDetails, ActiveLoanDTO activeLoanDTO) {

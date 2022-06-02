@@ -5,10 +5,10 @@ import manager.loans.LoanDTO;
 import manager.loans.LoansDTO;
 
 public class CustomerDTO {
-    LoansDTO investedLoans;
-    LoansDTO requestedLoans;
-    AccountDTO account;
-    String name;
+    final LoansDTO investedLoans;
+    final LoansDTO requestedLoans;
+    final AccountDTO account;
+    final String name;
 
     public LoansDTO getInvestedLoans() {
         return investedLoans;

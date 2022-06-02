@@ -3,7 +3,7 @@ package manager.loans;
 import java.util.List;
 
 public class LoansDTO {
-    List<LoanDTO> loansList;
+    final List<LoanDTO> loansList;
 
     public List<LoanDTO> getLoansList() {
         return loansList;

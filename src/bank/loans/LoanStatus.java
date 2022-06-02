@@ -7,7 +7,7 @@ public enum LoanStatus {
     RISKED("Risked"),
     FINISHED("Finished");
 
-    private String statusText;
+    private final String statusText;
 
     LoanStatus(String statusText) {
         this.statusText = statusText;

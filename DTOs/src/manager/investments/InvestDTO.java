@@ -1,9 +1,9 @@
 package manager.investments;
 
 public class InvestDTO {
-    String investorName;
-    String loanName;
-    int amount;
+    final String investorName;
+    final String loanName;
+    final int amount;
 
     public InvestDTO(String investorName, String loanName, int amount) {
         this.investorName = investorName;

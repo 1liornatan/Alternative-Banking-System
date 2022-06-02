@@ -1,8 +1,9 @@
 package manager.loans.details;
 
 public class LoanPaymentDTO {
-    int nextPaymentAmount, nextPaymentInYaz;
-    int cyclesPerPayment;
+    final int nextPaymentAmount;
+    final int nextPaymentInYaz;
+    final int cyclesPerPayment;
 
     public int getNextPaymentAmount() {
         return nextPaymentAmount;

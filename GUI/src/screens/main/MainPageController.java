@@ -1,5 +1,6 @@
 package screens.main;
 
+import bank.Bank;
 import bank.impl.BankImpl;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -27,31 +28,31 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MainPageController {
 
-    private BooleanProperty isFileSelected;
-    private BooleanProperty isAdminScreen;
+    private final BooleanProperty isFileSelected;
 
     private BorderPane mainScreen;
     private Stage primaryStage;
-    private Parent adminScreen;
-    private Parent customerScreen;
+    private final Parent adminScreen;
+    private final Parent customerScreen;
 
-    private AdminController adminController;
-    private CustomerController customerController;
+    private final AdminController adminController;
+    private final CustomerController customerController;
 
     private int x, y;
 
-    private BankImpl bankInstance;
+    private final Bank bankInstance;
 
-    private static String STYLE_DEFAULT = MainPageController.class.getResource("/screens/resources/mainStyle.css").toString();
-    private static String STYLE_DISCOUNT = MainPageController.class.getResource("/screens/resources/discount/styleDiscount.css").toString();
-    private static String STYLE_HAPOALIM = MainPageController.class.getResource("/screens/resources/hapoalim/styleHapoalim.css").toString();
-    private static String STYLE_ISRAEL = MainPageController.class.getResource("/screens/resources/israel/styleIsrael.css").toString();
+    private static final String STYLE_DEFAULT = Objects.requireNonNull(MainPageController.class.getResource("/screens/resources/mainStyle.css")).toString();
+    private static final String STYLE_DISCOUNT = Objects.requireNonNull(MainPageController.class.getResource("/screens/resources/discount/styleDiscount.css")).toString();
+    private static final String STYLE_HAPOALIM = Objects.requireNonNull(MainPageController.class.getResource("/screens/resources/hapoalim/styleHapoalim.css")).toString();
+    private static final String STYLE_ISRAEL = Objects.requireNonNull(MainPageController.class.getResource("/screens/resources/israel/styleIsrael.css")).toString();
 
     @FXML
-    private ComboBox viewComboBox;
+    private ComboBox<String> viewComboBox;
 
     @FXML
     private TextField filePathTextField;
@@ -110,7 +111,6 @@ public class MainPageController {
     }
 
     public MainPageController() throws IOException {
-        isAdminScreen = new SimpleBooleanProperty();
         isFileSelected = new SimpleBooleanProperty();
 
         FXMLLoader loader = new FXMLLoader();
@@ -138,7 +138,7 @@ public class MainPageController {
     void initialize() {
         filePathTextField.textProperty().bind(adminController.getFilePathProperty());
         isFileSelected.bind(adminController.getFileSelectedProperty());
-        viewComboBox.setItems(FXCollections.observableArrayList(new String("Admin")));
+        viewComboBox.setItems(FXCollections.observableArrayList("Admin"));
         viewComboBox.getSelectionModel().selectFirst();
         viewComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
 
@@ -163,13 +163,10 @@ public class MainPageController {
                 List<String> namesList = new ArrayList<>();
 
                 namesList.add("Admin");
-                for(String name : names.getNames())
-                    namesList.add(name);
+                namesList.addAll(names.getNames());
 
                 customerController.updateCategories();
-                Platform.runLater(() -> {
-                    viewComboBox.setItems(FXCollections.observableArrayList(namesList));
-                });
+                Platform.runLater(() -> viewComboBox.setItems(FXCollections.observableArrayList(namesList)));
             });
             customersNamesThread.start();
         });

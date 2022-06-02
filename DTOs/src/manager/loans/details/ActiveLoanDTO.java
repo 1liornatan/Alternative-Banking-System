@@ -1,7 +1,9 @@
 package manager.loans.details;
 
 public class ActiveLoanDTO {
-    int amountToActive, deriskAmount, missingCycles;
+    final int amountToActive;
+    final int deriskAmount;
+    final int missingCycles;
 
     public int getAmountToActive() {
         return amountToActive;

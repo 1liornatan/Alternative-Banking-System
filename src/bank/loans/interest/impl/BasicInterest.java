@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class BasicInterest implements Interest {
-    private float percent;
+    private final float percent;
     private final int cyclesPerPayment, duration, baseAmount;
 
     public BasicInterest(float percent, int baseAmount, int cyclesPerPayment, int duration) {

@@ -1,47 +1,29 @@
 package screens.customer;
 
+import bank.Bank;
 import bank.accounts.impl.exceptions.NoMoneyException;
 import bank.accounts.impl.exceptions.NonPositiveAmountException;
-import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import bank.loans.interest.exceptions.InvalidPercentException;
-import com.sun.deploy.util.BlackList;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import javafx.animation.KeyFrame;
-import javafx.animation.PathTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.*;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseDragEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Shape;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import manager.investments.*;
 import manager.loans.LoanData;
@@ -57,48 +39,46 @@ import models.utils.TradeTable;
 import org.controlsfx.control.CheckComboBox;
 import screens.MainPage;
 
-import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CustomerController {
 
-    private BankImpl bankInstance;
+    private Bank bankInstance;
     private List<LoanModel> loanerModelList;
     private List<LoanModel> lenderModelList;
-    private StringProperty customerId;
-    private IntegerProperty investAmount;
-    private IntegerProperty balanceProperty;
-    private IntegerProperty minInterestProperty;
-    private IntegerProperty minLoanDurationProperty;
-    private IntegerProperty maxRequestedLoansProperty;
-    private IntegerProperty maxOwnershipFieldProperty;
+    private final StringProperty customerId;
+    private final IntegerProperty investAmount;
+    private final IntegerProperty balanceProperty;
+    private final IntegerProperty minInterestProperty;
+    private final IntegerProperty minLoanDurationProperty;
+    private final IntegerProperty maxRequestedLoansProperty;
+    private final IntegerProperty maxOwnershipFieldProperty;
     private ObservableList<String> categoriesList;
-    private BooleanProperty isFileSelected;
+    private final BooleanProperty isFileSelected;
     private List<TransactionModel> transactionModels;
     private List<LoanModel> loanPModelList;
     private List<NotificationModel> notificationModels;
     private List<InvestmentModel> buyInvestmentModels;
     private List<InvestmentModel> sellInvestmentModels;
-    private IntegerProperty requestedLoansAmountProperty;
-    private IntegerProperty paymentsAmountProperty;
+    private final IntegerProperty requestedLoansAmountProperty;
+    private final IntegerProperty paymentsAmountProperty;
     private LoanModel selectedDebtLoan;
-    private BooleanProperty animationProperty;
+    private final BooleanProperty animationProperty;
 
 
-    final static Image WALK_1 = new Image(MainPage.class.getResource("/screens/resources/animation/1.png").toString());
-    final static Image WALK_2 = new Image(MainPage.class.getResource("/screens/resources/animation/2.png").toString());
-    final static Image WALK_3 = new Image(MainPage.class.getResource("/screens/resources/animation/3.png").toString());
-    final static Image WALK_4 = new Image(MainPage.class.getResource("/screens/resources/animation/4.png").toString());
-    final static Image WALK_5 = new Image(MainPage.class.getResource("/screens/resources/animation/5.png").toString());
-    final static Image WALK_6 = new Image(MainPage.class.getResource("/screens/resources/animation/6.png").toString());
-    final static Image WALK_7 = new Image(MainPage.class.getResource("/screens/resources/animation/7.png").toString());
-    final static Image WALK_8 = new Image(MainPage.class.getResource("/screens/resources/animation/8.png").toString());
-    final static Image WALK_9 = new Image(MainPage.class.getResource("/screens/resources/animation/9.png").toString());
-    final static Image WALK_10 = new Image(MainPage.class.getResource("/screens/resources/animation/10.png").toString());
-    final static Image WALK_11 = new Image(MainPage.class.getResource("/screens/resources/animation/11.png").toString());
-    final static Image WALK_12 = new Image(MainPage.class.getResource("/screens/resources/animation/12.png").toString());
-    final static Image WALK_13 = new Image(MainPage.class.getResource("/screens/resources/animation/13.png").toString());
+    final static Image WALK_1 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/1.png")).toString());
+    final static Image WALK_2 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/2.png")).toString());
+    final static Image WALK_3 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/3.png")).toString());
+    final static Image WALK_4 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/4.png")).toString());
+    final static Image WALK_5 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/5.png")).toString());
+    final static Image WALK_6 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/6.png")).toString());
+    final static Image WALK_7 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/7.png")).toString());
+    final static Image WALK_8 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/8.png")).toString());
+    final static Image WALK_9 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/9.png")).toString());
+    final static Image WALK_10 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/10.png")).toString());
+    final static Image WALK_11 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/11.png")).toString());
+    final static Image WALK_12 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/12.png")).toString());
+    final static Image WALK_13 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/13.png")).toString());
 
     @FXML
     private ImageView animationImage;
@@ -130,19 +110,10 @@ public class CustomerController {
     private TableView<TransactionModel> transactionsTable;
 
     @FXML
-    private Button chargeButton;
-
-    @FXML
     private ProgressBar searchLoansProgressBar;
 
     @FXML
-    private VBox sidePanelVBox;
-
-    @FXML
     private Label progressBarStatusLabel;
-
-    @FXML
-    private Button withdrawButton;
 
     @FXML
     private Button searchLoansButton;
@@ -187,18 +158,6 @@ public class CustomerController {
     private Button investButton;
 
     @FXML
-    private Button payCycleButton;
-
-    @FXML
-    private Button closeLoanButton;
-
-    @FXML
-    private Button payDebtButton;
-
-    @FXML
-    private Button submitDebtButton;
-
-    @FXML
     private HBox debtPaymentHBox;
 
     @FXML
@@ -206,12 +165,6 @@ public class CustomerController {
 
     @FXML
     private TableView<InvestmentModel> buyInvestmentTable;
-
-    @FXML
-    private Button searchInvestmentButton;
-
-    @FXML
-    private Button buyInvestmentButton;
 
     @FXML
     private Label buyErrorLabel;
@@ -223,21 +176,15 @@ public class CustomerController {
     private TableView<InvestmentModel> sellInvestmentTable;
 
     @FXML
-    private Button listInvestmentButton;
-
-    @FXML
-    private Button unlistInvestmentButton;
-
-    @FXML
     private Label sellErrorLabel;
-    private IntegerProperty debtAmountProperty;
+    private final IntegerProperty debtAmountProperty;
 
     @FXML
     private LineChart<String, Number> timeLineChart;
     private Timeline walkTimeline;
 
     @FXML
-    void buyInvestmentButtonAction(ActionEvent event) {
+    void buyInvestmentButtonAction(ActionEvent ignoredEvent) {
         InvestmentModel selectedItem = buyInvestmentTable.getSelectionModel().getSelectedItem();
         if(selectedItem == null) {
             buyErrorLabel.setText("Please select an investment!");
@@ -267,13 +214,13 @@ public class CustomerController {
     }
 
     @FXML
-    void investButtonAction(ActionEvent event) {
+    void investButtonAction(ActionEvent ignoredEvent) {
         setInvestmentsChosen();
     }
 
 
     @FXML
-    void listInvestmentButtonAction(ActionEvent event) {
+    void listInvestmentButtonAction(ActionEvent ignoredEvent) {
         InvestmentModel selectedItem = sellInvestmentTable.selectionModelProperty().get().getSelectedItem();
         if(selectedItem == null) {
             sellErrorLabel.setText("Please select an investment!");
@@ -311,16 +258,13 @@ public class CustomerController {
     }
 
     @FXML
-    void searchInvestmentButtonAction(ActionEvent event) {
+    void searchInvestmentButtonAction(ActionEvent ignoredEvent) {
         Thread searchInvestmentsThread = new Thread(() -> {
             InvestmentsSellData investmentsForSell = bankInstance.getInvestmentsForSell(customerId.get());
-            List<InvestmentModel> tempInvList = getInvModels(investmentsForSell);
 
-            buyInvestmentModels = tempInvList;
+            buyInvestmentModels = getInvModels(investmentsForSell);
 
-            Platform.runLater(() -> {
-                buyInvestmentTable.setItems(getBuyInvestments());
-            });
+            Platform.runLater(() -> buyInvestmentTable.setItems(getBuyInvestments()));
 
         });
         searchInvestmentsThread.start();
@@ -331,7 +275,7 @@ public class CustomerController {
     }
 
     @FXML
-    void unlistInvestmentButtonAction(ActionEvent event) {
+    void unlistInvestmentButtonAction(ActionEvent ignoredEvent) {
         InvestmentModel selectedItem = sellInvestmentTable.selectionModelProperty().get().getSelectedItem();
         if(selectedItem == null) {
             sellErrorLabel.setText("Please select an investment!");
@@ -368,15 +312,15 @@ public class CustomerController {
 
 
     @FXML
-    void tablesLeftButtonAction(ActionEvent event) {
+    void tablesLeftButtonAction(ActionEvent ignoredEvent) {
         ObservableList<LoanModel> selectedItems = loansChosenTable.getSelectionModel().getSelectedItems();
         loansFoundTable.getItems().addAll(selectedItems);
         loansChosenTable.getItems().removeAll(selectedItems);
     }
 
     @FXML
-    void withdrawButtonAction(ActionEvent event) {
-        int amount = Integer.valueOf(infAmountField.getText());
+    void withdrawButtonAction(ActionEvent ignoredEvent) {
+        int amount = Integer.parseInt(infAmountField.getText());
         if(amount == 0) {
             infErrorLabel.setText("Amount must be higher than 0! ");
             infErrorLabel.setTextFill(Color.RED);
@@ -391,8 +335,8 @@ public class CustomerController {
     }
 
     @FXML
-    void chargeButtonAction(ActionEvent event) {
-        int amount = Integer.valueOf(infAmountField.getText());
+    void chargeButtonAction(ActionEvent ignoredEvent) {
+        int amount = Integer.parseInt(infAmountField.getText());
         if(amount == 0) {
             infErrorLabel.setText("Amount must be higher than 0! ");
             infErrorLabel.setTextFill(Color.RED);
@@ -407,12 +351,12 @@ public class CustomerController {
     }
 
     @FXML
-    void searchLoansButtonAction(ActionEvent event) {
-        investAmount.set(Integer.valueOf(amountField.getText()));
-        minInterestProperty.set(Integer.valueOf(minInterestField.getText()));
-        minLoanDurationProperty.set(Integer.valueOf(minYazField.getText()));
-        maxOwnershipFieldProperty.set(Integer.valueOf(maxOwnershipField.getText()));
-        maxRequestedLoansProperty.set(Integer.valueOf(maxLoanerLoansField.getText()));
+    void searchLoansButtonAction(ActionEvent ignoredEvent) {
+        investAmount.set(Integer.parseInt(amountField.getText()));
+        minInterestProperty.set(Integer.parseInt(minInterestField.getText()));
+        minLoanDurationProperty.set(Integer.parseInt(minYazField.getText()));
+        maxOwnershipFieldProperty.set(Integer.parseInt(maxOwnershipField.getText()));
+        maxRequestedLoansProperty.set(Integer.parseInt(maxLoanerLoansField.getText()));
         searchLoansProgressBar.setProgress(0);
 
         if(investAmount.get() <= 0) {
@@ -470,14 +414,14 @@ public class CustomerController {
     }
 
     @FXML
-    void tablesRightButtonAction(ActionEvent event) {
+    void tablesRightButtonAction(ActionEvent ignoredEvent) {
         ObservableList<LoanModel> selectedItems = loansFoundTable.getSelectionModel().getSelectedItems();
         loansChosenTable.getItems().addAll(selectedItems);
         loansFoundTable.getItems().removeAll(selectedItems);
     }
 
     @FXML
-    void closeLoanButtonAction(ActionEvent event) {
+    void closeLoanButtonAction(ActionEvent ignoredEvent) {
         LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
         if (selectedLoan == null) {
             paymentErrorLabel.setText("You must select a loan first!");
@@ -504,7 +448,7 @@ public class CustomerController {
     }
 
     @FXML
-    void payCycleButtonAction(ActionEvent event) {
+    void payCycleButtonAction(ActionEvent ignoredEvent) {
         LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
         if (selectedLoan == null) {
             paymentErrorLabel.setText("You must select a loan first!");
@@ -532,7 +476,7 @@ public class CustomerController {
     }
 
     @FXML
-    void payDebtButtonAction(ActionEvent event) {
+    void payDebtButtonAction(ActionEvent ignoredEvent) {
         selectedDebtLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
 
         if (selectedDebtLoan == null) {
@@ -546,8 +490,8 @@ public class CustomerController {
     }
 
     @FXML
-    void submitDebtButtonAction(ActionEvent event) {
-        debtAmountProperty.set(Integer.valueOf(debtAmountField.getText()));
+    void submitDebtButtonAction(ActionEvent ignoredEvent) {
+        debtAmountProperty.set(Integer.parseInt(debtAmountField.getText()));
         Thread debtThread = new Thread(() -> {
             try {
                 bankInstance.deriskLoanByAmount(selectedDebtLoan.getId(), debtAmountProperty.get());
@@ -567,91 +511,39 @@ public class CustomerController {
     void initialize() {
         setDataTables();
         setSplitComps();
-        amountField.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue,
-                                String newValue) {
-                if (!newValue.matches("\\d*")) {
-                    amountField.setText(newValue.replaceAll("[^\\d]", ""));
-                } else if (newValue.isEmpty()) {
-                    amountField.setText("0");
-                } else if (Integer.valueOf(newValue) > balanceProperty.get()) {
-                    amountField.setText(String.valueOf(balanceProperty.get()));
-                }
+        setFieldLimits(amountField);
+        setFieldLimits(infAmountField);
+        minInterestField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                minInterestField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+            else if(newValue.isEmpty() || Integer.parseInt(newValue) < 1) {
+                minInterestField.setText("1");
             }
         });
-        infAmountField.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue,
-                                String newValue) {
-                if (!newValue.matches("\\d*")) {
-                    infAmountField.setText(newValue.replaceAll("[^\\d]", ""));
-                } else if (newValue.isEmpty()) {
-                    infAmountField.setText("0");
-                } else if (Integer.valueOf(newValue) > balanceProperty.get()) {
-                    infAmountField.setText(String.valueOf(balanceProperty.get()));
-                }
+        minYazField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                minYazField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+            else if(newValue.isEmpty() || Integer.parseInt(newValue) < 1) {
+                minYazField.setText("1");
             }
         });
-        minInterestField.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue,
-                                String newValue) {
-                if (!newValue.matches("\\d*")) {
-                    minInterestField.setText(newValue.replaceAll("[^\\d]", ""));
-                }
-                else if(newValue.isEmpty() || Integer.valueOf(newValue) < 1) {
-                    minInterestField.setText("1");
-                }
+        maxLoanerLoansField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                maxLoanerLoansField.setText(newValue.replaceAll("[^\\d]", ""));
             }
+            else if(newValue.isEmpty())
+                maxLoanerLoansField.setText("0");
         });
-        minYazField.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue,
-                                String newValue) {
-                if (!newValue.matches("\\d*")) {
-                    minYazField.setText(newValue.replaceAll("[^\\d]", ""));
-                }
-                else if(newValue.isEmpty() || Integer.valueOf(newValue) < 1) {
-                    minYazField.setText("1");
-                }
+        maxOwnershipField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                maxOwnershipField.setText(newValue.replaceAll("[^\\d]", ""));
             }
+            else if(newValue.isEmpty())
+                maxOwnershipField.setText("0");
         });
-        maxLoanerLoansField.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue,
-                                String newValue) {
-                if (!newValue.matches("\\d*")) {
-                    maxLoanerLoansField.setText(newValue.replaceAll("[^\\d]", ""));
-                }
-                else if(newValue.isEmpty())
-                    maxLoanerLoansField.setText("0");
-            }
-        });
-        maxOwnershipField.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue,
-                                String newValue) {
-                if (!newValue.matches("\\d*")) {
-                    maxOwnershipField.setText(newValue.replaceAll("[^\\d]", ""));
-                }
-                else if(newValue.isEmpty())
-                    maxOwnershipField.setText("0");
-            }
-        });
-        debtAmountField.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(ObservableValue<? extends String> observable, String oldValue,
-                                String newValue) {
-                if (!newValue.matches("\\d*")) {
-                    debtAmountField.setText(newValue.replaceAll("[^\\d]", ""));
-                } else if (newValue.isEmpty()) {
-                    debtAmountField.setText("0");
-                } else if (Integer.valueOf(newValue) > balanceProperty.get()) {
-                    debtAmountField.setText(String.valueOf(balanceProperty.get()));
-                }
-            }
-        });
+        setFieldLimits(debtAmountField);
 
         amountField.setText("0");
         debtAmountField.setText("0");
@@ -669,74 +561,60 @@ public class CustomerController {
 
     }
 
+    private void setFieldLimits(TextField amountField) {
+        amountField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                amountField.setText(newValue.replaceAll("[^\\d]", ""));
+            } else if (newValue.isEmpty()) {
+                amountField.setText("0");
+            } else if (Integer.parseInt(newValue) > balanceProperty.get()) {
+                amountField.setText(String.valueOf(balanceProperty.get()));
+            }
+        });
+    }
+
     private void setWalkAnimation() {
         walkTimeline = new Timeline();
         walkTimeline.setCycleCount(Timeline.INDEFINITE);
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(100), (event) -> {
-            animationImage.setImage(WALK_1);
-        }));
+                Duration.millis(100), (event) -> animationImage.setImage(WALK_1)));
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(200), (event) -> {
-            animationImage.setImage(WALK_2);
-        }));
+                Duration.millis(200), (event) -> animationImage.setImage(WALK_2)));
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(300), (event) -> {
-            animationImage.setImage(WALK_3);
-        }));
+                Duration.millis(300), (event) -> animationImage.setImage(WALK_3)));
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(400), (event) -> {
-            animationImage.setImage(WALK_4);
-        }));
+                Duration.millis(400), (event) -> animationImage.setImage(WALK_4)));
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(500), (event) -> {
-            animationImage.setImage(WALK_5);
-        }));
+                Duration.millis(500), (event) -> animationImage.setImage(WALK_5)));
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(600), (event) -> {
-            animationImage.setImage(WALK_6);
-        }));
+                Duration.millis(600), (event) -> animationImage.setImage(WALK_6)));
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(700), (event) -> {
-            animationImage.setImage(WALK_7);
-        }));
+                Duration.millis(700), (event) -> animationImage.setImage(WALK_7)));
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(800), (event) -> {
-            animationImage.setImage(WALK_8);
-        }));
+                Duration.millis(800), (event) -> animationImage.setImage(WALK_8)));
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(900), (event) -> {
-            animationImage.setImage(WALK_9);
-        }));
+                Duration.millis(900), (event) -> animationImage.setImage(WALK_9)));
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(1000), (event) -> {
-            animationImage.setImage(WALK_10);
-        }));
+                Duration.millis(1000), (event) -> animationImage.setImage(WALK_10)));
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(1100), (event) -> {
-            animationImage.setImage(WALK_11);
-        }));
+                Duration.millis(1100), (event) -> animationImage.setImage(WALK_11)));
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(1200), (event) -> {
-            animationImage.setImage(WALK_12);
-        }));
+                Duration.millis(1200), (event) -> animationImage.setImage(WALK_12)));
 
         walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(1300), (event) -> {
-            animationImage.setImage(WALK_13);
-        }));
+                Duration.millis(1300), (event) -> animationImage.setImage(WALK_13)));
 
 
 
@@ -807,9 +685,7 @@ public class CustomerController {
         Thread setInvestmentsThread = new Thread(() -> {
             int amount = investAmount.get();
             List<String> selectedLoansIds = new ArrayList<>();
-            loansChosenTable.getItems().stream().forEach(loanModel -> {
-                selectedLoansIds.add(loanModel.getId());
-            });
+            loansChosenTable.getItems().forEach(loanModel -> selectedLoansIds.add(loanModel.getId()));
             InvestmentsData investmentsData = new InvestmentsData.InvestmentsBuilder()
                     .Name(customerId.get())
                     .Amount(amount)
@@ -824,8 +700,8 @@ public class CustomerController {
                 });
                 // TODO: LABEL WITH STATUS & ERROR MESSAGE
             } catch (Exception e) {
-                System.out.println(e.getMessage());
-                System.out.println(e.getStackTrace());
+                buyErrorLabel.setText(e.getMessage());
+                buyErrorLabel.setTextFill(Color.RED);
             }
         });
         setInvestmentsThread.start();
@@ -885,37 +761,17 @@ public class CustomerController {
         updateTimeChart();
     }
 
-    private void updateLoansExpander() {
-        updateExpander(loanerLoansTable);
-        updateExpander(lenderLoansTable);
-        updateExpander(loansFoundTable);
-        updateExpander(loansChosenTable);
-        updateExpander(loanerLoansPTable);
-    }
-
-    private void updateExpander(TableView<LoanModel> tableView) {
-        tableView.getColumns().clear();
-        LoanTable.setDataTables(tableView);
-    }
 
 
     private Set<String> getSelectedCategories() {
 
         ObservableList<String> checkedItems = categoriesComboBox.getCheckModel().getCheckedItems();
 
-        return checkedItems.stream().collect(Collectors.toSet());
-    }
-
-    public String getCustomerId() {
-        return customerId.get();
+        return new HashSet<>(checkedItems);
     }
 
     public StringProperty customerIdProperty() {
         return customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId.set(customerId);
     }
 
 
@@ -926,9 +782,7 @@ public class CustomerController {
         Thread updateCategories = new Thread(() -> {
             Collection<String> categories = bankInstance.getCategoriesDTO().getCategories();
             ObservableList<String> tempCategoriesList = FXCollections.observableArrayList();
-            for(String category : categories) {
-                tempCategoriesList.add(category);
-            }
+            tempCategoriesList.addAll(categories);
             categoriesList = tempCategoriesList;
             Platform.runLater(() -> {
                 categoriesComboBox.getItems().setAll(categoriesList);
@@ -944,8 +798,8 @@ public class CustomerController {
 
     public void updateLoansData() {
         Thread updateThread = new Thread(() -> {
-            List<LoanModel> tempLenderModelList = new ArrayList<>();
-            List<LoanModel> tempLoanerModelList = new ArrayList<>();
+            List<LoanModel> tempLenderModelList;
+            List<LoanModel> tempLoanerModelList;
             List<LoanData>  loanerDataList = bankInstance.getLoanerData(customerId.get()).getLoans();
             List<LoanData>  lenderDataList = bankInstance.getInvestorData(customerId.get()).getLoans();
 
@@ -967,7 +821,7 @@ public class CustomerController {
 
     public void updatePaymentLoansData() {
         Thread updatePaymentLoanThread = new Thread(() -> {
-            List<LoanModel> tempLoanerModelList = new ArrayList<>();
+            List<LoanModel> tempLoanerModelList;
             List<LoanData>  loanerDataList = null;
             try {
                 loanerDataList = bankInstance.getUnFinishedLoans(customerId.get());
@@ -975,49 +829,32 @@ public class CustomerController {
                 e.printStackTrace();
             }
 
+            assert loanerDataList != null;
             tempLoanerModelList = makeLoanModelList(loanerDataList);
 
             loanPModelList = tempLoanerModelList;
             paymentsAmountProperty.set(loanPModelList.size());
 
-            Platform.runLater(() -> {
-                loanerLoansPTable.setItems(getLoans(loanPModelList));
-            });
+            Platform.runLater(() -> loanerLoansPTable.setItems(getLoans(loanPModelList)));
         });
 
         updatePaymentLoanThread.start();
     }
 
-    public BankImpl getBankInstance() {
-        return bankInstance;
-    }
-
-    public void setBankInstance(BankImpl bankInstance) {
+    public void setBankInstance(Bank bankInstance) {
         this.bankInstance = bankInstance;
-    }
-
-    public boolean isIsFileSelected() {
-        return isFileSelected.get();
     }
 
     public BooleanProperty isFileSelectedProperty() {
         return isFileSelected;
     }
 
-    public void setIsFileSelected(boolean isFileSelected) {
-        this.isFileSelected.set(isFileSelected);
-    }
-
     private ObservableList<TransactionModel> getTransactions() {
         return FXCollections.observableArrayList(transactionModels);
     }
 
-    private ObservableList<NotificationModel> getNotiications() {
+    private ObservableList<NotificationModel> getNotifications() {
         return FXCollections.observableArrayList(notificationModels);
-    }
-
-    private ObservableList<LoanModel> getLoans() {
-        return FXCollections.observableArrayList();
     }
 
     private void updateTransactions() {
@@ -1039,7 +876,10 @@ public class CustomerController {
                 }
                 transactionModels = tempTransactionModels;
             }
-            catch(Exception e) {}
+            catch(Exception e) {
+                paymentErrorLabel.setText(e.getMessage());
+                paymentErrorLabel.setTextFill(Color.RED);
+            }
             Platform.runLater(() -> transactionsTable.setItems(getTransactions()));
         });
         updateTransactions.start();
@@ -1098,6 +938,7 @@ public class CustomerController {
                 e.printStackTrace();
             }
             List<NotificationModel> tempNotificationModels = new ArrayList<>();
+            assert notificationsData != null;
             for(NotificationData data : notificationsData) {
                 tempNotificationModels.add(new NotificationModel.NotificationModelBuilder()
                         .message(data.getMessage())
@@ -1106,7 +947,7 @@ public class CustomerController {
             }
             notificationModels = tempNotificationModels;
             Platform.runLater(() -> {
-                notificationsTable.setItems(getNotiications());
+                notificationsTable.setItems(getNotifications());
                 notificationsTable.sort();
             });
         });
@@ -1133,33 +974,6 @@ public class CustomerController {
             }
         });
         depositThread.start();
-    }
-
-    public void makeEnterAmountScreen(String message) {
-        Stage newStage = new Stage();
-        VBox comp = new VBox();
-        Label messageLabel = new Label(message);
-        TextField amountField = new TextField("Amount");
-        comp.getChildren().add(messageLabel);
-        comp.getChildren().add(amountField);
-
-        HBox buttonsBox = new HBox();
-        Button cancelButton = new Button("Cancel");
-        Button enterButton = new Button("Submit");
-
-        buttonsBox.getChildren().add(cancelButton);
-        buttonsBox.getChildren().add(enterButton);
-
-        comp.getChildren().add(buttonsBox);
-
-        // Style
-        comp.setAlignment(Pos.CENTER);
-        comp.setFillWidth(true);
-        newStage.initStyle(StageStyle.UNDECORATED);
-
-        Scene stageScene = new Scene(comp, 300, 300);
-        newStage.setScene(stageScene);
-        newStage.show();
     }
 
 
@@ -1195,9 +1009,7 @@ public class CustomerController {
                 sellInvestmentModels = getInvModels(customerInvestments);
 
 
-                Platform.runLater(() -> {
-                    sellInvestmentTable.setItems(getSellInvestments());
-                });
+                Platform.runLater(() -> sellInvestmentTable.setItems(getSellInvestments()));
 
             } catch (DataNotFoundException e) {
                 sellErrorLabel.setText(e.getMessage());
@@ -1211,7 +1023,7 @@ public class CustomerController {
     }
 
     private void updateTimeChart() {
-        int i = 0;
+        int i;
         try {
             PaymentsData data = bankInstance.getPaymentsData(customerId.get());
 

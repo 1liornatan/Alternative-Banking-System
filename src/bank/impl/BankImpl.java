@@ -52,7 +52,7 @@ public class BankImpl implements Bank {
     private DataStorage<Account> loanAccounts;
     private DataStorage<Transaction> transactions;
     private DataStorage<Loan> loans;
-    private DataStorage<Investment> sellInvestmentsDataStorage;
+    private final DataStorage<Investment> sellInvestmentsDataStorage;
     private Set<String> categories;
     private BankLoanHandler loanHandler;
     private TimeHandler timeHandler;
@@ -68,20 +68,21 @@ public class BankImpl implements Bank {
         sellInvestmentsDataStorage = new BankDataStorage<>(timeHandler);
     }
 
+    @Override
     public void listInvestment(InvestmentData data) throws DataNotFoundException {
         Optional<Investment> first = loans.getDataPair(data.getLoanId()).getKey().getInvestments().stream().filter(inv -> inv.getId().equals(data.getInvestmentId())).findFirst();
 
-        if(first.isPresent()) {
-            sellInvestmentsDataStorage.addData(first.get());
-        }
+        first.ifPresent(sellInvestmentsDataStorage::addData);
     }
 
+    @Override
     public void unlistInvestment(InvestmentData data) throws DataNotFoundException {
         if(sellInvestmentsDataStorage.isDataExists(data.getInvestmentId()))
             sellInvestmentsDataStorage.remove(data.getInvestmentId());
     }
 
 
+    @Override
     public void investmentTrade(InvestmentData data) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
         buyInvestment(data.getInvestmentId(), data.getBuyerId(), data.getOwnerId());
     }
@@ -105,15 +106,12 @@ public class BankImpl implements Bank {
         sellInvestmentsDataStorage.remove(investmentId);
     }
 
+    @Override
     public InvestmentsSellData getCustomerInvestments(String customerId) throws DataNotFoundException {
         CustomerAccount account = customersAccounts.getDataById(customerId);
         List<Investment> investments = new ArrayList<>();
 
-        account.getLoansInvested().stream().filter(loan -> loan.getStatus() == LoanStatus.ACTIVE).forEach(loan -> {
-            loan.getInvestments().stream().filter(investment -> investment.getInvestorId().equals(customerId)).forEach(investment -> {
-                investments.add(investment);
-            });
-        });
+        account.getLoansInvested().stream().filter(loan -> loan.getStatus() == LoanStatus.ACTIVE).forEach(loan -> loan.getInvestments().stream().filter(investment -> investment.getInvestorId().equals(customerId)).forEach(investments::add));
 
         return investmentsListToData(investments);
     }
@@ -239,16 +237,14 @@ public class BankImpl implements Bank {
                     Loan loan = pair.getKey();
                     return getMissingCycles(loan) > 1;
                 })
-                .forEach(pair -> {
-                    updateRiskStatus(pair.getKey());
-                });
+                .forEach(pair -> updateRiskStatus(pair.getKey()));
     }
 
     private void updateRiskStatus(Loan loan) {
         int notificationYaz = getCurrentYaz();
         loan.setStatus(LoanStatus.RISKED);
         Set<String> investors = new HashSet<>();
-        loan.getInvestments().stream().forEach(inv -> {
+        loan.getInvestments().forEach(inv -> {
             investors.add(inv.getInvestorId());
             if(sellInvestmentsDataStorage.isDataExists(inv.getId())) {
                 try {
@@ -262,7 +258,7 @@ public class BankImpl implements Bank {
                 }
             }
         });
-        investors.stream().forEach(investor -> {
+        investors.forEach(investor -> {
             try {
                 CustomerAccount investorAcc = customersAccounts.getDataById(investor);
                 investorAcc.addNotification(new BankNotification(
@@ -291,6 +287,7 @@ public class BankImpl implements Bank {
         loanHandler.oneCycle();
     }
 
+    @Override
     public void advanceCycle(String loanId) throws DataNotFoundException, NonPositiveAmountException {
         Loan loan = loans.getDataById(loanId);
         loanHandler.payOneCycle(loan);
@@ -372,7 +369,7 @@ public class BankImpl implements Bank {
             forSale.add(true);
         }
 
-        InvestmentsSellData sellData = new InvestmentsSellData.SellBuilder()
+        return new InvestmentsSellData.SellBuilder()
                 .name(investors)
                 .loans(loans)
                 .amount(sellAmounts)
@@ -381,9 +378,9 @@ public class BankImpl implements Bank {
                 .forSale(forSale)
                 .Build();
 
-        return sellData;
-
     }
+
+    @Override
     public void setInvestmentsData(InvestmentsData investmentsData) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
         List<String> loansIds = investmentsData.getLoansIds();
         List<Loan> loansList = new ArrayList<>();
@@ -400,15 +397,14 @@ public class BankImpl implements Bank {
         CustomerAccount investingAccount = customersAccounts.getDataById(investor);
 
         float percent = loan.getInterestPercent();
-        int amountInvesting = amount;
         int cyclesPerPayment = loan.getCyclesPerPayment();
         int duration = loan.getDuration();
 
-        Interest interest = new BasicInterest(percent, amountInvesting, cyclesPerPayment, duration);
+        Interest interest = new BasicInterest(percent, amount, cyclesPerPayment, duration);
 
         Investment loanInvestment = new LoanInvestment(investor, interest, loan.getId());
         loanHandler.addInvestment(loan, loanInvestment, investingAccount);
-        investingAccount.addNotification(new BankNotification("Invested " + amountInvesting + " in '" + loan.getId() + "'.",
+        investingAccount.addNotification(new BankNotification("Invested " + amount + " in '" + loan.getId() + "'.",
                 timeHandler.getCurrentTime()));
     }
 
@@ -421,10 +417,10 @@ public class BankImpl implements Bank {
         int lowestLoan = 0;
 
         loansAmount = loanDataList.size();
-        loanDataList.sort(Comparator.comparingInt(p -> p.getAmountToActive()));
+        loanDataList.sort(Comparator.comparingInt(Loan::getAmountToActive));
         minAmount = loanDataList.get(0).getAmountToActive();
         avgAmount = (int) Math.ceil (amountLeft / (loansAmount - lowestLoan));
-        loanDataList.stream().forEach(loan -> amountInvestingArr.add(0));
+        loanDataList.forEach(loan -> amountInvestingArr.add(0));
 
 
         if (minAmount > avgAmount) {
@@ -673,7 +669,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public CustomerData getCustomerData(CustomerAccount customer) throws DataNotFoundException {
+    public CustomerData getCustomerData(CustomerAccount customer) {
         CustomerData customerData = new CustomerData();
         customerData.setBalance(customer.getBalance());
         customerData.setName(customer.getId());
@@ -728,7 +724,6 @@ public class BankImpl implements Bank {
         try {
             customersAccounts.getDataById(customerId)
                     .getLoansInvested()
-                    .stream()
                     .forEach(loan -> {
                         try {
                             loanDataList.add(getLoanData(loan));
@@ -750,7 +745,6 @@ public class BankImpl implements Bank {
         try {
             customersAccounts.getDataById(customerId)
                     .getLoansRequested()
-                    .stream()
                     .forEach(loan -> {
                         try {
                             loanDataList.add(getLoanData(loan));
@@ -785,8 +779,7 @@ public class BankImpl implements Bank {
         List<TransactionData> transactionsDataList = new ArrayList<>();
         try {
             customersAccounts.getDataById(customerId).getTransactions()
-                    .stream()
-                    .forEach(transaction -> { transactionsDataList.add(getTransactionData(transaction));});
+                    .forEach(transaction -> transactionsDataList.add(getTransactionData(transaction)));
         } catch (DataNotFoundException e) {
             e.printStackTrace();
         }
@@ -798,11 +791,11 @@ public class BankImpl implements Bank {
     public NotificationsData getNotificationsData(String customerId) throws DataNotFoundException {
         NotificationsData notificationsData = new NotificationsData();
         List<NotificationData> notificationDataList = new ArrayList<>();
-        customersAccounts.getDataById(customerId).getNotificationList().stream()
-                .forEach(notification -> {notificationDataList.add(new NotificationData.NotificationDataBuilder()
+        customersAccounts.getDataById(customerId).getNotificationList()
+                .forEach(notification -> notificationDataList.add(new NotificationData.NotificationDataBuilder()
                         .message(notification.getMessage())
                         .yazMade(notification.getYazMade())
-                        .build());});
+                        .build()));
         notificationsData.setNotificationsList(notificationDataList);
         return notificationsData;
     }
@@ -824,10 +817,10 @@ public class BankImpl implements Bank {
             CustomerAccount ownerAcc = customersAccounts.getDataById(loan.getOwnerId());
 
             Set<String> investors = new HashSet<>();
-            loan.getInvestments().stream().forEach(inv -> investors.add(inv.getInvestorId()));
+            loan.getInvestments().forEach(inv -> investors.add(inv.getInvestorId()));
 
             ownerAcc.addNotification(new BankNotification("Your Loan '" + loan.getId() + "' is not in risk an d is active again!", messageYaz));
-            investors.stream().forEach(investor -> {
+            investors.forEach(investor -> {
                 try {
                     CustomerAccount invAcc = customersAccounts.getDataById(investor);
                     invAcc.addNotification(new BankNotification("The Loan '" + loan.getId() + "' is not in risk and is active again!", messageYaz));
@@ -865,12 +858,10 @@ public class BankImpl implements Bank {
                     String description = transaction.getDescription().toLowerCase();
                     return description.contains("loan") && description.contains("payment");
                 })
-                .filter(transaction -> {
-                    return transaction.getAmount() > 0;
-                })
+                .filter(transaction -> transaction.getAmount() > 0)
                 .forEach(transaction -> {
                     try {
-                        Integer yazIndex = transactions.getDataPair(transaction.getId()).getValue() - 1;
+                        int yazIndex = transactions.getDataPair(transaction.getId()).getValue() - 1;
                         payments.set(yazIndex, payments.get(yazIndex) + 1);
                         amounts.set(yazIndex, amounts.get(yazIndex) + transaction.getAmount());
                     } catch (DataNotFoundException e) {
@@ -880,6 +871,7 @@ public class BankImpl implements Bank {
         return new PaymentsData.PaymentsDataBuilder().payments(payments).amount(amounts).build();
     }
 
+    @Override
     public PaymentsData getAllTransactionsData() {
         List<Integer> payments = new ArrayList<>();
         List<Integer> amounts = new ArrayList<>();
@@ -890,7 +882,7 @@ public class BankImpl implements Bank {
             amounts.add(0);
         }
 
-        transactions.getAllPairs().stream()
+        transactions.getAllPairs()
                 .forEach(pair -> {
                     int yazIndex = pair.getValue();
                     int amount = Math.abs(pair.getKey().getAmount());
@@ -898,11 +890,12 @@ public class BankImpl implements Bank {
                     payments.set(yazIndex, payments.get(yazIndex) + 1);
                 });
 
-        amounts.stream().forEach(number -> number = number / 2);
+        amounts.forEach(number -> number = number / 2);
 
         return new PaymentsData.PaymentsDataBuilder().payments(payments).amount(amounts).build();
     }
 
+    @Override
     public PaymentsData getAllLoansData() {
         List<Integer> payments = new ArrayList<>();
         List<Integer> amounts = new ArrayList<>();
@@ -913,7 +906,7 @@ public class BankImpl implements Bank {
             amounts.add(0);
         }
 
-        loans.getAllPairs().stream()
+        loans.getAllPairs()
                 .forEach(pair -> {
                     int yazIndex = pair.getValue();
                     int amount = Math.abs(pair.getKey().getBaseAmount());
@@ -924,6 +917,7 @@ public class BankImpl implements Bank {
         return new PaymentsData.PaymentsDataBuilder().payments(payments).amount(amounts).build();
     }
 
+    @Override
     public PaymentsData getAllCustomersData() {
         List<Integer> payments = new ArrayList<>();
         List<Integer> amounts = new ArrayList<>();
@@ -934,7 +928,7 @@ public class BankImpl implements Bank {
             amounts.add(0);
         }
 
-        customersAccounts.getAllPairs().stream()
+        customersAccounts.getAllPairs()
                 .forEach(pair -> {
                     int yazIndex = pair.getValue();
                     int amount = Math.abs(pair.getKey().getBalance());

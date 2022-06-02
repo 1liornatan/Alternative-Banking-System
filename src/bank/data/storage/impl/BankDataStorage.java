@@ -14,8 +14,8 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
     private final TimeHandler timeHandler;
 
     public class F implements Serializable {
-        E data;
-        int time;
+        final E data;
+        final int time;
 
         public F(E data) {
             this.data = data;
@@ -48,7 +48,7 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
     }
 
     @Override
-    public void remove(String id) throws DataNotFoundException {
+    public void remove(String id) {
         container.remove(id);
     }
     @Override

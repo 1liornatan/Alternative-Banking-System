@@ -6,8 +6,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class LoanStatusModel {
-    IntegerProperty numOfPendingLoansRequested, numOfActiveLoansRequested, numOfRiskLoansRequested, numOfFinishedLoansRequested, numOfNewLoansRequested;
-    StringProperty name;
+    final IntegerProperty numOfPendingLoansRequested;
+    final IntegerProperty numOfActiveLoansRequested;
+    final IntegerProperty numOfRiskLoansRequested;
+    final IntegerProperty numOfFinishedLoansRequested;
+    final IntegerProperty numOfNewLoansRequested;
+    final StringProperty name;
 
     public String getName() {
         return name.get();

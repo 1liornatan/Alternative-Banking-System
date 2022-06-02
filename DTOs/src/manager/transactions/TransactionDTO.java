@@ -1,9 +1,10 @@
 package manager.transactions;
 
 public class TransactionDTO {
-    String description;
-    int amount;
-    int previousBalance, yazMade;
+    final String description;
+    final int amount;
+    final int previousBalance;
+    final int yazMade;
 
     public TransactionDTO(String description, int amount, int previousBalance, int yazMade) {
         this.description = description;

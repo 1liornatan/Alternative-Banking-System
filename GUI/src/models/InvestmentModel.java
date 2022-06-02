@@ -17,9 +17,12 @@ public class InvestmentModel {
     }
 
     public static class InvestmentModelBuilder {
-        StringProperty loanId, ownerId, investmentId;
-        IntegerProperty yazMade, amount;
-        BooleanProperty isForSale;
+        final StringProperty loanId;
+        final StringProperty ownerId;
+        final StringProperty investmentId;
+        final IntegerProperty yazMade;
+        final IntegerProperty amount;
+        final BooleanProperty isForSale;
 
         public InvestmentModelBuilder() {
             loanId = new SimpleStringProperty();

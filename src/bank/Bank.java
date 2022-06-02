@@ -12,10 +12,7 @@ import bank.time.TimeHandler;
 import bank.transactions.Transaction;
 import files.xmls.exceptions.*;
 import manager.customers.*;
-import manager.investments.InvestDTO;
-import manager.investments.InvestmentsSellData;
-import manager.investments.PaymentsData;
-import manager.investments.RequestDTO;
+import manager.investments.*;
 import manager.loans.LoanDTO;
 import manager.categories.CategoriesDTO;
 import manager.loans.LoanData;
@@ -34,6 +31,14 @@ import java.util.List;
 import java.util.Set;
 
 public interface Bank {
+    void listInvestment(InvestmentData data) throws DataNotFoundException;
+
+    void unlistInvestment(InvestmentData data) throws DataNotFoundException;
+
+    void investmentTrade(InvestmentData data) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
+
+    InvestmentsSellData getCustomerInvestments(String customerId) throws DataNotFoundException;
+
     DataStorage<CustomerAccount> getCustomersAccounts();
 
     DataStorage<Account> getLoanAccounts();
@@ -50,6 +55,8 @@ public interface Bank {
 
     void advanceOneCycle() throws DataNotFoundException, NonPositiveAmountException;
 
+    void advanceCycle(String loanId) throws DataNotFoundException, NonPositiveAmountException;
+
     int getCurrentYaz();
 
     //    int createLoan(int ownerId, float amount, String category); // returns loan's id
@@ -64,6 +71,8 @@ public interface Bank {
     int getDeriskAmount(Loan loan);
 
     InvestmentsSellData getInvestmentsForSell(String requesterId);
+
+    void setInvestmentsData(InvestmentsData investmentsData) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
 
     void createInvestment(String investor, Loan loan, int amount) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
 
@@ -121,4 +130,10 @@ public interface Bank {
     void closeLoan(String id) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
 
     PaymentsData getPaymentsData(String customerId) throws DataNotFoundException;
+
+    PaymentsData getAllTransactionsData();
+
+    PaymentsData getAllLoansData();
+
+    PaymentsData getAllCustomersData();
 }

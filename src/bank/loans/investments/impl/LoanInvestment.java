@@ -12,8 +12,10 @@ public class LoanInvestment implements Investment {
     private String investorId;
 
     private final Interest interest;
-    private int amountPaid, paymentsReceived, id;
-    private List<Integer> payments;
+    private int amountPaid;
+    private int paymentsReceived;
+    private final int id;
+    private final List<Integer> payments;
     private final String loanId;
 
     public LoanInvestment(String investorId, Interest interest, String loanId) {

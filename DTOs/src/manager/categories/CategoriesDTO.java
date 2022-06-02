@@ -5,13 +5,12 @@ import java.util.List;
 import java.util.Set;
 
 public class CategoriesDTO {
-    List<String> categories;
+    final List<String> categories;
 
     public CategoriesDTO(Set<String> categories) {
         this.categories = new ArrayList<>();
 
-        for(String str : categories)
-            this.categories.add(str);
+        this.categories.addAll(categories);
     }
 
     public List<String> getCategories() {

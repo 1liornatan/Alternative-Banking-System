@@ -1,8 +1,8 @@
 package manager.time;
 
 public class YazSystemDTO {
-    private int currentYaz;
-    private int previousYaz;
+    private final int currentYaz;
+    private final int previousYaz;
 
     public YazSystemDTO(int currentYaz, int previousYaz) {
         this.currentYaz = currentYaz;

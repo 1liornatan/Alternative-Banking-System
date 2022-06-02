@@ -5,7 +5,7 @@ import bank.Bank;
 import java.io.*;
 
 public class SystemSaver implements Saver {
-    Bank bank;
+    final Bank bank;
     private boolean valid;
     private int prevYaz, currYaz;
     private Object categories, customers, loanAccounts, loans, transactions;

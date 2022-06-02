@@ -7,12 +7,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class RequestDTO {
-    int amount;
-    CategoriesDTO categoriesDTO;
-    float minInterest;
-    int minLoanDuration;
-    int maxRelatedLoans;
-    String requesterName;
+    final int amount;
+    final CategoriesDTO categoriesDTO;
+    final float minInterest;
+    final int minLoanDuration;
+    final int maxRelatedLoans;
+    final String requesterName;
 
     public RequestDTO(Builder builder) {
         this.amount = builder.amount;
@@ -47,12 +47,12 @@ public class RequestDTO {
     }
 
     public static class Builder {
-        int amount;
+        final int amount;
         CategoriesDTO categoriesDTO;
         float minInterest;
         int minLoanDuration;
         int maxRelatedLoans;
-        String requesterName;
+        final String requesterName;
 
         public Builder(String requesterName, int amount) {
             this.amount = amount;

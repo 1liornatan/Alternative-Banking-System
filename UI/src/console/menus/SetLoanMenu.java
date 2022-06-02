@@ -21,13 +21,13 @@ import java.util.*;
 
 public class SetLoanMenu {
     int amount;
-    Set<String> categories;
+    final Set<String> categories;
     float minInterest;
-    int minLoanDuration;
-    int balance;
+    final int minLoanDuration;
+    final int balance;
     int maxRequestedLoans;
-    String requesterName;
-    Bank bankInstance;
+    final String requesterName;
+    final Bank bankInstance;
 
     public SetLoanMenu(Bank bank, CustomerDTO customerDTO) {
         this.requesterName = customerDTO.getName();

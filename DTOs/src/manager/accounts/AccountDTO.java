@@ -4,9 +4,9 @@ import manager.transactions.TransactionDTO;
 import manager.transactions.TransactionsDTO;
 
 public class AccountDTO {
-    String name;
-    int balance;
-    TransactionsDTO transactionsDTO;
+    final String name;
+    final int balance;
+    final TransactionsDTO transactionsDTO;
 
     public String getName() {
         return name;

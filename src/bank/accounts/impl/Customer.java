@@ -9,8 +9,9 @@ import java.util.*;
 
 public class Customer extends LoanAccount implements CustomerAccount {
     private final String name;
-    private Collection<Loan> loansRequested, loansInvested;
-    private List<Notification> notificationList;
+    private final Collection<Loan> loansRequested;
+    private final Collection<Loan> loansInvested;
+    private final List<Notification> notificationList;
 
     @Override
     public boolean equals(Object o) {

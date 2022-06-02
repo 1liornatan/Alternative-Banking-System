@@ -1,5 +1,6 @@
 package screens.admin;
 
+import bank.Bank;
 import bank.impl.BankImpl;
 import bank.impl.exceptions.DataNotFoundException;
 import files.xmls.exceptions.*;
@@ -26,7 +27,6 @@ import models.LoanStatusModel;
 import models.utils.LoanTable;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import screens.customer.CustomerController;
-import screens.utils.HoveredThresholdNode;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,11 +36,11 @@ public class AdminController {
 
     private static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
 
-    BooleanProperty isFileSelected;
-    StringProperty filePathProperty;
-    IntegerProperty currYazProperty;
+    final BooleanProperty isFileSelected;
+    final StringProperty filePathProperty;
+    final IntegerProperty currYazProperty;
 
-    private BankImpl bankInstance;
+    private Bank bankInstance;
     private List<CustomerModel> customerModelList;
     private List<LoanModel> loanModelList;
 
@@ -72,11 +72,11 @@ public class AdminController {
     void customersButtonAction(ActionEvent event) {
         PaymentsData data = bankInstance.getAllCustomersData();
 
-        int i = 0;
-        XYChart.Series series = new XYChart.Series();
-        XYChart.Series forecasting = new XYChart.Series();
-        XYChart.Series seriesA = new XYChart.Series();
-        XYChart.Series forecastingA = new XYChart.Series();
+        int i;
+        XYChart.Series<String, Integer> series = new XYChart.Series<>();
+        XYChart.Series<String, Integer> forecasting = new XYChart.Series<>();
+        XYChart.Series<String, Integer> seriesA = new XYChart.Series<>();
+        XYChart.Series<String, Integer> forecastingA = new XYChart.Series<>();
         seriesA.setName("Balance in ABS");
         forecasting.setName("Forecasting balance");
         series.setName("Customers in ABS");
@@ -93,15 +93,15 @@ public class AdminController {
         for(i = 0; i < yaz; i++) {
             sum += payments.get(i);
             sumBalance += amounts.get(i);
-            series.getData().add(new XYChart.Data(String.valueOf(i+1), payments.get(i)));
-            seriesA.getData().add(new XYChart.Data(String.valueOf(i+1), amounts.get(i)));
+            series.getData().add(new XYChart.Data<>(String.valueOf(i+1), payments.get(i)));
+            seriesA.getData().add(new XYChart.Data<>(String.valueOf(i+1), amounts.get(i)));
         }
 
         int avg = sum / (i+1);
         int avgBalance = sumBalance / (i+1);
         for(int j = 0; j < i + 5; j++) {
-            forecasting.getData().add(new XYChart.Data(String.valueOf(j+1), avg*j));
-            forecastingA.getData().add(new XYChart.Data(String.valueOf(j+1), avg*(i+1)));
+            forecasting.getData().add(new XYChart.Data<>(String.valueOf(j+1), avg*j));
+            forecastingA.getData().add(new XYChart.Data<>(String.valueOf(j+1), avg*(i+1)));
         }
 
         timeLineChart.getData().clear();
@@ -112,12 +112,11 @@ public class AdminController {
     void transactionsButtonAction(ActionEvent event) {
         PaymentsData data = bankInstance.getAllTransactionsData();
 
-        int i = 0;
-        XYChart.Series series = new XYChart.Series();
-        XYChart.Series forecasting = new XYChart.Series();
-        XYChart.Series seriesA = new XYChart.Series();
-        XYChart.Series forecastingA = new XYChart.Series();
-        seriesA.setName("Transactions Amount");
+        int i;
+        XYChart.Series<String, Integer> series = new XYChart.Series<>();
+        XYChart.Series<String, Integer> forecasting = new XYChart.Series<>();
+        XYChart.Series<String, Integer> seriesA = new XYChart.Series<>();
+        XYChart.Series<String, Integer> forecastingA = new XYChart.Series<>();        seriesA.setName("Transactions Amount");
         forecasting.setName("Forecasting #Transactions");
         series.setName("#Transactions");
         forecasting.setName("Forecasting Amount");
@@ -133,15 +132,15 @@ public class AdminController {
         for(i = 0; i < yaz; i++) {
             sum += payments.get(i);
             sumBalance += amounts.get(i);
-            series.getData().add(new XYChart.Data(String.valueOf(i+1), payments.get(i)));
-            seriesA.getData().add(new XYChart.Data(String.valueOf(i+1), amounts.get(i)));
+            series.getData().add(new XYChart.Data<>(String.valueOf(i+1), payments.get(i)));
+            seriesA.getData().add(new XYChart.Data<>(String.valueOf(i+1), amounts.get(i)));
         }
 
         int avg = sum / (i+1);
         int avgBalance = sumBalance / (i+1);
         for(int j = 0; j < i + 5; j++) {
-            forecasting.getData().add(new XYChart.Data(String.valueOf(j+1), avg*j));
-            forecastingA.getData().add(new XYChart.Data(String.valueOf(j+1), avg*(i+1)));
+            forecasting.getData().add(new XYChart.Data<>(String.valueOf(j+1), avg*j));
+            forecastingA.getData().add(new XYChart.Data<>(String.valueOf(j+1), avg*(i+1)));
         }
 
         timeLineChart.getData().clear();
@@ -153,10 +152,10 @@ public class AdminController {
         PaymentsData data = bankInstance.getAllLoansData();
 
         int i = 0;
-        XYChart.Series series = new XYChart.Series();
-        XYChart.Series forecasting = new XYChart.Series();
-        XYChart.Series seriesA = new XYChart.Series();
-        XYChart.Series forecastingA = new XYChart.Series();
+        XYChart.Series<String, Integer> series = new XYChart.Series<>();
+        XYChart.Series<String, Integer> forecasting = new XYChart.Series<>();
+        XYChart.Series<String, Integer> seriesA = new XYChart.Series<>();
+        XYChart.Series<String, Integer> forecastingA = new XYChart.Series<>();
         seriesA.setName("Loans Amount");
         forecasting.setName("Forecasting Amount");
         series.setName("#Loans");
@@ -173,15 +172,15 @@ public class AdminController {
         for(i = 0; i < yaz; i++) {
             sum += payments.get(i);
             sumBalance += amounts.get(i);
-            series.getData().add(new XYChart.Data(String.valueOf(i+1), payments.get(i)));
-            seriesA.getData().add(new XYChart.Data(String.valueOf(i+1), amounts.get(i)));
+            series.getData().add(new XYChart.Data<>(String.valueOf(i+1), payments.get(i)));
+            seriesA.getData().add(new XYChart.Data<>(String.valueOf(i+1), amounts.get(i)));
         }
 
         int avg = sum / (i+1);
         int avgBalance = sumBalance / (i+1);
         for(int j = 0; j < i + 5; j++) {
-            forecasting.getData().add(new XYChart.Data(String.valueOf(j+1), avg*j));
-            forecastingA.getData().add(new XYChart.Data(String.valueOf(j+1), avg*(i+1)));
+            forecasting.getData().add(new XYChart.Data<>(String.valueOf(j+1), avg*j));
+            forecastingA.getData().add(new XYChart.Data<>(String.valueOf(j+1), avg*(i+1)));
         }
 
         timeLineChart.getData().clear();
@@ -191,14 +190,14 @@ public class AdminController {
     @FXML
     void increaseYazButtonAction(ActionEvent event) {
         Thread increaseYazThread = new Thread(() -> {
-           // try {
+            try {
                 bankInstance.advanceOneYaz();
                 updateBankData();
                 int currYaz = bankInstance.getCurrentYaz();
                 Platform.runLater(() -> currYazProperty.set(currYaz));
-           /* } catch (DataNotFoundException | NonPositiveAmountException e) {
-                e.printStackTrace();
-            }*/
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         });
         increaseYazThread.start();
     }
@@ -227,7 +226,7 @@ public class AdminController {
                     filePathProperty.set(absolutePath);
                     currYazProperty.set(currYaz);
                 });
-            } catch (NotXmlException | XmlNoLoanOwnerException | XmlNoCategoryException | XmlPaymentsException | XmlAccountExistsException | XmlNotFoundException | DataNotFoundException e) {
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
                 Platform.runLater(() -> {
                     Alert errorMessage = new Alert(Alert.AlertType.ERROR, e.getMessage());
@@ -423,11 +422,11 @@ public class AdminController {
         updateThread.start();
     }
 
-    public BankImpl getBankInstance() {
+    public Bank getBankInstance() {
         return bankInstance;
     }
 
-    public void setBankInstance(BankImpl bankInstance) {
+    public void setBankInstance(Bank bankInstance) {
         this.bankInstance = bankInstance;
     }
 

@@ -6,10 +6,19 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class LoanModel {
-    private StringProperty id, status;
-    private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
-    private IntegerProperty amountToActive, investorsAmount, deriskAmount, missingCycles;
-    private IntegerProperty paymentAmount, amountLeftToPay;
+    private final StringProperty id;
+    private final StringProperty status;
+    private final IntegerProperty amount;
+    private final IntegerProperty startYaz;
+    private final IntegerProperty endYaz;
+    private final IntegerProperty nextPaymentInYaz;
+    private final IntegerProperty finalAmount;
+    private final IntegerProperty amountToActive;
+    private final IntegerProperty investorsAmount;
+    private final IntegerProperty deriskAmount;
+    private final IntegerProperty missingCycles;
+    private final IntegerProperty paymentAmount;
+    private final IntegerProperty amountLeftToPay;
 
     private LoanModel(LoanModelBuilder builder) {
         this.id = builder.id;
@@ -132,12 +141,19 @@ public class LoanModel {
     }
 
     public static class LoanModelBuilder {
-        public IntegerProperty amountToActive, investorsAmount;
-        public IntegerProperty deriskAmount;
-        public IntegerProperty missingCycles;
-        private StringProperty id, status;
-        private IntegerProperty amount, startYaz, endYaz, nextPaymentInYaz, finalAmount;
-        IntegerProperty paymentAmount, amountLeftToPay;
+        public final IntegerProperty amountToActive;
+        public final IntegerProperty investorsAmount;
+        public final IntegerProperty deriskAmount;
+        public final IntegerProperty missingCycles;
+        private final StringProperty id;
+        private final StringProperty status;
+        private final IntegerProperty amount;
+        private final IntegerProperty startYaz;
+        private final IntegerProperty endYaz;
+        private final IntegerProperty nextPaymentInYaz;
+        private final IntegerProperty finalAmount;
+        final IntegerProperty paymentAmount;
+        final IntegerProperty amountLeftToPay;
 
         public LoanModelBuilder() {
             id = new SimpleStringProperty(null);
