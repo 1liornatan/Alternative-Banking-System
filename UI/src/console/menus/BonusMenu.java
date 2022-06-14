@@ -1,11 +1,10 @@
 package console.menus;
 
-import bank.Bank;
-import bank.impl.holder.BooleanHolder;
+import bank.logic.Bank;
+import bank.logic.impl.holder.BooleanHolder;
 import console.menus.exceptions.NoOptionException;
 import console.menus.exceptions.XmlNotLoadedException;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.Scanner;

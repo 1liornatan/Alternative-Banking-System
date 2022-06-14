@@ -1,7 +1,7 @@
 package screens.main;
 
-import bank.Bank;
-import bank.impl.BankImpl;
+import bank.logic.Bank;
+import bank.logic.impl.BankImpl;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;

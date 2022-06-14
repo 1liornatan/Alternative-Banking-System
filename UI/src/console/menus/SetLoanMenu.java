@@ -1,19 +1,16 @@
 package console.menus;
 
-import bank.Bank;
-import bank.accounts.impl.exceptions.NoMoneyException;
-import bank.accounts.impl.exceptions.NonPositiveAmountException;
-import bank.impl.exceptions.DataNotFoundException;
-import bank.loans.interest.exceptions.InvalidPercentException;
+import bank.logic.Bank;
+import bank.logic.accounts.impl.exceptions.NoMoneyException;
+import bank.logic.accounts.impl.exceptions.NonPositiveAmountException;
+import bank.logic.impl.exceptions.DataNotFoundException;
+import bank.logic.loans.interest.exceptions.InvalidPercentException;
 import console.menus.exceptions.NoAmountSetException;
 import console.menus.exceptions.NoOptionException;
 import manager.categories.CategoriesDTO;
 import manager.customers.CustomerDTO;
-import manager.investments.InvestDTO;
 import manager.investments.RequestDTO;
-import manager.loans.LoanDTO;
 import manager.loans.LoanData;
-import manager.loans.LoansDTO;
 import manager.loans.LoansData;
 import utils.PrintUtils;
 

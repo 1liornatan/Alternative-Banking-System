@@ -1,9 +1,7 @@
 package screens.admin;
 
-import bank.Bank;
-import bank.impl.BankImpl;
-import bank.impl.exceptions.DataNotFoundException;
-import files.xmls.exceptions.*;
+import bank.logic.Bank;
+import bank.logic.impl.exceptions.DataNotFoundException;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;

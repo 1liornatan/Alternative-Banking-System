@@ -1,10 +1,10 @@
 package screens.customer;
 
-import bank.Bank;
-import bank.accounts.impl.exceptions.NoMoneyException;
-import bank.accounts.impl.exceptions.NonPositiveAmountException;
-import bank.impl.exceptions.DataNotFoundException;
-import bank.loans.interest.exceptions.InvalidPercentException;
+import bank.logic.Bank;
+import bank.logic.accounts.impl.exceptions.NoMoneyException;
+import bank.logic.accounts.impl.exceptions.NonPositiveAmountException;
+import bank.logic.impl.exceptions.DataNotFoundException;
+import bank.logic.loans.interest.exceptions.InvalidPercentException;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;

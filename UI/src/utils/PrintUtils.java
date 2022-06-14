@@ -1,18 +1,14 @@
 package utils;
 
-import bank.impl.exceptions.DataNotFoundException;
-import bank.loans.Loan;
+import bank.logic.impl.exceptions.DataNotFoundException;
 import manager.customers.CustomerDTO;
 import manager.customers.CustomersDTO;
-import manager.loans.LoanDTO;
 import manager.loans.LoanData;
-import manager.loans.LoansDTO;
 import manager.loans.LoansData;
 import manager.transactions.TransactionDTO;
 import manager.transactions.TransactionsDTO;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PrintUtils {
