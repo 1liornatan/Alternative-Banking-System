@@ -506,6 +506,7 @@ public class CustomerController {
                 paymentErrorLabel.setTextFill(Color.RED);
             }
         });
+        debtThread.start();
     }
 
     @FXML

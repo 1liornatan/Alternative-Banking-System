@@ -2,6 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/AbsAdmin/AbsAdmin.iml" filepath="$PROJECT_DIR$/AbsAdmin/AbsAdmin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AbsClient/AbsClient.iml" filepath="$PROJECT_DIR$/AbsClient/AbsClient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AbsServer/AbsServer.iml" filepath="$PROJECT_DIR$/AbsServer/AbsServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DC/DC.iml" filepath="$PROJECT_DIR$/DC/DC.iml" />
       <module fileurl="file://$PROJECT_DIR$/DTOs/DTOs.iml" filepath="$PROJECT_DIR$/DTOs/DTOs.iml" />
       <module fileurl="file://$PROJECT_DIR$/Engine.iml" filepath="$PROJECT_DIR$/Engine.iml" />
       <module fileurl="file://$PROJECT_DIR$/GUI/GUI.iml" filepath="$PROJECT_DIR$/GUI/GUI.iml" />

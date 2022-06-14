@@ -150,7 +150,8 @@ public class BankLoanHandler implements LoanHandler {
 
             if(isFinished) {
                 loan.setStatus(LoanStatus.FINISHED);
-                loan.setFinishedYaz(timeHandler.getCurrentTime());
+                loan.setFinishedYaz(currYaz);
+                srcAcc.addNotification(new BankNotification("Loan '" + loan.getId() + "' is now finished!", currYaz));
             }
 
         } catch (NonPositiveAmountException e) {

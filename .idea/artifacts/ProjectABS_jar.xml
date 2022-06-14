@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ProjectABS:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ProjectABS_jar</output-path>
+    <root id="archive" name="ProjectABS.jar">
+      <element id="module-output" name="Engine" />
+      <element id="module-output" name="DTOs" />
+      <element id="module-output" name="UI" />
+      <element id="module-output" name="GUI" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/08. Java FX/08. Java FX/tools/cssfx-1.0.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/UTILS/controlsfx/controlsfx-8.40.14.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

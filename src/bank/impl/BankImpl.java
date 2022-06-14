@@ -828,7 +828,7 @@ public class BankImpl implements Bank {
             Set<String> investors = new HashSet<>();
             loan.getInvestments().forEach(inv -> investors.add(inv.getInvestorId()));
 
-            ownerAcc.addNotification(new BankNotification("Your Loan '" + loan.getId() + "' is not in risk an d is active again!", messageYaz));
+            ownerAcc.addNotification(new BankNotification("Your Loan '" + loan.getId() + "' is not in risk an is active again!", messageYaz));
             investors.forEach(investor -> {
                 try {
                     CustomerAccount invAcc = customersAccounts.getDataById(investor);

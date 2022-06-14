@@ -158,7 +158,7 @@
 }
 
 .combo-box .cell:selected {
-    -fx-text-fill: #3c92cc;
+    -fx-text-fill: #ffffff;
     -fx-font-size: 16;
     -fx-font-weight: BOLD;
 }
