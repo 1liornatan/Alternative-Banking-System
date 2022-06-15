@@ -14,7 +14,7 @@ import java.io.IOException;
 
 import static abs.constants.Constants.USERNAME;
 
-@WebServlet(name = "Login Servlet", urlPatterns = "/login")
+@WebServlet(name = "Login Servlet", urlPatterns = "/bank/login")
 public class LightweightLoginServlet extends HttpServlet {
 
     @Override
@@ -22,6 +22,9 @@ public class LightweightLoginServlet extends HttpServlet {
         response.setContentType("text/plain;charset=UTF-8");
 
         String usernameFromSession = SessionUtils.getUsername(request);
+
+        BankManager bankManager = ServletUtils.getBankManager(getServletContext());
+
         UserManager userManager = ServletUtils.getUserManager(getServletContext());
 
         if (usernameFromSession == null) { //user is not logged in yet
@@ -58,6 +61,8 @@ public class LightweightLoginServlet extends HttpServlet {
                     }
                     else {
                         //add the new user to the users list
+                        if(!bankManager.isUserExists(usernameFromParameter))
+                            bankManager.addCustomer(usernameFromParameter);
                         userManager.addUser(usernameFromParameter);
                         //set the username in a session so it will be available on each request
                         //the true parameter means that if a session object does not exists yet

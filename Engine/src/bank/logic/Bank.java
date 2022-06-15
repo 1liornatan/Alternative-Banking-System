@@ -138,4 +138,6 @@ public interface Bank {
     PaymentsData getAllLoansData();
 
     PaymentsData getAllCustomersData();
+
+    boolean isCustomerExists(String username);
 }

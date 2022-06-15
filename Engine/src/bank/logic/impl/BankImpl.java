@@ -952,4 +952,9 @@ public class BankImpl implements Bank {
 
         return new PaymentsData.PaymentsDataBuilder().payments(payments).amount(amounts).build();
     }
+
+    @Override
+    public boolean isCustomerExists(String username) {
+        return customersAccounts.isDataExists(username);
+    }
 }
