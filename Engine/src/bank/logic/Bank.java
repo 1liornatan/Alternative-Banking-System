@@ -12,6 +12,7 @@ import bank.logic.time.TimeHandler;
 import bank.logic.transactions.Transaction;
 import files.xmls.exceptions.*;
 import manager.customers.*;
+import manager.info.ClientInfoData;
 import manager.investments.*;
 import manager.loans.LoanDTO;
 import manager.categories.CategoriesDTO;
@@ -25,6 +26,7 @@ import manager.transactions.TransactionData;
 import manager.transactions.TransactionsDTO;
 import manager.transactions.TransactionsData;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
@@ -140,4 +142,8 @@ public interface Bank {
     PaymentsData getAllCustomersData();
 
     boolean isCustomerExists(String username);
+
+    void addLoansFromFile(String customer, String filePath) throws XmlPaymentsException, NonPositiveAmountException, DataNotFoundException;
+
+    ClientInfoData getClientInfo(String customer) throws DataNotFoundException;
 }

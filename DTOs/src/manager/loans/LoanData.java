@@ -3,7 +3,7 @@ package manager.loans;
 public class LoanData {
     String name, category, status, loanRequester;
     int baseAmount, finalAmount;
-    float interest;
+    int interest;
     int startedYaz, finishedYaz;
     int nextPaymentInYaz, nextPaymentAmount, cyclesPerPayment;
     int amountToActive, deriskAmount, missingCycles;
@@ -73,11 +73,11 @@ public class LoanData {
         loanRequester = loanRequester;
     }
 
-    public float getInterest() {
+    public int getInterest() {
         return interest;
     }
 
-    public void setInterest(float interest) {
+    public void setInterest(int interest) {
         this.interest = interest;
     }
 

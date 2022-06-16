@@ -186,7 +186,7 @@ public class BasicLoan implements Loan {
     }
 
     @Override
-    public float getInterestPercent() {
+    public int getInterestPercent() {
         return interest.getPercent();
     }
 

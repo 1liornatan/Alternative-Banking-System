@@ -26,7 +26,7 @@ public interface Loan extends Singular {
     String getCategory();
     int getFinalAmount();
     int getInterestAmount();
-    float getInterestPercent();
+    int getInterestPercent();
 
     int getCyclesPerPayment();
 

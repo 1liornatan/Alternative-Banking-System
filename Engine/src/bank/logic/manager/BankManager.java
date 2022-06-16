@@ -1,12 +1,11 @@
 package bank.logic.manager;
 
 import bank.logic.Bank;
-import bank.logic.accounts.impl.exceptions.NoMoneyException;
-import bank.logic.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.logic.impl.BankImpl;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.loans.interest.exceptions.InvalidPercentException;
 import manager.customers.CustomersNames;
+import manager.info.ClientInfoData;
 import manager.investments.InvestmentsData;
 import manager.investments.RequestDTO;
 import manager.loans.LoansData;
@@ -39,5 +38,13 @@ public class BankManager {
 
     public void setInvestment(InvestmentsData investmentsData) throws Exception {
         bankInstance.setInvestmentsData(investmentsData);
+    }
+
+    public void addLoansFromFile(String username, String filePath) throws Exception {
+        bankInstance.addLoansFromFile(username, filePath);
+    }
+
+    public ClientInfoData getClientInfo(String customer) throws DataNotFoundException {
+        return bankInstance.getClientInfo(customer);
     }
 }
