@@ -10,7 +10,7 @@ public interface Interest extends Serializable {
 
     int getDuration();
 
-    float getPercent(); // returns interest's percent per payment
+    int getPercent(); // returns interest's percent per payment
     int getBaseAmount();
 
 }

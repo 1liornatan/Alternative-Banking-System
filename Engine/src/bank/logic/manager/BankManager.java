@@ -7,6 +7,7 @@ import bank.logic.impl.BankImpl;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.loans.interest.exceptions.InvalidPercentException;
 import manager.customers.CustomersNames;
+import manager.info.ClientInfoData;
 import manager.investments.InvestmentsData;
 import manager.investments.PaymentsData;
 import manager.investments.RequestDTO;
@@ -72,4 +73,12 @@ public class BankManager {
     }
 
     public void deriskLoanByAmount(String id, int amount) {bankInstance.deriskLoanByAmount(id, amount);}
+
+    public void addLoansFromFile(String username, String filePath) throws Exception {
+        bankInstance.addLoansFromFile(username, filePath);
+    }
+
+    public ClientInfoData getClientInfo(String customer) throws DataNotFoundException {
+        return bankInstance.getClientInfo(customer);
+    }
 }

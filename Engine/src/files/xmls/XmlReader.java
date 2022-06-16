@@ -1,5 +1,6 @@
 package files.xmls;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -28,8 +29,9 @@ import javax.xml.bind.Unmarshaller;
 
 public class XmlReader {
     private static final String JAXB_XML_ABS_PACKAGE_NAME = "files.schema.generated";
+
     private Set<String> categoryNames;
-    private DataStorage<bank.logic.accounts.CustomerAccount> customersDataStorage;//TODO: ?????????
+    private DataStorage<CustomerAccount> customersDataStorage;//TODO: ?????????
     private DataStorage<Loan> loansDataStorage;
     private boolean validation;
 
@@ -127,8 +129,9 @@ public class XmlReader {
         return (AbsDescriptor) u.unmarshal(in);
     }
 
-
     public boolean isValid() {
         return validation;
     }
+
+
 }

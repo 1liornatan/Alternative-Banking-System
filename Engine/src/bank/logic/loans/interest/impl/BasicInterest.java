@@ -3,10 +3,10 @@ package bank.logic.loans.interest.impl;
 import bank.logic.loans.interest.Interest;
 
 public class BasicInterest implements Interest {
-    private final float percent;
+    private final int percent;
     private final int cyclesPerPayment, duration, baseAmount;
 
-    public BasicInterest(float percent, int baseAmount, int cyclesPerPayment, int duration) {
+    public BasicInterest(int percent, int baseAmount, int cyclesPerPayment, int duration) {
         this.percent = percent;
         this.baseAmount = baseAmount;
         this.cyclesPerPayment = cyclesPerPayment;
@@ -25,7 +25,7 @@ public class BasicInterest implements Interest {
     }
 
     @Override
-    public float getPercent() {
+    public int getPercent() {
         return percent;
     }
 

@@ -12,6 +12,8 @@ import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.loans.Loan;
 import bank.logic.loans.LoanStatus;
 import bank.logic.loans.handler.impl.BankLoanHandler;
+import bank.logic.loans.impl.BasicLoan;
+import bank.logic.loans.impl.builder.LoanBuilder;
 import bank.logic.loans.interest.Interest;
 import bank.logic.loans.interest.exceptions.InvalidPercentException;
 import bank.logic.loans.interest.impl.BasicInterest;
@@ -23,11 +25,13 @@ import bank.logic.time.handler.BankTimeHandler;
 import bank.logic.transactions.Transaction;
 import files.saver.Saver;
 import files.saver.SystemSaver;
+import files.xmls.XmlLoanReader;
 import files.xmls.XmlReader;
 import files.xmls.exceptions.*;
 import javafx.util.Pair;
 import manager.accounts.AccountDTO;
 import manager.customers.*;
+import manager.info.ClientInfoData;
 import manager.investments.*;
 import manager.loans.LoanDTO;
 import manager.loans.LoanData;
@@ -399,7 +403,7 @@ public class BankImpl implements Bank {
     public void createInvestment(String investor, Loan loan, int amount) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
         CustomerAccount investingAccount = customersAccounts.getDataById(investor);
 
-        float percent = loan.getInterestPercent();
+        int percent = loan.getInterestPercent();
         int cyclesPerPayment = loan.getCyclesPerPayment();
         int duration = loan.getDuration();
 
@@ -956,5 +960,40 @@ public class BankImpl implements Bank {
     @Override
     public boolean isCustomerExists(String username) {
         return customersAccounts.isDataExists(username);
+    }
+
+    @Override
+    public void addLoansFromFile(String customer, String filePath) throws XmlPaymentsException, NonPositiveAmountException, DataNotFoundException {
+        List<LoanData> loansFromXML = XmlLoanReader.getLoansFromXML(filePath);
+        String categoryName, loanName;
+        int interestPercent, amount, payPerTime, totalTime;
+
+        CustomerAccount customerAccount = customersAccounts.getDataById(customer);
+
+        for(LoanData loan : loansFromXML) {
+            categoryName = loan.getCategory();
+            loanName = loan.getName();
+            interestPercent = loan.getInterest();
+            amount = loan.getBaseAmount();
+            payPerTime = loan.getCyclesPerPayment();
+            totalTime = loan.getFinishedYaz();
+
+            Interest interest = new BasicInterest(interestPercent, amount, payPerTime, totalTime);
+            LoanBuilder loanBuilder = new LoanBuilder(customer, categoryName, loanName);
+
+            Loan loanData = new BasicLoan(loanBuilder, interest, timeHandler);
+            customerAccount.addRequestedLoan(loanData);
+            loans.addData(loanData);
+            categories.add(categoryName);
+        }
+    }
+
+    @Override
+    public ClientInfoData getClientInfo(String customer) throws DataNotFoundException {
+        CustomerAccount customerAccount = customersAccounts.getDataById(customer);
+        return new ClientInfoData.ClientInfoDataBuilder()
+                .balance(customerAccount.getBalance())
+                .categories(categories)
+                .build();
     }
 }
