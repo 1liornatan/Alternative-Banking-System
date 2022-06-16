@@ -3,6 +3,7 @@ package abs.servlets;
 import abs.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
+import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.manager.BankManager;
 import bank.users.UserManager;
 import com.google.gson.Gson;
@@ -34,9 +35,39 @@ public class LoanServlet extends HttpServlet {
             response.getOutputStream().print("Not logged in yet.");
         } else {
             //user is already logged in
-            LoansData requestedLoans = bankManager.getRequestedLoans(usernameFromSession.trim());
+            String type = request.getParameter(Constants.TYPE);
             Gson gson = new Gson();
-            String jsonResponse = gson.toJson(requestedLoans);
+            if(type == null)
+            {
+                response.getOutputStream().print("Invalid Parameters!");
+                return;
+            }
+
+            String jsonResponse = null;
+
+            switch(type) {
+                case(Constants.REQUESTED_LOANS): {
+                    LoansData requestedLoans = bankManager.getRequestedLoans(usernameFromSession.trim());
+                    jsonResponse = gson.toJson(requestedLoans);
+                    break;
+                }
+                case(Constants.INVESTED_LOANS): {
+                    LoansData investedLoans = bankManager.getInvestedLoans(usernameFromSession.trim());
+                    jsonResponse = gson.toJson(investedLoans);
+                    break;
+                }
+                case(Constants.UNFINISHED_LOANS): {
+                    LoansData unFinishedLoans = new LoansData();
+                    try {
+                        unFinishedLoans.setLoans(bankManager.getUnFinishedLoans(usernameFromSession.trim()));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    jsonResponse = gson.toJson(unFinishedLoans);
+                    break;
+                }
+            }
+
             logServerMessage("Loans Request (" + usernameFromSession + "): " + jsonResponse);
 
             try (PrintWriter out = response.getWriter()) {

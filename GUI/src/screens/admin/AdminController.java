@@ -268,15 +268,6 @@ public class AdminController {
 
         CustomerModel customer = param.getValue();
 
-/*        TextField nameField = new TextField(customer.getName());
-        TextField balanceField = new TextField(String.valueOf(customer.getBalance()));
-
-        nameField.setEditable(false);
-        balanceField.setEditable(false);
-
-        expander.addRow(0, new Label("Name"), nameField);
-        expander.addRow(0, new Label("Balance"), balanceField);*/
-
         TableView<LoanStatusModel> expanderTable = new TableView<>();
 
         TableColumn<LoanStatusModel, String> nameColumn = new TableColumn<>("");
