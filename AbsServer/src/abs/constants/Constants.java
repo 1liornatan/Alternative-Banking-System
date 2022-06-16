@@ -16,7 +16,7 @@ public class Constants {
     public static final String PAY_DEBT_REQUEST = "pay_debt_request";
     public static final String PAY_CYCLE_REQUEST = "pay_cycle_request";
 
-
+    public static final String AMOUNT = "amount";
     public static final String TRANSACTION_WITHDRAW = "withdraw";
     public static final String TRANSACTION_CHARGE = "charge";
 }

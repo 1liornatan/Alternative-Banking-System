@@ -8,6 +8,7 @@ import bank.logic.accounts.impl.exceptions.NoMoneyException;
 import bank.logic.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.logic.data.storage.DataStorage;
 import bank.logic.data.storage.impl.BankDataStorage;
+import bank.logic.impl.exceptions.DataAlreadyExistsException;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.loans.Loan;
 import bank.logic.loans.LoanStatus;
@@ -963,7 +964,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public void addLoansFromFile(String customer, String filePath) throws XmlPaymentsException, NonPositiveAmountException, DataNotFoundException {
+    public void addLoansFromFile(String customer, String filePath) throws XmlPaymentsException, NonPositiveAmountException, DataNotFoundException, DataAlreadyExistsException {
         List<LoanData> loansFromXML = XmlLoanReader.getLoansFromXML(filePath);
         String categoryName, loanName;
         int interestPercent, amount, payPerTime, totalTime;
@@ -977,6 +978,9 @@ public class BankImpl implements Bank {
             amount = loan.getBaseAmount();
             payPerTime = loan.getCyclesPerPayment();
             totalTime = loan.getFinishedYaz();
+
+            if(loans.isDataExists(loanName))
+                throw new DataAlreadyExistsException(loanName);
 
             Interest interest = new BasicInterest(interestPercent, amount, payPerTime, totalTime);
             LoanBuilder loanBuilder = new LoanBuilder(customer, categoryName, loanName);

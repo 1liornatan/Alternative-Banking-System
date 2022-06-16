@@ -5,6 +5,7 @@ import bank.logic.accounts.CustomerAccount;
 import bank.logic.accounts.impl.exceptions.NoMoneyException;
 import bank.logic.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.logic.data.storage.DataStorage;
+import bank.logic.impl.exceptions.DataAlreadyExistsException;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.loans.Loan;
 import bank.logic.loans.interest.exceptions.InvalidPercentException;
@@ -143,7 +144,7 @@ public interface Bank {
 
     boolean isCustomerExists(String username);
 
-    void addLoansFromFile(String customer, String filePath) throws XmlPaymentsException, NonPositiveAmountException, DataNotFoundException;
+    void addLoansFromFile(String customer, String filePath) throws XmlPaymentsException, NonPositiveAmountException, DataNotFoundException, DataAlreadyExistsException;
 
     ClientInfoData getClientInfo(String customer) throws DataNotFoundException;
 }
