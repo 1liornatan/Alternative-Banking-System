@@ -20,6 +20,8 @@ public class LogoutServlet extends HttpServlet {
 
         if (usernameFromSession != null) {
             System.out.println("Clearing session for " + usernameFromSession);
+            if(SessionUtils.isAdmin(request))
+                userManager.removeAdmin();
             userManager.removeUser(usernameFromSession);
             SessionUtils.clearSession(request);
 

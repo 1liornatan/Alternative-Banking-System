@@ -19,4 +19,5 @@ public class Constants {
     public static final String AMOUNT = "amount";
     public static final String TRANSACTION_WITHDRAW = "withdraw";
     public static final String TRANSACTION_CHARGE = "charge";
+    public static final String IS_ADMIN = "is_admin";
 }

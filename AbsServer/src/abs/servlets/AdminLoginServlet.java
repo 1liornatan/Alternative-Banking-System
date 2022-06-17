@@ -14,16 +14,14 @@ import java.io.IOException;
 
 import static abs.constants.Constants.USERNAME;
 
-@WebServlet(name = "Login Servlet", urlPatterns = "/bank/login")
-public class LightweightLoginServlet extends HttpServlet {
+@WebServlet(name = "Admin Login Servlet", urlPatterns = "/bank/login/admin")
+public class AdminLoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/plain;charset=UTF-8");
 
         String usernameFromSession = SessionUtils.getUsername(request);
-
-        BankManager bankManager = ServletUtils.getBankManager(getServletContext());
 
         UserManager userManager = ServletUtils.getUserManager(getServletContext());
 
@@ -52,8 +50,8 @@ public class LightweightLoginServlet extends HttpServlet {
                 do here other not related actions (such as response setup. this is shown here in that manner just to stress this issue
                  */
                 synchronized (this) {
-                    if (userManager.isUserExists(usernameFromParameter)) {
-                        String errorMessage = "Username " + usernameFromParameter + " already exists. Please enter a different username.";
+                    if (userManager.isAdminConnected()) {
+                        String errorMessage = "Admin " + userManager.getAdmin() + " is already connected. Only one admin can be connected at a time.";
 
                         // stands for unauthorized as there is already such user with this name
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -61,19 +59,18 @@ public class LightweightLoginServlet extends HttpServlet {
                     }
                     else {
                         //add the new user to the users list
-                        if(!bankManager.isUserExists(usernameFromParameter))
-                            bankManager.addCustomer(usernameFromParameter);
-                        userManager.addUser(usernameFromParameter);
+                        userManager.addAdmin(usernameFromParameter);
                         //set the username in a session so it will be available on each request
                         //the true parameter means that if a session object does not exists yet
                         //create a new one
+                        request.getSession(true).setAttribute(Constants.IS_ADMIN, Boolean.TRUE);
                         request.getSession(true).setAttribute(Constants.USERNAME, usernameFromParameter);
-                        request.getSession(true).setAttribute(Constants.IS_ADMIN, Boolean.FALSE);
+
 
                         //redirect the request to the bank - in order to actually change the URL
                         System.out.println("On login, request URI is: " + request.getRequestURI());
                         response.setStatus(HttpServletResponse.SC_OK);
-                        response.getOutputStream().print("Logged in Successfully");
+                        response.getOutputStream().print("Admin Logged in Successfully");
                     }
                 }
             }

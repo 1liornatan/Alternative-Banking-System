@@ -7,6 +7,7 @@ import bank.logic.manager.BankManager;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import manager.customers.CustomerData;
 import java.io.IOException;
 import java.util.List;
 
+@WebServlet(name = "Accounts Servlet", urlPatterns = "/bank/accounts")
 public class AccountServlet extends HttpServlet {
 
     @Override
@@ -26,6 +28,10 @@ public class AccountServlet extends HttpServlet {
         ServletOutputStream outputStream = resp.getOutputStream();
         if(usernameFromSession == null) {
 
+        }
+        else if(!SessionUtils.isAdmin(req)) {
+            outputStream.print("Only admins are authorized for this request.");
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
         else {
             try {
