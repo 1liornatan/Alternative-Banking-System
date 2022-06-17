@@ -67,6 +67,7 @@ public class LoanServlet extends HttpServlet {
                     jsonResponse = gson.toJson(unFinishedLoans);
                     break;
                 }
+                // TODO: CASE OF ALL LOANS
             }
 
             logServerMessage("Loans Request (" + usernameFromSession + "): " + jsonResponse);
