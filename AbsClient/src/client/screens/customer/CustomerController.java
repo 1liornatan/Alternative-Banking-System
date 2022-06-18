@@ -1,10 +1,5 @@
-package screens.customer;
+package client.screens.customer;
 
-import bank.logic.Bank;
-import bank.logic.accounts.impl.exceptions.NoMoneyException;
-import bank.logic.accounts.impl.exceptions.NonPositiveAmountException;
-import bank.logic.impl.exceptions.DataNotFoundException;
-import bank.logic.loans.interest.exceptions.InvalidPercentException;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -37,13 +32,11 @@ import models.TransactionModel;
 import models.utils.LoanTable;
 import models.utils.TradeTable;
 import org.controlsfx.control.CheckComboBox;
-import screens.MainPage;
 
 import java.util.*;
 
 public class CustomerController {
 
-    private Bank bankInstance;
     private List<LoanModel> loanerModelList;
     private List<LoanModel> lenderModelList;
     private final StringProperty customerId;
@@ -83,10 +76,8 @@ public class CustomerController {
     @FXML
     private ImageView animationImage;
 
-
     @FXML
     private Label infErrorLabel;
-
 
     @FXML
     private TextField balanceField;
@@ -726,30 +717,6 @@ public class CustomerController {
         progressBarStatusLabel.textProperty().unbind();
         progressBarStatusLabel.setText("");
         searchLoansProgressBar.setProgress(0);
-    }
-
-    public static List<LoanModel> makeLoanModelList(List<LoanData> loanDataList) {
-        List<LoanModel> tempLoanModelList = new ArrayList<>();
-        for(LoanData loanData : loanDataList) {
-            LoanModel loanModel = new LoanModel.LoanModelBuilder()
-                    .id(loanData.getName())
-                    .amount(loanData.getBaseAmount())
-                    .endYaz(loanData.getFinishedYaz())
-                    .startYaz(loanData.getStartedYaz())
-                    .nextPaymentInYaz(loanData.getNextPaymentInYaz())
-                    .finalAmount(loanData.getFinalAmount())
-                    .status(loanData.getStatus())
-                    .investorsAmount(loanData.getInvestorsAmount())
-                    .amountToActive(loanData.getAmountToActive())
-                    .deriskAmount(loanData.getDeriskAmount())
-                    .missingCycles(loanData.getMissingCycles())
-                    .payment(loanData.getNextPaymentAmount())
-                    .left(loanData.getCloseAmount())
-                    .build();
-
-            tempLoanModelList.add(loanModel);
-        }
-        return tempLoanModelList;
     }
 
     public void updateData() {

@@ -1,7 +1,8 @@
-package screens.admin;
+package client.screens.admin;
 
-import bank.logic.Bank;
-import bank.logic.impl.exceptions.DataNotFoundException;
+import client.utils.Constants;
+import client.utils.http.HttpClientUtil;
+import com.sun.istack.internal.NotNull;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -15,38 +16,36 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.DataFormat;
 import javafx.scene.layout.GridPane;
-import javafx.stage.FileChooser;
 import manager.customers.CustomerData;
+import manager.customers.CustomersData;
 import manager.investments.PaymentsData;
 import manager.loans.LoanData;
+import manager.loans.LoansData;
 import models.CustomerModel;
 import models.LoanModel;
 import models.LoanStatusModel;
 import models.utils.LoanTable;
+import okhttp3.*;
 import org.controlsfx.control.table.TableRowExpanderColumn;
-import screens.customer.CustomerController;
+import utils.ModelUtils;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static client.utils.Constants.GSON_INSTANCE;
 
 public class AdminController {
 
     private static final DataFormat SERIALIZED_MIME_TYPE = new DataFormat("application/x-java-serialized-object");
 
-    final BooleanProperty isFileSelected;
-    final StringProperty filePathProperty;
     final IntegerProperty currYazProperty;
 
-    private Bank bankInstance;
     private List<CustomerModel> customerModelList;
     private List<LoanModel> loanModelList;
 
     @FXML
     private Button increaseYazButton;
-
-    @FXML
-    private Button loadFileButton;
 
     @FXML
     private Button customersButton;
@@ -67,9 +66,118 @@ public class AdminController {
     private LineChart<String, Integer> timeLineChart;
 
     @FXML
-    void customersButtonAction(ActionEvent event) {
-        PaymentsData data = bankInstance.getAllCustomersData();
+    private ScrollPane loginPane;
 
+    @FXML
+    private TextField adminNameTextField;
+
+    @FXML
+    private Label loginErrorLabel;
+    private StringProperty loginErrorMessageProperty;
+    private BooleanProperty isLoggedIn;
+
+    @FXML
+    void loginButtonAction(ActionEvent event) {
+        String userName = adminNameTextField.getText();
+
+        if (userName.isEmpty()) {
+            loginErrorMessageProperty.set("User name is empty. You can't login with empty user name");
+            return;
+        }
+
+        //noinspection ConstantConditions
+        String finalUrl = HttpUrl
+                .parse(Constants.LOGIN_PAGE)
+                .newBuilder()
+                .addQueryParameter("username", userName)
+                .build()
+                .toString();
+
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() ->
+                        loginErrorMessageProperty.set("Something went wrong: " + e.getMessage())
+                );
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.code() != 200) {
+                    String responseBody = response.body().string();
+                    Platform.runLater(() ->
+                            loginErrorMessageProperty.set("Something went wrong: " + responseBody)
+                    );
+                } else {
+                    Platform.runLater(() -> {
+                        loginPane.setVisible(false);
+                        isLoggedIn.set(true);
+                    });
+                }
+            }
+        });
+    }
+
+    @FXML
+    void logoutButtonYaz(ActionEvent event) {
+        HttpClientUtil.runAsync(Constants.LOGOUT, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                System.out.println("Logout request ended with failure...:(");
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.isSuccessful() || response.isRedirect()) {
+                    HttpClientUtil.removeCookiesOf(Constants.BASE_DOMAIN);
+                    Platform.runLater(() -> {
+                        loginPane.setVisible(true);
+                        isLoggedIn.set(false);
+                    });
+                }
+            }
+        });
+    }
+
+    @FXML
+    void customersButtonAction(ActionEvent event) {
+        String finalUrl = HttpUrl
+                .parse(Constants.FORECAST_PAGE)
+                .newBuilder()
+                .addQueryParameter(Constants.TYPE_PARAM, Constants.ALL_CUSTOMERS)
+                .build()
+                .toString();
+
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() ->
+                        System.out.println("Something went wrong: " + e.getMessage())
+                );
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.code() != 200) {
+                    String responseBody = response.body().string();
+                    Platform.runLater(() ->
+                            System.out.println("Something went wrong: " + responseBody)
+                    );
+                } else {
+                    String rawBody = response.body().string();
+                    PaymentsData data = GSON_INSTANCE.fromJson(rawBody, PaymentsData.class);
+
+                    Platform.runLater(() -> {
+                        updateCharts(data);
+                    });
+                }
+            }
+        });
+    }
+
+    private void updateCharts(PaymentsData data) {
         int i;
         XYChart.Series<String, Integer> series = new XYChart.Series<>();
         XYChart.Series<String, Integer> forecasting = new XYChart.Series<>();
@@ -108,8 +216,42 @@ public class AdminController {
 
     @FXML
     void transactionsButtonAction(ActionEvent event) {
-        PaymentsData data = bankInstance.getAllTransactionsData();
+        String finalUrl = HttpUrl
+                .parse(Constants.FORECAST_PAGE)
+                .newBuilder()
+                .addQueryParameter(Constants.TYPE_PARAM, Constants.ALL_TRANSACTIONS)
+                .build()
+                .toString();
 
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() ->
+                        System.out.println("Something went wrong: " + e.getMessage())
+                );
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.code() != 200) {
+                    String responseBody = response.body().string();
+                    Platform.runLater(() ->
+                            System.out.println("Something went wrong: " + responseBody)
+                    );
+                } else {
+                    String rawBody = response.body().string();
+                    PaymentsData data = GSON_INSTANCE.fromJson(rawBody, PaymentsData.class);
+
+                    Platform.runLater(() -> {
+                        updateCharts2(data);
+                    });
+                }
+            }
+        });
+    }
+
+    private void updateCharts2(PaymentsData data) {
         int i;
         XYChart.Series<String, Integer> series = new XYChart.Series<>();
         XYChart.Series<String, Integer> forecasting = new XYChart.Series<>();
@@ -147,8 +289,42 @@ public class AdminController {
 
     @FXML
     void loansButtonAction(ActionEvent event) {
-        PaymentsData data = bankInstance.getAllLoansData();
+        String finalUrl = HttpUrl
+                .parse(Constants.FORECAST_PAGE)
+                .newBuilder()
+                .addQueryParameter(Constants.TYPE_PARAM, Constants.ALL_LOANS)
+                .build()
+                .toString();
 
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() ->
+                        System.out.println("Something went wrong: " + e.getMessage())
+                );
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.code() != 200) {
+                    String responseBody = response.body().string();
+                    Platform.runLater(() ->
+                            System.out.println("Something went wrong: " + responseBody)
+                    );
+                } else {
+                    String rawBody = response.body().string();
+                    PaymentsData data = GSON_INSTANCE.fromJson(rawBody, PaymentsData.class);
+
+                    Platform.runLater(() -> {
+                        updateCharts3(data);
+                    });
+                }
+            }
+        });
+    }
+
+    private void updateCharts3(PaymentsData data) {
         int i = 0;
         XYChart.Series<String, Integer> series = new XYChart.Series<>();
         XYChart.Series<String, Integer> forecasting = new XYChart.Series<>();
@@ -187,7 +363,7 @@ public class AdminController {
 
     @FXML
     void increaseYazButtonAction(ActionEvent event) {
-        Thread increaseYazThread = new Thread(() -> {
+/*        Thread increaseYazThread = new Thread(() -> {
             try {
                 bankInstance.advanceOneYaz();
                 updateBankData();
@@ -197,42 +373,7 @@ public class AdminController {
                 System.out.println(e.getMessage());
             }
         });
-        increaseYazThread.start();
-    }
-
-    @FXML
-    void loadFileButtonAction(ActionEvent event) {
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select words file");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML Files", "*.xml"));
-        File selectedFile = fileChooser.showOpenDialog(null);
-
-        if (selectedFile == null) {
-            return;
-        }
-
-        String absolutePath = selectedFile.getAbsolutePath();
-
-        Thread loadBankThread = new Thread(() -> {
-            try {
-                bankInstance.loadData(absolutePath);
-                isFileSelected.set(true);
-                updateBankData();
-                int currYaz = bankInstance.getCurrentYaz();
-                Platform.runLater(() -> {
-                    filePathProperty.set(absolutePath);
-                    currYazProperty.set(currYaz);
-                });
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                Platform.runLater(() -> {
-                    Alert errorMessage = new Alert(Alert.AlertType.ERROR, e.getMessage());
-                    errorMessage.show();
-                });
-            }
-        });
-        loadBankThread.start();
+        increaseYazThread.start();*/
     }
 
     public void updateBankData() {
@@ -241,22 +382,44 @@ public class AdminController {
     }
 
     private void updateLoansData() {
-        if(!isFileSelected.get())
+        if(!isLoggedIn.get())
             return;
 
-        Thread updateLoansThread = new Thread(() -> {
-            try {
-                List<LoanData> loanDataList = bankInstance.getLoansData().getLoans();
-                loanModelList = CustomerController.makeLoanModelList(loanDataList);
-                Platform.runLater(() -> {
-                    adminLoansTable.setItems(getLoans());
-                });
-            } catch (DataNotFoundException e) {
-                e.printStackTrace();
+        String finalUrl = HttpUrl
+                .parse(Constants.LOAN_PAGE)
+                .newBuilder()
+                .addQueryParameter(Constants.TYPE_PARAM, Constants.ALL_LOANS)
+                .build()
+                .toString();
+
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() ->
+                        System.out.println("Something went wrong: " + e.getMessage())
+                );
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.code() != 200) {
+                    String responseBody = response.body().string();
+                    Platform.runLater(() ->
+                            System.out.println("Something went wrong: " + responseBody)
+                    );
+                } else {
+                    String rawBody = response.body().string();
+                    LoansData loansData = GSON_INSTANCE.fromJson(rawBody, LoansData.class);
+                    List<LoanData> loanDataList = loansData.getLoans();
+                    loanModelList = ModelUtils.makeLoanModelList(loanDataList);
+
+                    Platform.runLater(() -> {
+                        adminLoansTable.setItems(getLoans());
+                    });
+                }
             }
         });
-
-        updateLoansThread.start();
     }
 
 
@@ -342,102 +505,73 @@ public class AdminController {
     }
 
     public AdminController() {
-        isFileSelected = new SimpleBooleanProperty();
-        filePathProperty = new SimpleStringProperty();
+        loginErrorMessageProperty = new SimpleStringProperty();
         currYazProperty = new SimpleIntegerProperty();
         customerModelList = new ArrayList<>();
         loanModelList = new ArrayList<>();
+        isLoggedIn = new SimpleBooleanProperty(false);
     }
 
-    public BooleanProperty getFileSelectedProperty() {
-        return isFileSelected;
-    }
-    public StringProperty getFilePathProperty() {
-        return filePathProperty;
-    }
     public IntegerProperty getCurrYazProperty() { return currYazProperty; }
 
     @FXML
     void initialize() {
-        isFileSelected.set(false);
         setDataTables();
-        increaseYazButton.disableProperty().bind(isFileSelected.not());
-        adminsCustomersTable.disableProperty().bind(isFileSelected.not());
-        adminLoansTable.disableProperty().bind(isFileSelected.not());
-        loansButton.disableProperty().bind(isFileSelected.not());
-        transactionsButton.disableProperty().bind(isFileSelected.not());
-        customersButton.disableProperty().bind(isFileSelected.not());
         increaseYazButton.setText("Increase\nYaz");
         increaseYazButton.setStyle("-fx-text-alignment: CENTER;");
-        loadFileButton.setText("Load\nFile");
-        loadFileButton.setStyle("-fx-text-alignment: CENTER;");
-
-
+        loginErrorLabel.textProperty().bind(loginErrorMessageProperty);
+        startUpdateThread();
     }
 
-    public void updateCustomersData() {
-        if(!isFileSelected.get())
-            return;
-
+    private void startUpdateThread() {
         Thread updateThread = new Thread(() -> {
-            try {
-                List<CustomerModel> tempCustomerModelList = new ArrayList<>();
-                List<CustomerData> customerDataList = bankInstance.getCustomersData().getCustomers();
-                for(CustomerData customerData : customerDataList) {
-                    CustomerModel customerModel = new CustomerModel();
-
-                    customerModel.setName(customerData.getName());
-                    customerModel.setBalance(customerData.getBalance());
-                    customerModel.setNumOfActiveLoansInvested(customerData.getNumOfActiveLoansInvested());
-                    customerModel.setNumOfActiveLoansRequested(customerData.getNumOfActiveLoansRequested());
-                    customerModel.setNumOfPendingLoansInvested(customerData.getNumOfPendingLoansInvested());
-                    customerModel.setNumOfPendingLoansRequested(customerData.getNumOfPendingLoansRequested());
-                    customerModel.setNumOfNewLoansInvested(customerData.getNumOfNewLoansInvested());
-                    customerModel.setNumOfNewLoansRequested(customerData.getNumOfNewLoansRequested());
-                    customerModel.setNumOfRiskLoansInvested(customerData.getNumOfRiskLoansInvested());
-                    customerModel.setNumOfRiskLoansRequested(customerData.getNumOfRiskLoansRequested());
-                    customerModel.setNumOfFinishedLoansInvested(customerData.getNumOfFinishedLoansInvested());
-                    customerModel.setNumOfFinishedLoansRequested(customerData.getNumOfFinishedLoansRequested());
-
-                    tempCustomerModelList.add(customerModel);
+            while(true) {
+                updateBankData();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    System.out.println(e.getMessage());
                 }
-                customerModelList = tempCustomerModelList;
-                Platform.runLater(() -> adminsCustomersTable.setItems(getCustomers()));
-            } catch (DataNotFoundException e) {
-                e.printStackTrace();
             }
         });
-
         updateThread.start();
     }
 
-    public Bank getBankInstance() {
-        return bankInstance;
+    public void updateCustomersData() {
+        if (!isLoggedIn.get())
+            return;
+
+        String finalUrl = HttpUrl
+                .parse(Constants.CUSTOMERS_PAGE)
+                .toString();
+
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() ->
+                        System.out.println("Something went wrong: " + e.getMessage())
+                );
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.code() != 200) {
+                    String responseBody = response.body().string();
+                    Platform.runLater(() ->
+                            System.out.println("Something went wrong: " + responseBody)
+                    );
+                } else {
+                    String rawBody = response.body().string();
+                    CustomersData customersData = GSON_INSTANCE.fromJson(rawBody, CustomersData.class);
+                    List<CustomerData> customerDataList = customersData.getCustomers();
+                    List<CustomerModel> tempCustomerModelList = ModelUtils.makeCustomerModelList(customerDataList);
+                    customerModelList = tempCustomerModelList;
+                    Platform.runLater(() -> adminsCustomersTable.setItems(getCustomers()));
+                }
+            }
+        });
+
+
     }
-
-    public void setBankInstance(Bank bankInstance) {
-        this.bankInstance = bankInstance;
-    }
-
-/*
-    public ObservableList<XYChart.Data<Integer, Integer>> plot(int... y) {
-        final ObservableList<XYChart.Data<Integer, Integer>> dataset = FXCollections.observableArrayList();
-        int i = 0;
-        while (i < y.length) {
-            final XYChart.Data<Integer, Integer> data = new XYChart.Data<>(i + 1, y[i]);
-            data.setNode(
-                    new HoveredThresholdNode(
-                            (i == 0) ? 0 : y[i-1],
-                            y[i]
-                    )
-            );
-
-            dataset.add(data);
-            i++;
-        }
-
-        return dataset;
-    }
-*/
-
 }

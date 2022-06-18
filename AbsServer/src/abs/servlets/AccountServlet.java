@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import manager.customers.CustomerData;
+import manager.customers.CustomersData;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,7 +36,7 @@ public class AccountServlet extends HttpServlet {
         }
         else {
             try {
-                List<CustomerData> customerDataList = bankManager.getCustomersData().getCustomers();
+                CustomersData customerDataList = bankManager.getCustomersData();
                 Gson gson = new Gson();
                 String jsonResponse = gson.toJson(customerDataList);
                 outputStream.print(jsonResponse);

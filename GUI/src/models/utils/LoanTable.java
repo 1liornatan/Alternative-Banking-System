@@ -1,6 +1,5 @@
 package models.utils;
 
-import bank.logic.loans.LoanStatus;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;

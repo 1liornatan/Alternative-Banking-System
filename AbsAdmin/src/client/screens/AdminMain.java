@@ -1,19 +1,17 @@
-package screens;
+package client.screens;
 
+import client.screens.admin.AdminController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import screens.main.MainPageController;
 import screens.resources.BankScreenConsts;
 
 import java.net.URL;
 
-public class MainPage extends Application {
-
-
-
+public class AdminMain extends Application {
 
     @SuppressWarnings("unchecked")
     @Override
@@ -23,28 +21,18 @@ public class MainPage extends Application {
         FXMLLoader loader = new FXMLLoader();
 
         // load main fxml
-        URL mainFXML = getClass().getResource(BankScreenConsts.MAIN_FXML_RESOURCE_IDENTIFIER);
-        loader.setLocation(mainFXML);
-        BorderPane root = loader.load();
-
-        // wire up controller
-
-        MainPageController mainPageController = loader.getController();
-        mainPageController.setMainScreen(root);
-        mainPageController.setAdminScreen();
-        //BusinessLogic businessLogic = new BusinessLogic(histogramController);
-        //mainPageController.setBusinessLogic(businessLogic);
+        URL adminFXML = getClass().getResource(BankScreenConsts.ADMIN_FXML_RESOURCE_IDENTIFIER);
+        loader.setLocation(adminFXML);
+        Parent root = loader.load();
 
 
         // set stage
-        primaryStage.setTitle("Alternative Banking System");
+        primaryStage.setTitle("Alternative Banking System - Admin Client");
         Scene scene = new Scene(root, 1050, 600);
         scene.getStylesheets().add(getClass().getResource("/screens/resources/mainStyle.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
-        mainPageController.setPrimaryStage(primaryStage);
     }
-
 
     public static void main(String[] args) {
         launch(args);
