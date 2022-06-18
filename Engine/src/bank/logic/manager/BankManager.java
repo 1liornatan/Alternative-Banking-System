@@ -87,4 +87,6 @@ public class BankManager {
     public CustomersData getCustomersData() throws DataNotFoundException {
         return bankInstance.getCustomersData();
     }
+
+    public LoansData getLoansData() throws DataNotFoundException {return bankInstance.getLoansData();}
 }

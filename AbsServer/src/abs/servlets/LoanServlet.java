@@ -46,28 +46,49 @@ public class LoanServlet extends HttpServlet {
 
             String jsonResponse = null;
 
-            switch(type) {
-                case(Constants.REQUESTED_LOANS): {
-                    LoansData requestedLoans = bankManager.getRequestedLoans(usernameFromSession.trim());
-                    jsonResponse = gson.toJson(requestedLoans);
-                    break;
-                }
-                case(Constants.INVESTED_LOANS): {
-                    LoansData investedLoans = bankManager.getInvestedLoans(usernameFromSession.trim());
-                    jsonResponse = gson.toJson(investedLoans);
-                    break;
-                }
-                case(Constants.UNFINISHED_LOANS): {
-                    LoansData unFinishedLoans = new LoansData();
+            if(SessionUtils.isAdmin(request)) {
+                if(type.equals(Constants.ALL_LOANS)) {
                     try {
-                        unFinishedLoans.setLoans(bankManager.getUnFinishedLoans(usernameFromSession.trim()));
-                    } catch (Exception e) {
+                        LoansData allLoans = bankManager.getLoansData();
+                        jsonResponse = gson.toJson(allLoans);
+                    } catch (DataNotFoundException e) {
                         e.printStackTrace();
                     }
-                    jsonResponse = gson.toJson(unFinishedLoans);
-                    break;
                 }
-                // TODO: CASE OF ALL LOANS
+                else {
+                    response.getOutputStream().print("Only customers are authorized for this request.");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                }
+
+            }
+            else {
+                switch (type) {
+                    case (Constants.REQUESTED_LOANS): {
+                        LoansData requestedLoans = bankManager.getRequestedLoans(usernameFromSession.trim());
+                        jsonResponse = gson.toJson(requestedLoans);
+                        break;
+                    }
+                    case (Constants.INVESTED_LOANS): {
+                        LoansData investedLoans = bankManager.getInvestedLoans(usernameFromSession.trim());
+                        jsonResponse = gson.toJson(investedLoans);
+                        break;
+                    }
+                    case (Constants.UNFINISHED_LOANS): {
+                        LoansData unFinishedLoans = new LoansData();
+                        try {
+                            unFinishedLoans.setLoans(bankManager.getUnFinishedLoans(usernameFromSession.trim()));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        jsonResponse = gson.toJson(unFinishedLoans);
+                        break;
+                    }
+                    case (Constants.ALL_LOANS): {
+                        response.getOutputStream().print("Only admins are authorized for this request.");
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    }
+                    // TODO: CASE OF ALL LOANS
+                }
             }
 
             logServerMessage("Loans Request (" + usernameFromSession + "): " + jsonResponse);

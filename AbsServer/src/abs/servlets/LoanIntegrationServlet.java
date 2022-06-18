@@ -31,8 +31,10 @@ public class LoanIntegrationServlet extends HttpServlet {
 
         if (usernameFromSession == null) { //user is not logged in yet
             response.getOutputStream().print("Not logged in yet.");
+        } else if (SessionUtils.isAdmin(request)) {
+            response.getOutputStream().print("Only customers are authorized for this request.");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
-            //user is already logged in
             Properties prop = new Properties();
             prop.load(request.getInputStream());
             Gson gson = new Gson();

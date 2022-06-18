@@ -6,6 +6,7 @@ public class Constants {
     public static final String REQUESTED_LOANS = "requested_loans";
     public static final String INVESTED_LOANS = "invested_loans";
     public static final String UNFINISHED_LOANS = "unfinished_loans";
+    public static final String ALL_LOANS = "all_loans";
     public static final String TYPE = "type";
 
     public static final int INT_PARAMETER_ERROR = Integer.MIN_VALUE;
