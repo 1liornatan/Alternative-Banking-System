@@ -10,9 +10,7 @@ import manager.customers.CustomersDTO;
 import manager.customers.CustomersData;
 import manager.customers.CustomersNames;
 import manager.info.ClientInfoData;
-import manager.investments.InvestmentsData;
-import manager.investments.PaymentsData;
-import manager.investments.RequestDTO;
+import manager.investments.*;
 import manager.loans.LoanData;
 import manager.loans.LoansData;
 import manager.messages.NotificationsData;
@@ -89,4 +87,28 @@ public class BankManager {
     }
 
     public LoansData getLoansData() throws DataNotFoundException {return bankInstance.getLoansData();}
+
+    public void investmentTrade(InvestmentData data) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
+        bankInstance.investmentTrade(data);
+    }
+
+    public void listInvestment(InvestmentData data) throws DataNotFoundException {
+        bankInstance.listInvestment(data);
+    }
+
+    public void unlistInvestment(InvestmentData data) throws DataNotFoundException {
+        bankInstance.unlistInvestment(data);
+    }
+
+    public InvestmentsSellData getInvestmentsForSell(String requesterId) {
+        return bankInstance.getInvestmentsForSell(requesterId);
+    }
+
+    public InvestmentsSellData getCustomerInvestments(String customerId) throws DataNotFoundException {
+        return getCustomerInvestments(customerId);
+    }
+
+    public PaymentsData getAllLoansData() {return bankInstance.getAllLoansData();}
+    public PaymentsData getAllCustomersData() {return bankInstance.getAllCustomersData();}
+    public PaymentsData getAllTransactionsData() {return bankInstance.getAllTransactionsData();}
 }
