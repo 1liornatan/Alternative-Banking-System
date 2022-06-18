@@ -35,18 +35,12 @@ public class LoanIntegrationServlet extends HttpServlet {
             response.getOutputStream().print("Only customers are authorized for this request.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
-            Properties prop = new Properties();
-            prop.load(request.getInputStream());
-            Gson gson = new Gson();
-            String jsonRequest = prop.getProperty(Constants.INTEGRATION_REQUEST);
+            String jsonRequest = request.getReader().toString();
 
-            if(jsonRequest == null)
-                return;
-
-            RequestDTO requestDTO = gson.fromJson(jsonRequest, RequestDTO.class);
+            RequestDTO requestDTO = Constants.GSON_INSTANCE.fromJson(jsonRequest, RequestDTO.class);
             try {
                 LoansData integrationLoans = bankManager.getIntegrationLoans(requestDTO);
-                String jsonResponse = gson.toJson(integrationLoans);
+                String jsonResponse = Constants.GSON_INSTANCE.toJson(integrationLoans);
 
                 try (PrintWriter out = response.getWriter()) {
                     out.print(jsonResponse);
@@ -70,12 +64,8 @@ public class LoanIntegrationServlet extends HttpServlet {
         if (usernameFromSession == null) { //user is not logged in yet
             response.getOutputStream().print("Not logged in yet.");
         } else {
-            //user is already logged in
-            Properties prop = new Properties();
-            prop.load(request.getInputStream());
-            Gson gson = new Gson();
-            String jsonRequest = prop.getProperty(Constants.INTEGRATION_SUBMIT);
-            InvestmentsData investmentsData = gson.fromJson(jsonRequest, InvestmentsData.class);
+            String jsonRequest = request.getReader().toString();
+            InvestmentsData investmentsData = Constants.GSON_INSTANCE.fromJson(jsonRequest, InvestmentsData.class);
             try {
                 bankManager.setInvestment(investmentsData);
                 response.setStatus(HttpServletResponse.SC_OK);

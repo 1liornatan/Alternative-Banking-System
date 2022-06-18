@@ -1,5 +1,7 @@
 package abs.constants;
 
+import com.google.gson.Gson;
+
 public class Constants {
     public static final String USERNAME = "username";
     public static final String USER_NAME_ERROR = "username_error";
@@ -18,6 +20,8 @@ public class Constants {
     public static final String CLOSE_LOAN_REQUEST = "close_loan_request";
     public static final String PAY_DEBT_REQUEST = "pay_debt_request";
     public static final String PAY_CYCLE_REQUEST = "pay_cycle_request";
+    public static final String PROP_TYPE = "type";
+    public static final String PROP_LOAN_ID = "loan_data";
 
     public static final String INVESTMENT_DATA = "investment_data";
     public static final String LIST_INVESTMENT_REQUEST = "list_investment";
@@ -27,7 +31,11 @@ public class Constants {
     public static final String BUY_INVESTMENT_REQUEST = "buy_investment";
     public static final String AMOUNT = "amount";
     public static final String TRANSACTION_WITHDRAW = "withdraw";
-    public static final String TRANSACTION_CHARGE = "charge";
+    public static final String TRANSACTION_DEPOSIT = "deposit";
     public static final String IS_ADMIN = "is_admin";
+    public static final String TYPE_CLOSE = "type_close";
+    public static final String TYPE_DEBT = "type_debt";
+    public static final String TYPE_CYCLE = "type_cycle";
 
+    public static final Gson GSON_INSTANCE = new Gson();
 }

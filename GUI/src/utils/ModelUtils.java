@@ -2,8 +2,11 @@ package utils;
 
 import manager.customers.CustomerData;
 import manager.loans.LoanData;
+import manager.transactions.TransactionData;
+import manager.transactions.TransactionsData;
 import models.CustomerModel;
 import models.LoanModel;
+import models.TransactionModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,5 +57,19 @@ public class ModelUtils {
             tempCustomerModelList.add(customerModel);
         }
         return tempCustomerModelList;
+    }
+
+    public static List<TransactionModel> makeTransactionsModelList(TransactionsData transactionsData) {
+        List<TransactionModel> tempTransactionModels = new ArrayList<>();
+
+        for (TransactionData data : transactionsData.getTransactions()) {
+            tempTransactionModels.add(new TransactionModel.TransactionModelBuilder()
+                    .description(data.getDescription())
+                    .amount(data.getAmount())
+                    .previousBalance(data.getPreviousBalance())
+                    .yazMade(data.getYazMade())
+                    .build());
+        }
+        return tempTransactionModels;
     }
 }
