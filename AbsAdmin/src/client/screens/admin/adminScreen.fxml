@@ -125,9 +125,9 @@
             </TabPane>
          </content>
       </ScrollPane>
-      <ScrollPane fx:id="loginPane" fitToHeight="true" fitToWidth="true">
+      <ScrollPane fx:id="loginPane">
          <content>
-            <VBox alignment="CENTER" prefHeight="623.0" prefWidth="646.0">
+            <VBox alignment="CENTER" prefHeight="613.0" prefWidth="644.0">
                <children>
                   <Label alignment="CENTER" text="Enter Admin Name" />
                   <TextField fx:id="adminNameTextField" maxWidth="100.0" />

@@ -40,32 +40,33 @@ public class PaymentServlet extends HttpServlet {
             //user is already logged in
             Properties prop = new Properties();
             prop.load(request.getInputStream());
-
-            String loanName = prop.getProperty(Constants.LOAN_DATA);
+            Gson gson = new Gson();
+            String jsonRequest = prop.getProperty(Constants.LOAN_DATA);
+            LoanData loan = gson.fromJson(jsonRequest, LoanData.class);
             String type = prop.getProperty(Constants.TYPE);
 
-            if (loanName == null || type == null) {
+            if (loan == null || type == null) {
                 response.getOutputStream().print("Invalid Parameters!");
                 return;
             }
             try {
                 switch (type) {
                     case (Constants.CLOSE_LOAN_REQUEST): {
-                        bankManager.closeLoan(loanName);
+                        bankManager.closeLoan(loan.getName());
                         break;
                     }
                     case (Constants.PAY_CYCLE_REQUEST): {
-                        bankManager.advanceCycle(loanName);
+                        bankManager.advanceCycle(loan.getName());
                         break;
                     }
                     case (Constants.PAY_DEBT_REQUEST): {
                         String amountRequest = prop.getProperty(Constants.AMOUNT);
-                        int amount = Integer.parseInt(amountRequest);
+                        int amount = gson.fromJson(amountRequest, int.class);
                         if (amount <= 0) {
                             response.getOutputStream().print("Invalid Parameters!");
                             return;
                         }
-                        bankManager.deriskLoanByAmount(loanName, amount);
+                        bankManager.deriskLoanByAmount(loan.getName(), amount);
                         break;
                     }
                 }

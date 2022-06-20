@@ -59,6 +59,7 @@ public class TransactionServlet extends HttpServlet {
 
         } else {
             //user is already logged in
+            Gson gson = new Gson();
             int amount = ServletUtils.getIntParameter(request,Constants.AMOUNT);
             String type = request.getParameter(Constants.TYPE);
 
@@ -72,8 +73,8 @@ public class TransactionServlet extends HttpServlet {
                            bankManager.withdraw(usernameFromSession.trim(),amount,Constants.TRANSACTION_WITHDRAW);
                            break;
                     }
-                     case(Constants.TRANSACTION_DEPOSIT): {
-                          bankManager.charge(usernameFromSession.trim(),amount,Constants.TRANSACTION_DEPOSIT);
+                     case(Constants.TRANSACTION_CHARGE): {
+                          bankManager.charge(usernameFromSession.trim(),amount,Constants.TRANSACTION_CHARGE);
                           break;
                      }
                 }
