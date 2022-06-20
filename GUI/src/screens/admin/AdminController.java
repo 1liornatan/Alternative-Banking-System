@@ -23,6 +23,7 @@ import models.CustomerModel;
 import models.LoanModel;
 import models.LoanStatusModel;
 import models.utils.LoanTable;
+import models.utils.ModelListUtils;
 import org.controlsfx.control.table.TableRowExpanderColumn;
 import screens.customer.CustomerController;
 
@@ -247,7 +248,7 @@ public class AdminController {
         Thread updateLoansThread = new Thread(() -> {
             try {
                 List<LoanData> loanDataList = bankInstance.getLoansData().getLoans();
-                loanModelList = CustomerController.makeLoanModelList(loanDataList);
+                loanModelList = ModelListUtils.makeLoanModelList(loanDataList);
                 Platform.runLater(() -> {
                     adminLoansTable.setItems(getLoans());
                 });

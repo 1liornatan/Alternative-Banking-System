@@ -5,8 +5,6 @@ import bank.logic.accounts.impl.exceptions.NoMoneyException;
 import bank.logic.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.loans.interest.exceptions.InvalidPercentException;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -20,29 +18,37 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.util.Duration;
 import manager.investments.*;
 import manager.loans.LoanData;
 import manager.loans.LoansData;
-import manager.messages.NotificationData;
 import manager.transactions.TransactionData;
 import models.InvestmentModel;
 import models.LoanModel;
 import models.NotificationModel;
 import models.TransactionModel;
 import models.utils.LoanTable;
+import models.utils.ModelListUtils;
 import models.utils.TradeTable;
 import org.controlsfx.control.CheckComboBox;
-import screens.MainPage;
+import screens.customer.animation.AnimationLogic;
+import screens.customer.loans.integration.IntegrationLogic;
+import screens.customer.notifications.NotificationsLogic;
+import screens.customer.payments.PaymentsLogic;
+import screens.customer.payments.controls.Operations;
 
 import java.util.*;
 
 public class CustomerController {
 
+    private AnimationLogic animationLogic;
+    private PaymentsLogic paymentsLogic;
+    private NotificationsLogic notificationsLogic;
+    private IntegrationLogic integrationLogic;
+
+    // FROM UP IS GOOD
     private Bank bankInstance;
     private List<LoanModel> loanerModelList;
     private List<LoanModel> lenderModelList;
@@ -65,28 +71,11 @@ public class CustomerController {
     private LoanModel selectedDebtLoan;
     private final BooleanProperty animationProperty;
 
-
-    final static Image WALK_1 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/1.png")).toString());
-    final static Image WALK_2 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/2.png")).toString());
-    final static Image WALK_3 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/3.png")).toString());
-    final static Image WALK_4 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/4.png")).toString());
-    final static Image WALK_5 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/5.png")).toString());
-    final static Image WALK_6 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/6.png")).toString());
-    final static Image WALK_7 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/7.png")).toString());
-    final static Image WALK_8 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/8.png")).toString());
-    final static Image WALK_9 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/9.png")).toString());
-    final static Image WALK_10 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/10.png")).toString());
-    final static Image WALK_11 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/11.png")).toString());
-    final static Image WALK_12 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/12.png")).toString());
-    final static Image WALK_13 = new Image(Objects.requireNonNull(MainPage.class.getResource("/screens/resources/animation/13.png")).toString());
-
     @FXML
     private ImageView animationImage;
 
-
     @FXML
     private Label infErrorLabel;
-
 
     @FXML
     private TextField balanceField;
@@ -181,7 +170,6 @@ public class CustomerController {
 
     @FXML
     private LineChart<String, Number> timeLineChart;
-    private Timeline walkTimeline;
 
     @FXML
     void buyInvestmentButtonAction(ActionEvent ignoredEvent) {
@@ -423,57 +411,12 @@ public class CustomerController {
 
     @FXML
     void closeLoanButtonAction(ActionEvent ignoredEvent) {
-        LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
-        if (selectedLoan == null) {
-            paymentErrorLabel.setText("You must select a loan first!");
-            paymentErrorLabel.setTextFill(Color.RED);
-        }
-        else {
-            Thread closeLoanThread = new Thread(() -> {
-                try {
-                    bankInstance.closeLoan(selectedLoan.getId());
-                    Platform.runLater(() -> {
-                        updateData();
-                        paymentErrorLabel.setText("Successfully Closed Loan!");
-                        paymentErrorLabel.setTextFill(Color.GREEN);
-                    });
-                } catch (DataNotFoundException | NoMoneyException | NonPositiveAmountException e) {
-                    Platform.runLater(() -> {
-                        paymentErrorLabel.setText(e.getMessage());
-                        paymentErrorLabel.setTextFill(Color.RED);
-                    });
-                }
-            });
-            closeLoanThread.start();
-        }
+        paymentsLogic.makeOperation(Operations.CLOSE, -1);
     }
 
     @FXML
     void payCycleButtonAction(ActionEvent ignoredEvent) {
-        LoanModel selectedLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
-        if (selectedLoan == null) {
-            paymentErrorLabel.setText("You must select a loan first!");
-            paymentErrorLabel.setTextFill(Color.RED);
-        }
-        else {
-            Thread payCycleThread = new Thread(() -> {
-                try {
-                    bankInstance.advanceCycle(selectedLoan.getId());
-                    Platform.runLater(() -> {
-                        updateData();
-                        paymentErrorLabel.setText("Successfully paid " + selectedLoan.getPaymentAmount());
-                        paymentErrorLabel.setTextFill(Color.GREEN);
-                    });
-                } catch (Exception e) {
-                    Platform.runLater(() -> {
-                        paymentErrorLabel.setText(e.getMessage());
-                        paymentErrorLabel.setTextFill(Color.RED);
-                    });
-                }
-
-                });
-            payCycleThread.start();
-        }
+        paymentsLogic.makeOperation(Operations.CYCLE, -1);
     }
 
     @FXML
@@ -492,25 +435,19 @@ public class CustomerController {
 
     @FXML
     void submitDebtButtonAction(ActionEvent ignoredEvent) {
-        debtAmountProperty.set(Integer.parseInt(debtAmountField.getText()));
-        Thread debtThread = new Thread(() -> {
-            try {
-                bankInstance.deriskLoanByAmount(selectedDebtLoan.getId(), debtAmountProperty.get());
-                Platform.runLater(() -> {
-                    updateData();
-                    paymentErrorLabel.setText("Successfully paid " + debtAmountProperty.get());
-                    paymentErrorLabel.setTextFill(Color.GREEN);
-                });
-            } catch (Exception e) {
-                paymentErrorLabel.setText(e.getMessage());
-                paymentErrorLabel.setTextFill(Color.RED);
-            }
-        });
-        debtThread.start();
+        int debtAmount = Integer.parseInt(debtAmountField.getText());
+        paymentsLogic.makeOperation(Operations.DEBT, debtAmount);
     }
 
     @FXML
     void initialize() {
+
+        setupAnimation();
+        setupNotifications();
+        setupPayments();
+
+
+        // FROM UP IS GOOD
         setDataTables();
         setSplitComps();
         setFieldLimits(amountField);
@@ -559,8 +496,28 @@ public class CustomerController {
         tablesRightButton.setDisable(true);
         setLoansIntegrationButtons();
         debtPaymentHBox.setDisable(true);
-        setWalkAnimation();
 
+    }
+
+    private void setupPayments() {
+        paymentsLogic = new PaymentsLogic(customerId, loanerLoansPTable, paymentErrorLabel);
+    }
+
+    private void setupNotifications() {
+        notificationsLogic = new NotificationsLogic(customerId, notificationsTable);
+    }
+
+    private void setupAnimation() {
+        animationLogic = new AnimationLogic(animationImage);
+        startAnimation();
+    }
+
+    private void stopAnimation() {
+        animationLogic.animationOff();
+    }
+
+    private void startAnimation() {
+        animationLogic.animationOn();
     }
 
     private void setFieldLimits(TextField amountField) {
@@ -573,55 +530,6 @@ public class CustomerController {
                 amountField.setText(String.valueOf(balanceProperty.get()));
             }
         });
-    }
-
-    private void setWalkAnimation() {
-        walkTimeline = new Timeline();
-        walkTimeline.setCycleCount(Timeline.INDEFINITE);
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(100), (event) -> animationImage.setImage(WALK_1)));
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(200), (event) -> animationImage.setImage(WALK_2)));
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(300), (event) -> animationImage.setImage(WALK_3)));
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(400), (event) -> animationImage.setImage(WALK_4)));
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(500), (event) -> animationImage.setImage(WALK_5)));
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(600), (event) -> animationImage.setImage(WALK_6)));
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(700), (event) -> animationImage.setImage(WALK_7)));
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(800), (event) -> animationImage.setImage(WALK_8)));
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(900), (event) -> animationImage.setImage(WALK_9)));
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(1000), (event) -> animationImage.setImage(WALK_10)));
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(1100), (event) -> animationImage.setImage(WALK_11)));
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(1200), (event) -> animationImage.setImage(WALK_12)));
-
-        walkTimeline.getKeyFrames().add(new KeyFrame(
-                Duration.millis(1300), (event) -> animationImage.setImage(WALK_13)));
-
-
-
-
-        walkTimeline.play();
     }
 
     private void setSplitComps() {
@@ -647,7 +555,6 @@ public class CustomerController {
         sellInvestmentTable.getColumns().get(3).prefWidthProperty().bind(sellInvestmentTable.widthProperty().multiply(0.1));
         isListed.prefWidthProperty().bind(sellInvestmentTable.widthProperty().multiply(0.1));
 
-        setNotificationsTable();
         setTransactionsTable();
 
     }
@@ -680,7 +587,7 @@ public class CustomerController {
     }
 
     private void addFoundLoans(List<LoanData> loansList) {
-        loansFoundTable.setItems(FXCollections.observableArrayList(makeLoanModelList(loansList)));
+        loansFoundTable.setItems(FXCollections.observableArrayList(ModelListUtils.makeLoanModelList(loansList)));
     }
 
     private void setInvestmentsChosen() {
@@ -728,36 +635,17 @@ public class CustomerController {
         searchLoansProgressBar.setProgress(0);
     }
 
-    public static List<LoanModel> makeLoanModelList(List<LoanData> loanDataList) {
-        List<LoanModel> tempLoanModelList = new ArrayList<>();
-        for(LoanData loanData : loanDataList) {
-            LoanModel loanModel = new LoanModel.LoanModelBuilder()
-                    .id(loanData.getName())
-                    .amount(loanData.getBaseAmount())
-                    .endYaz(loanData.getFinishedYaz())
-                    .startYaz(loanData.getStartedYaz())
-                    .nextPaymentInYaz(loanData.getNextPaymentInYaz())
-                    .finalAmount(loanData.getFinalAmount())
-                    .status(loanData.getStatus())
-                    .investorsAmount(loanData.getInvestorsAmount())
-                    .amountToActive(loanData.getAmountToActive())
-                    .deriskAmount(loanData.getDeriskAmount())
-                    .missingCycles(loanData.getMissingCycles())
-                    .payment(loanData.getNextPaymentAmount())
-                    .left(loanData.getCloseAmount())
-                    .build();
-
-            tempLoanModelList.add(loanModel);
-        }
-        return tempLoanModelList;
-    }
 
     public void updateData() {
+
+        notificationsLogic.updateNotifications();
+
+        //UP IS GOOD
        // updateLoansExpander();
+
         updateLoansData();
         updatePaymentLoansData();
         updateTransactions();
-        updateNotifications();
         updateOwnedInvestments();
         updateTimeChart();
     }
@@ -804,8 +692,8 @@ public class CustomerController {
             List<LoanData>  loanerDataList = bankInstance.getLoanerData(customerId.get()).getLoans();
             List<LoanData>  lenderDataList = bankInstance.getInvestorData(customerId.get()).getLoans();
 
-            tempLoanerModelList = makeLoanModelList(loanerDataList);
-            tempLenderModelList = makeLoanModelList(lenderDataList);
+            tempLoanerModelList = ModelListUtils.makeLoanModelList(loanerDataList);
+            tempLenderModelList = ModelListUtils.makeLoanModelList(lenderDataList);
 
             lenderModelList = tempLenderModelList;
             loanerModelList = tempLoanerModelList;
@@ -822,21 +710,7 @@ public class CustomerController {
 
     public void updatePaymentLoansData() {
         Thread updatePaymentLoanThread = new Thread(() -> {
-            List<LoanModel> tempLoanerModelList;
-            List<LoanData>  loanerDataList = null;
-            try {
-                loanerDataList = bankInstance.getUnFinishedLoans(customerId.get());
-            } catch (DataNotFoundException e) {
-                e.printStackTrace();
-            }
 
-            assert loanerDataList != null;
-            tempLoanerModelList = makeLoanModelList(loanerDataList);
-
-            loanPModelList = tempLoanerModelList;
-            paymentsAmountProperty.set(loanPModelList.size());
-
-            Platform.runLater(() -> loanerLoansPTable.setItems(getLoans(loanPModelList)));
         });
 
         updatePaymentLoanThread.start();
@@ -911,50 +785,6 @@ public class CustomerController {
 
     }
 
-    private void setNotificationsTable() {
-        TableColumn<NotificationModel, String> notificationMessageColumn = new TableColumn<>("Message");
-        notificationMessageColumn.setCellValueFactory(new PropertyValueFactory<>("message"));
-        notificationMessageColumn.setPrefWidth(300);
-        TableColumn<NotificationModel, Integer> yazMadeColumn = new TableColumn<>("Date");
-        yazMadeColumn.setCellValueFactory(new PropertyValueFactory<>("yazMade"));
-
-        yazMadeColumn.maxWidthProperty().bind(notificationsTable.widthProperty().multiply(0.1));
-        yazMadeColumn.setStyle("-fx-alignment: CENTER;");
-        notificationMessageColumn.maxWidthProperty().bind(notificationsTable.widthProperty().multiply(0.9));
-        notificationsTable.getColumns().addAll(notificationMessageColumn, yazMadeColumn);
-        yazMadeColumn.setSortType(TableColumn.SortType.DESCENDING);
-        notificationsTable.getSortOrder().clear();
-        notificationsTable.getSortOrder().add(yazMadeColumn);
-
-    }
-
-    private void updateNotifications() {
-        if(!isFileSelected.get())
-            return;
-        Thread updateNotifications = new Thread(() -> {
-            List<NotificationData> notificationsData = null;
-            try {
-                notificationsData = bankInstance.getNotificationsData(customerId.get()).getNotificationsList();
-            } catch (DataNotFoundException e) {
-                e.printStackTrace();
-            }
-            List<NotificationModel> tempNotificationModels = new ArrayList<>();
-            assert notificationsData != null;
-            for(NotificationData data : notificationsData) {
-                tempNotificationModels.add(new NotificationModel.NotificationModelBuilder()
-                        .message(data.getMessage())
-                        .yazMade(data.getYazMade())
-                        .build());
-            }
-            notificationModels = tempNotificationModels;
-            Platform.runLater(() -> {
-                notificationsTable.setItems(getNotifications());
-                notificationsTable.sort();
-            });
-        });
-        updateNotifications.start();
-    }
-
     public void createWithdraw(int amount) {
         Thread withdrawThread = new Thread(() -> {
             try {
@@ -978,37 +808,11 @@ public class CustomerController {
     }
 
 
-    private List<InvestmentModel> getInvModels(InvestmentsSellData investmentsForSell) {
-        List<InvestmentModel> investmentModels = new ArrayList<>();
-
-        List<String> investorsIds = investmentsForSell.getInvestorsIds();
-        List<String> investmentIds = investmentsForSell.getInvIds();
-        List<String> loansIds = investmentsForSell.getLoansIds();
-        List<Integer> amounts = investmentsForSell.getAmounts();
-        List<Integer> yazPlaced = investmentsForSell.getYazPlaced();
-        List<Boolean> forSale = investmentsForSell.getForSale();
-
-        int arrSize = loansIds.size();
-
-        for(int i = 0; i < arrSize; i++) {
-            investmentModels.add(new InvestmentModel.InvestmentModelBuilder()
-                    .loan(loansIds.get(i))
-                    .owner(investorsIds.get(i))
-                    .amount(amounts.get(i))
-                    .yaz(yazPlaced.get(i))
-                    .id(investmentIds.get(i))
-                    .forSale(forSale.get(i))
-                    .build());
-        }
-        return investmentModels;
-    }
-
     private void updateOwnedInvestments() {
         Thread updateOwnedInvestments = new Thread(() -> {
             try {
                 InvestmentsSellData customerInvestments = bankInstance.getCustomerInvestments(customerId.get());
-                sellInvestmentModels = getInvModels(customerInvestments);
-
+                sellInvestmentModels = ModelListUtils.makeInvestmentModelList(customerInvestments);
 
                 Platform.runLater(() -> sellInvestmentTable.setItems(getSellInvestments()));
 
@@ -1057,19 +861,5 @@ public class CustomerController {
         }
 
     }
-
-    public void animationOn() {
-        walkTimeline.play();
-        animationProperty.set(true);
-        animationImage.setVisible(true);
-    }
-
-    public void animationOff() {
-        walkTimeline.stop();
-        animationProperty.set(false);
-        animationImage.setVisible(false);
-    }
-
-
 }
 
