@@ -16,6 +16,7 @@ public class IntegrationsReqs {
         this.maxLoans = builder.maxLoans;
         this.minInterest = builder.minInterest;
         this.minYaz = builder.minYaz;
+        this.categories = builder.categories;
     }
 
     public int getAmount() {

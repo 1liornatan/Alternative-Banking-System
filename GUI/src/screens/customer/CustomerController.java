@@ -35,6 +35,7 @@ import models.utils.TradeTable;
 import org.controlsfx.control.CheckComboBox;
 import screens.customer.animation.AnimationLogic;
 import screens.customer.loans.integration.IntegrationLogic;
+import screens.customer.loans.integration.IntegrationsReqs;
 import screens.customer.notifications.NotificationsLogic;
 import screens.customer.payments.PaymentsLogic;
 import screens.customer.payments.controls.Operations;
@@ -250,7 +251,7 @@ public class CustomerController {
         Thread searchInvestmentsThread = new Thread(() -> {
             InvestmentsSellData investmentsForSell = bankInstance.getInvestmentsForSell(customerId.get());
 
-            buyInvestmentModels = getInvModels(investmentsForSell);
+            buyInvestmentModels = ModelListUtils.makeInvestmentModelList(investmentsForSell);
 
             Platform.runLater(() -> buyInvestmentTable.setItems(getBuyInvestments()));
 
@@ -340,6 +341,26 @@ public class CustomerController {
 
     @FXML
     void searchLoansButtonAction(ActionEvent ignoredEvent) {
+        IntegrationsReqs reqs = new IntegrationsReqs.Builder(Integer.parseInt(amountField.getText()))
+                .maxLoans(Integer.parseInt(maxLoanerLoansField.getText()))
+                        .maxOwnership(Integer.parseInt(maxOwnershipField.getText()))
+                                .minYaz(Integer.parseInt(minYazField.getText()))
+                                        .minInterest(Integer.parseInt(minInterestField.getText()))
+                                                .build();
+
+        if(investAmount.get() <= 0) {
+            progressBarStatusLabel.textProperty().unbind();
+            progressBarStatusLabel.setText("Amount must be positive!");
+            progressBarStatusLabel.setTextFill(Color.RED);
+            return;
+        }
+
+        integrationLogic.setupSearch(reqs);
+        setProgressBar(DoubleProperty prop);
+        integrationLogic.makeSearch();
+
+
+        // UP IS GOOD
         investAmount.set(Integer.parseInt(amountField.getText()));
         minInterestProperty.set(Integer.parseInt(minInterestField.getText()));
         minLoanDurationProperty.set(Integer.parseInt(minYazField.getText()));
@@ -860,6 +881,23 @@ public class CustomerController {
             System.out.println(e.getMessage());
         }
 
+    }
+
+    void setProgressBar(DoubleProperty prop) {
+        searchLoansProgressBar.progressProperty().bind(prop);
+        prop.addListener((obs, oldVal, newVal) -> {
+            switch(newVal.toString()) {
+                case "0.3":
+                    progressBarStatusLabel.setText("Searching Loans...");
+                    break;
+                case "0.7":
+                    progressBarStatusLabel.setText("Printing Loans...");
+                    break;
+                case "1.0":
+                    progressBarStatusLabel.setText("Found " + loansFoundTable.getItems().size() + " Loans.");
+                    break;
+            }
+        });
     }
 }
 
