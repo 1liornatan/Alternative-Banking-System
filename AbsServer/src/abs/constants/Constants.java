@@ -1,5 +1,7 @@
 package abs.constants;
 
+import com.google.gson.Gson;
+
 public class Constants {
     public static final String USERNAME = "username";
     public static final String USER_NAME_ERROR = "username_error";
@@ -22,12 +24,12 @@ public class Constants {
     public static final String INVESTMENT_DATA = "investment_data";
     public static final String LIST_INVESTMENT_REQUEST = "list_investment";
     public static final String UNLIST_INVESTMENT_REQUEST = "unlist_investment";
-    public static final String INVESTMENTS_FOR_SELL = "investments_for_sale";
-    public static final String LISTED_INVESTMENTS = "listed_invested";
+    public static final String INVESTMENTS_FOR_SELL = "investments_for_sell";
+    public static final String LISTED_INVESTMENTS = "listed_investments";
     public static final String BUY_INVESTMENT_REQUEST = "buy_investment";
     public static final String AMOUNT = "amount";
     public static final String TRANSACTION_WITHDRAW = "withdraw";
-    public static final String TRANSACTION_CHARGE = "charge";
+    public static final String TRANSACTION_DEPOSIT = "deposit";
     public static final String IS_ADMIN = "is_admin";
-
+    public static final Gson GSON_INSTANCE = new Gson();
 }

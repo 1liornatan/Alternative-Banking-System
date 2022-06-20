@@ -4,7 +4,6 @@ import abs.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.manager.BankManager;
-import com.google.gson.Gson;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import manager.transactions.TransactionsData;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Properties;
 
 @WebServlet(name = "Transaction Servlet", urlPatterns = "/bank/transactions")
 public class TransactionServlet extends HttpServlet {
@@ -31,9 +31,8 @@ public class TransactionServlet extends HttpServlet {
                 response.getOutputStream().print("Only customers are authorized for this request.");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
-            Gson gson = new Gson();
                 TransactionsData transactions = bankManager.getTransactionsData(usernameFromSession);
-                String jsonResponse = gson.toJson(transactions);
+                String jsonResponse = Constants.GSON_INSTANCE.toJson(transactions);
 
                 try (PrintWriter out = response.getWriter()) {
                     out.print(jsonResponse);
@@ -59,27 +58,30 @@ public class TransactionServlet extends HttpServlet {
 
         } else {
             //user is already logged in
-            Gson gson = new Gson();
-            int amount = ServletUtils.getIntParameter(request,Constants.AMOUNT);
-            String type = request.getParameter(Constants.TYPE);
+            Properties prop = new Properties();
+            prop.load(request.getInputStream());
+            int amount = Integer.parseInt(prop.getProperty(Constants.AMOUNT));
+            String type = prop.getProperty(Constants.TYPE);
 
-            if(amount <= 0 || type == null) {
+            if (amount <= 0 || type == null) {
                 response.getOutputStream().print("Invalid Parameters!");
-                return;
-            }
-            try {
-               switch(type) {
-                    case(Constants.TRANSACTION_WITHDRAW): {
-                           bankManager.withdraw(usernameFromSession.trim(),amount,Constants.TRANSACTION_WITHDRAW);
-                           break;
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+            } else {
+                try {
+                    switch (type) {
+                        case (Constants.TRANSACTION_WITHDRAW): {
+                            bankManager.withdraw(usernameFromSession, amount, Constants.TRANSACTION_WITHDRAW);
+                            break;
+                        }
+                        case (Constants.TRANSACTION_DEPOSIT): {
+                            bankManager.deposit(usernameFromSession, amount, Constants.TRANSACTION_DEPOSIT);
+                            break;
+                        }
                     }
-                     case(Constants.TRANSACTION_CHARGE): {
-                          bankManager.charge(usernameFromSession.trim(),amount,Constants.TRANSACTION_CHARGE);
-                          break;
-                     }
+                } catch (Exception e) {
+                    response.getOutputStream().print(e.getMessage());
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
     }

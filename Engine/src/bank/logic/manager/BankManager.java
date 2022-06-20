@@ -6,7 +6,6 @@ import bank.logic.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.logic.impl.BankImpl;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.loans.interest.exceptions.InvalidPercentException;
-import manager.customers.CustomersDTO;
 import manager.customers.CustomersData;
 import manager.customers.CustomersNames;
 import manager.info.ClientInfoData;
@@ -52,7 +51,7 @@ public class BankManager {
         bankInstance.withdraw(accountId,amount,description);
     }
 
-    public void charge(String accountId, int amount, String description) throws DataNotFoundException, NonPositiveAmountException {
+    public void deposit(String accountId, int amount, String description) throws DataNotFoundException, NonPositiveAmountException {
         bankInstance.deposit(accountId, amount, description);
     }
 

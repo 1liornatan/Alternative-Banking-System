@@ -16,7 +16,9 @@ import manager.loans.LoansData;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Properties;
 
+import static abs.constants.Constants.GSON_INSTANCE;
 import static abs.constants.Constants.USERNAME;
 
 @WebServlet(name = "Loans Servlet", urlPatterns = "/bank/loan")
@@ -24,7 +26,7 @@ public class LoanServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/plain;charset=UTF-8");
+        response.setContentType("application/json");
 
         String usernameFromSession = SessionUtils.getUsername(request);
 
@@ -35,9 +37,10 @@ public class LoanServlet extends HttpServlet {
         if (usernameFromSession == null) { //user is not logged in yet
             response.getOutputStream().print("Not logged in yet.");
         } else {
+            Properties prop = new Properties();
+            prop.load(request.getInputStream());
             //user is already logged in
-            String type = request.getParameter(Constants.TYPE);
-            Gson gson = new Gson();
+            String type = prop.getProperty(Constants.TYPE);
             if(type == null)
             {
                 response.getOutputStream().print("Invalid Parameters!");
@@ -50,7 +53,7 @@ public class LoanServlet extends HttpServlet {
                 if(type.equals(Constants.ALL_LOANS)) {
                     try {
                         LoansData allLoans = bankManager.getLoansData();
-                        jsonResponse = gson.toJson(allLoans);
+                        jsonResponse = Constants.GSON_INSTANCE.toJson(allLoans);
                     } catch (DataNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -64,30 +67,29 @@ public class LoanServlet extends HttpServlet {
             else {
                 switch (type) {
                     case (Constants.REQUESTED_LOANS): {
-                        LoansData requestedLoans = bankManager.getRequestedLoans(usernameFromSession.trim());
-                        jsonResponse = gson.toJson(requestedLoans);
+                        LoansData requestedLoans = bankManager.getRequestedLoans(usernameFromSession);
+                        jsonResponse = Constants.GSON_INSTANCE.toJson(requestedLoans);
                         break;
                     }
                     case (Constants.INVESTED_LOANS): {
-                        LoansData investedLoans = bankManager.getInvestedLoans(usernameFromSession.trim());
-                        jsonResponse = gson.toJson(investedLoans);
+                        LoansData investedLoans = bankManager.getInvestedLoans(usernameFromSession);
+                        jsonResponse = Constants.GSON_INSTANCE.toJson(investedLoans);
                         break;
                     }
                     case (Constants.UNFINISHED_LOANS): {
                         LoansData unFinishedLoans = new LoansData();
                         try {
-                            unFinishedLoans.setLoans(bankManager.getUnFinishedLoans(usernameFromSession.trim()));
+                            unFinishedLoans.setLoans(bankManager.getUnFinishedLoans(usernameFromSession));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        jsonResponse = gson.toJson(unFinishedLoans);
+                        jsonResponse = Constants.GSON_INSTANCE.toJson(unFinishedLoans);
                         break;
                     }
                     case (Constants.ALL_LOANS): {
                         response.getOutputStream().print("Only admins are authorized for this request.");
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     }
-                    // TODO: CASE OF ALL LOANS
                 }
             }
 

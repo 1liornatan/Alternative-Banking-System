@@ -1,5 +1,6 @@
 package abs.servlets;
 
+import abs.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.impl.exceptions.DataNotFoundException;
@@ -14,6 +15,8 @@ import manager.transactions.TransactionsData;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import static abs.constants.Constants.GSON_INSTANCE;
 
 @WebServlet(name = "Notification Servlet", urlPatterns = "/bank/notifications")
 public class NotificationServlet extends HttpServlet {
@@ -33,14 +36,14 @@ public class NotificationServlet extends HttpServlet {
             response.getOutputStream().print("Only customers are authorized for this request.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
-            Gson gson = new Gson();
             NotificationsData notifications = null;
             try {
                 notifications = bankManager.getNotificationsData(usernameFromSession);
             } catch (Exception e) {
-                e.printStackTrace();
+                response.getOutputStream().print(e.getMessage());
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
             }
-            String jsonResponse = gson.toJson(notifications);
+            String jsonResponse = Constants.GSON_INSTANCE.toJson(notifications);
 
             try (PrintWriter out = response.getWriter()) {
                 out.print(jsonResponse);

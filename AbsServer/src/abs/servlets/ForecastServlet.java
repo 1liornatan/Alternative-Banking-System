@@ -5,6 +5,7 @@ import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.manager.BankManager;
 import com.google.gson.Gson;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import manager.investments.PaymentsData;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Properties;
 
 @WebServlet(name = "Forecast Servlet", urlPatterns = "/bank/forecast")
 public class ForecastServlet extends HttpServlet {
@@ -21,21 +23,22 @@ public class ForecastServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
-
+        ServletOutputStream outputStream = response.getOutputStream();
         String usernameFromSession = SessionUtils.getUsername(request);
 
         BankManager bankManager = ServletUtils.getBankManager(getServletContext());
 
         if (usernameFromSession == null) { //user is not logged in yet
-            response.getOutputStream().print("Not logged in yet.");
-        } else if (SessionUtils.isAdmin(request)) {
-            response.getOutputStream().print("Only customers are authorized for this request.");
+            outputStream.print("Not logged in yet.");
+        } else if (!SessionUtils.isAdmin(request)) {
+            outputStream.print("Only Admins are authorized for this request.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
-            String type = request.getParameter(Constants.TYPE);
-            Gson gson = new Gson();
+            Properties prop = new Properties();
+            prop.load(request.getInputStream());
+            String type = prop.getProperty(Constants.TYPE);
             if (type == null) {
-                response.getOutputStream().print("Invalid Parameters!");
+                outputStream.print("Invalid Parameters!");
                 return;
             }
 
@@ -54,7 +57,7 @@ public class ForecastServlet extends HttpServlet {
                     break;
                 }
             }
-            String jsonResponse = gson.toJson(paymentsData);
+            String jsonResponse = Constants.GSON_INSTANCE.toJson(paymentsData);
 
             try (PrintWriter out = response.getWriter()) {
                 out.print(jsonResponse);
@@ -62,7 +65,7 @@ public class ForecastServlet extends HttpServlet {
                 logServerMessage("Loan Trade Response (" + usernameFromSession + "): " + jsonResponse);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                response.getOutputStream().print("Invalid parameters found!");
+                outputStream.print("Invalid parameters found!");
             }
         }
     }

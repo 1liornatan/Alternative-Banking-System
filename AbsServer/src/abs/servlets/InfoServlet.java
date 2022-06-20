@@ -1,5 +1,6 @@
 package abs.servlets;
 
+import abs.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.impl.exceptions.DataNotFoundException;
@@ -32,8 +33,7 @@ public class InfoServlet extends HttpServlet {
         } else {
             try {
                 ClientInfoData clientInfo = bankManager.getClientInfo(usernameFromSession);
-                Gson gson = new Gson();
-                String jsonResponse = gson.toJson(clientInfo, ClientInfoData.class);
+                String jsonResponse = Constants.GSON_INSTANCE.toJson(clientInfo, ClientInfoData.class);
                 writer.print(jsonResponse);
 
             } catch (DataNotFoundException e) {

@@ -40,26 +40,26 @@ public class TradeServlet extends HttpServlet {
             response.getOutputStream().print("Only customers are authorized for this request.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
-            String type = request.getParameter(Constants.TYPE);
-            Gson gson = new Gson();
+            Properties prop = new Properties();
+            String type = prop.getProperty(Constants.TYPE);
             if(type == null)
             {
                 response.getOutputStream().print("Invalid Parameters!");
-                return;
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
             }
 
             String jsonResponse = null;
 
             switch(type) {
                 case(Constants.INVESTMENTS_FOR_SELL): {
-                    InvestmentsSellData investmentsForSell = bankManager.getInvestmentsForSell(usernameFromSession.trim());
-                    jsonResponse = gson.toJson(investmentsForSell);
+                    InvestmentsSellData investmentsForSell = bankManager.getInvestmentsForSell(usernameFromSession);
+                    jsonResponse = Constants.GSON_INSTANCE.toJson(investmentsForSell);
                     break;
                 }
                 case(Constants.LISTED_INVESTMENTS): {
                     try {
-                        InvestmentsSellData listedInvestments = bankManager.getCustomerInvestments(usernameFromSession.trim());
-                        jsonResponse = gson.toJson(listedInvestments);
+                        InvestmentsSellData listedInvestments = bankManager.getCustomerInvestments(usernameFromSession);
+                        jsonResponse = Constants.GSON_INSTANCE.toJson(listedInvestments);
                     } catch (Exception e) {
                         response.setStatus(HttpServletResponse.SC_CONFLICT);
                         response.getOutputStream().print("Invalid parameters found!");
@@ -95,10 +95,9 @@ public class TradeServlet extends HttpServlet {
         } else {
             Properties prop = new Properties();
             prop.load(request.getInputStream());
-            Gson gson = new Gson();
             String jsonRequest = prop.getProperty(Constants.INVESTMENT_DATA);
             String type = prop.getProperty(Constants.TYPE);
-            InvestmentData investmentData = gson.fromJson(jsonRequest, InvestmentData.class);
+            InvestmentData investmentData = Constants.GSON_INSTANCE.fromJson(jsonRequest, InvestmentData.class);
 
             if(type == null) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -112,27 +111,27 @@ public class TradeServlet extends HttpServlet {
                             response.setStatus(HttpServletResponse.SC_OK);
                         } catch (Exception e) {
                             response.setStatus(HttpServletResponse.SC_CONFLICT);
-                            response.getOutputStream().print("Invalid parameters found!");
+                            response.getOutputStream().print(e.getMessage());
                         }
                         break;
                     }
-                    case (Constants.LIST_INVESTMENT_REQUEST): { //TODO: check if listed already
+                    case (Constants.LIST_INVESTMENT_REQUEST): {
                         try {
                             bankManager.listInvestment(investmentData);
                             response.setStatus(HttpServletResponse.SC_OK);
                         } catch (DataNotFoundException e) {
                             response.setStatus(HttpServletResponse.SC_CONFLICT);
-                            response.getOutputStream().print("Invalid parameters found!");
+                            response.getOutputStream().print(e.getMessage());
                         }
                         break;
                     }
-                    case (Constants.UNLIST_INVESTMENT_REQUEST): { //TODO: check if unlisted already
+                    case (Constants.UNLIST_INVESTMENT_REQUEST): {
                         try {
                             bankManager.unlistInvestment(investmentData);
                             response.setStatus(HttpServletResponse.SC_OK);
                         } catch (DataNotFoundException e) {
                             response.setStatus(HttpServletResponse.SC_CONFLICT);
-                            response.getOutputStream().print("Invalid parameters found!");
+                            response.getOutputStream().print(e.getMessage());
                         }
                         break;
                     }

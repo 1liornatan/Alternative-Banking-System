@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
 
+import static abs.constants.Constants.GSON_INSTANCE;
+
 @WebServlet(name = "Payment Servlet", urlPatterns = "/bank/payments")
 public class PaymentServlet extends HttpServlet {
 
@@ -40,33 +42,31 @@ public class PaymentServlet extends HttpServlet {
             //user is already logged in
             Properties prop = new Properties();
             prop.load(request.getInputStream());
-            Gson gson = new Gson();
-            String jsonRequest = prop.getProperty(Constants.LOAN_DATA);
-            LoanData loan = gson.fromJson(jsonRequest, LoanData.class);
+            String loanId = prop.getProperty(Constants.LOAN_DATA);
             String type = prop.getProperty(Constants.TYPE);
 
-            if (loan == null || type == null) {
+            if (loanId == null || type == null) {
                 response.getOutputStream().print("Invalid Parameters!");
                 return;
             }
             try {
                 switch (type) {
                     case (Constants.CLOSE_LOAN_REQUEST): {
-                        bankManager.closeLoan(loan.getName());
+                        bankManager.closeLoan(loanId);
                         break;
                     }
                     case (Constants.PAY_CYCLE_REQUEST): {
-                        bankManager.advanceCycle(loan.getName());
+                        bankManager.advanceCycle(loanId);
                         break;
                     }
                     case (Constants.PAY_DEBT_REQUEST): {
                         String amountRequest = prop.getProperty(Constants.AMOUNT);
-                        int amount = gson.fromJson(amountRequest, int.class);
+                        int amount = Integer.parseInt(amountRequest);
                         if (amount <= 0) {
-                            response.getOutputStream().print("Invalid Parameters!");
+                            response.getOutputStream().print("Invalid Amount!");
                             return;
                         }
-                        bankManager.deriskLoanByAmount(loan.getName(), amount);
+                        bankManager.deriskLoanByAmount(loanId, amount);
                         break;
                     }
                 }
