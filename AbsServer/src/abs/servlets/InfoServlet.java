@@ -1,12 +1,10 @@
 package abs.servlets;
 
-import abs.constants.Constants;
+import http.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.manager.BankManager;
-import com.google.gson.Gson;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,9 +1,8 @@
 package abs.servlets;
 
-import abs.constants.Constants;
+import http.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
-import bank.logic.manager.BankManager;
 import bank.users.UserManager;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-import static abs.constants.Constants.USERNAME;
+import static http.constants.Constants.USERNAME;
 
 @WebServlet(name = "Admin Login Servlet", urlPatterns = "/bank/login/admin")
 public class AdminLoginServlet extends HttpServlet {

@@ -1,11 +1,10 @@
 package abs.servlets;
 
-import abs.constants.Constants;
+import http.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.loans.interest.exceptions.InvalidPercentException;
 import bank.logic.manager.BankManager;
-import com.google.gson.Gson;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +15,6 @@ import manager.loans.LoansData;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Properties;
 
 @WebServlet(name = "Loan Integration Servlet", urlPatterns = "/bank/loan/integration")
 public class LoanIntegrationServlet extends HttpServlet {

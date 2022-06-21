@@ -1,23 +1,16 @@
 package abs.servlets;
 
-import abs.constants.Constants;
+import http.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
-import bank.logic.accounts.impl.exceptions.NoMoneyException;
-import bank.logic.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.logic.impl.exceptions.DataNotFoundException;
-import bank.logic.loans.interest.exceptions.InvalidPercentException;
 import bank.logic.manager.BankManager;
-import com.google.gson.Gson;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import manager.investments.InvestmentData;
-import manager.investments.InvestmentsData;
 import manager.investments.InvestmentsSellData;
-import manager.investments.RequestDTO;
-import manager.loans.LoansData;
 
 import java.io.IOException;
 import java.io.PrintWriter;
