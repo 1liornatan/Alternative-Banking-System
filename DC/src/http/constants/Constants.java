@@ -44,4 +44,6 @@ public class Constants {
     public static final String URL_NOTIFICATIONS = URL_BASE + "/bank/notifications";
     public static final String URL_FORECAST = URL_BASE + "/bank/forecast";
     public static final String FORECAST_PAYMENTS = "forecast_customer";
+    public static final String URL_LOGOUT = URL_BASE + "/logout";
+    public static final String URL_CUSTOMERS = URL_BASE + "/bank/accounts";
 }

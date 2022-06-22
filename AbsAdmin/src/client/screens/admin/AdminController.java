@@ -1,8 +1,8 @@
 package client.screens.admin;
 
-import client.utils.Constants;
-import client.utils.http.HttpClientUtil;
 import com.sun.istack.internal.NotNull;
+import http.constants.Constants;
+import http.utils.HttpClientUtil;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -32,8 +32,6 @@ import utils.ModelUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static client.utils.Constants.GSON_INSTANCE;
 
 public class AdminController {
 
@@ -65,63 +63,14 @@ public class AdminController {
     @FXML
     private LineChart<String, Integer> timeLineChart;
 
-    @FXML
-    private ScrollPane loginPane;
 
-    @FXML
-    private TextField adminNameTextField;
-
-    @FXML
-    private Label loginErrorLabel;
     private StringProperty loginErrorMessageProperty;
     private BooleanProperty isLoggedIn;
 
-    @FXML
-    void loginButtonAction(ActionEvent event) {
-        String userName = adminNameTextField.getText();
-
-        if (userName.isEmpty()) {
-            loginErrorMessageProperty.set("User name is empty. You can't login with empty user name");
-            return;
-        }
-
-        //noinspection ConstantConditions
-        String finalUrl = HttpUrl
-                .parse(Constants.LOGIN_PAGE)
-                .newBuilder()
-                .addQueryParameter("username", userName)
-                .build()
-                .toString();
-
-        HttpClientUtil.runAsync(finalUrl, new Callback() {
-
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Platform.runLater(() ->
-                        loginErrorMessageProperty.set("Something went wrong: " + e.getMessage())
-                );
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                if (response.code() != 200) {
-                    String responseBody = response.body().string();
-                    Platform.runLater(() ->
-                            loginErrorMessageProperty.set("Something went wrong: " + responseBody)
-                    );
-                } else {
-                    Platform.runLater(() -> {
-                        loginPane.setVisible(false);
-                        isLoggedIn.set(true);
-                    });
-                }
-            }
-        });
-    }
 
     @FXML
     void logoutButtonYaz(ActionEvent event) {
-        HttpClientUtil.runAsync(Constants.LOGOUT, new Callback() {
+        HttpClientUtil.runAsync(Constants.URL_LOGOUT, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 System.out.println("Logout request ended with failure...:(");
@@ -130,9 +79,8 @@ public class AdminController {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful() || response.isRedirect()) {
-                    HttpClientUtil.removeCookiesOf(Constants.BASE_DOMAIN);
+                    HttpClientUtil.removeCookiesOf(Constants.URL_BASE);
                     Platform.runLater(() -> {
-                        loginPane.setVisible(true);
                         isLoggedIn.set(false);
                     });
                 }
@@ -142,24 +90,23 @@ public class AdminController {
 
     @FXML
     void customersButtonAction(ActionEvent event) {
-        String finalUrl = HttpUrl
-                .parse(Constants.FORECAST_PAGE)
-                .newBuilder()
-                .addQueryParameter(Constants.TYPE_PARAM, Constants.ALL_CUSTOMERS)
-                .build()
-                .toString();
+        makeForecastRequest(Constants.ALL_CUSTOMERS);
+    }
 
-        HttpClientUtil.runAsync(finalUrl, new Callback() {
+    private void makeForecastRequest(String type) {
+        new Thread(() -> {
+            try {
+                OkHttpClient client = new OkHttpClient().newBuilder()
+                        .build();
+                MediaType mediaType = MediaType.parse("text/plain");
+                RequestBody body = RequestBody.create(mediaType, "type=" + type);
+                Request request = new Request.Builder()
+                        .url(Constants.URL_FORECAST)
+                        .method("GET", body)
+                        .addHeader("Content-Type", "text/plain")
+                        .build();
+                Response response = client.newCall(request).execute();
 
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Platform.runLater(() ->
-                        System.out.println("Something went wrong: " + e.getMessage())
-                );
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.code() != 200) {
                     String responseBody = response.body().string();
                     Platform.runLater(() ->
@@ -167,14 +114,18 @@ public class AdminController {
                     );
                 } else {
                     String rawBody = response.body().string();
-                    PaymentsData data = GSON_INSTANCE.fromJson(rawBody, PaymentsData.class);
+                    PaymentsData data = Constants.GSON_INSTANCE.fromJson(rawBody, PaymentsData.class);
 
                     Platform.runLater(() -> {
                         updateCharts(data);
                     });
                 }
+
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
             }
-        });
+
+        }).start();
     }
 
     private void updateCharts(PaymentsData data) {
@@ -216,39 +167,7 @@ public class AdminController {
 
     @FXML
     void transactionsButtonAction(ActionEvent event) {
-        String finalUrl = HttpUrl
-                .parse(Constants.FORECAST_PAGE)
-                .newBuilder()
-                .addQueryParameter(Constants.TYPE_PARAM, Constants.ALL_TRANSACTIONS)
-                .build()
-                .toString();
-
-        HttpClientUtil.runAsync(finalUrl, new Callback() {
-
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Platform.runLater(() ->
-                        System.out.println("Something went wrong: " + e.getMessage())
-                );
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                if (response.code() != 200) {
-                    String responseBody = response.body().string();
-                    Platform.runLater(() ->
-                            System.out.println("Something went wrong: " + responseBody)
-                    );
-                } else {
-                    String rawBody = response.body().string();
-                    PaymentsData data = GSON_INSTANCE.fromJson(rawBody, PaymentsData.class);
-
-                    Platform.runLater(() -> {
-                        updateCharts2(data);
-                    });
-                }
-            }
-        });
+        makeForecastRequest(Constants.ALL_TRANSACTIONS);
     }
 
     private void updateCharts2(PaymentsData data) {
@@ -289,39 +208,7 @@ public class AdminController {
 
     @FXML
     void loansButtonAction(ActionEvent event) {
-        String finalUrl = HttpUrl
-                .parse(Constants.FORECAST_PAGE)
-                .newBuilder()
-                .addQueryParameter(Constants.TYPE_PARAM, Constants.ALL_LOANS)
-                .build()
-                .toString();
-
-        HttpClientUtil.runAsync(finalUrl, new Callback() {
-
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Platform.runLater(() ->
-                        System.out.println("Something went wrong: " + e.getMessage())
-                );
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                if (response.code() != 200) {
-                    String responseBody = response.body().string();
-                    Platform.runLater(() ->
-                            System.out.println("Something went wrong: " + responseBody)
-                    );
-                } else {
-                    String rawBody = response.body().string();
-                    PaymentsData data = GSON_INSTANCE.fromJson(rawBody, PaymentsData.class);
-
-                    Platform.runLater(() -> {
-                        updateCharts3(data);
-                    });
-                }
-            }
-        });
+        makeForecastRequest(Constants.ALL_LOANS);
     }
 
     private void updateCharts3(PaymentsData data) {
@@ -385,24 +272,19 @@ public class AdminController {
         if(!isLoggedIn.get())
             return;
 
-        String finalUrl = HttpUrl
-                .parse(Constants.LOAN_PAGE)
-                .newBuilder()
-                .addQueryParameter(Constants.TYPE_PARAM, Constants.ALL_LOANS)
-                .build()
-                .toString();
+        new Thread(() -> {
 
-        HttpClientUtil.runAsync(finalUrl, new Callback() {
-
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Platform.runLater(() ->
-                        System.out.println("Something went wrong: " + e.getMessage())
-                );
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+            try {
+                OkHttpClient client = new OkHttpClient().newBuilder()
+                        .build();
+                MediaType mediaType = MediaType.parse("text/plain");
+                RequestBody body = RequestBody.create(mediaType, "type=" + Constants.ALL_LOANS);
+                Request request = new Request.Builder()
+                        .url(Constants.URL_LOAN)
+                        .method("GET", body)
+                        .addHeader("Content-Type", "text/plain")
+                        .build();
+                Response response = client.newCall(request).execute();
                 if (response.code() != 200) {
                     String responseBody = response.body().string();
                     Platform.runLater(() ->
@@ -410,7 +292,7 @@ public class AdminController {
                     );
                 } else {
                     String rawBody = response.body().string();
-                    LoansData loansData = GSON_INSTANCE.fromJson(rawBody, LoansData.class);
+                    LoansData loansData = Constants.GSON_INSTANCE.fromJson(rawBody, LoansData.class);
                     List<LoanData> loanDataList = loansData.getLoans();
                     loanModelList = ModelUtils.makeLoanModelList(loanDataList);
 
@@ -418,8 +300,10 @@ public class AdminController {
                         adminLoansTable.setItems(getLoans());
                     });
                 }
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
             }
-        });
+        }).start();
     }
 
 
@@ -519,7 +403,6 @@ public class AdminController {
         setDataTables();
         increaseYazButton.setText("Increase\nYaz");
         increaseYazButton.setStyle("-fx-text-alignment: CENTER;");
-        loginErrorLabel.textProperty().bind(loginErrorMessageProperty);
         startUpdateThread();
     }
 
@@ -541,9 +424,7 @@ public class AdminController {
         if (!isLoggedIn.get())
             return;
 
-        String finalUrl = HttpUrl
-                .parse(Constants.CUSTOMERS_PAGE)
-                .toString();
+        String finalUrl = Constants.URL_CUSTOMERS;
 
         HttpClientUtil.runAsync(finalUrl, new Callback() {
 
@@ -563,7 +444,7 @@ public class AdminController {
                     );
                 } else {
                     String rawBody = response.body().string();
-                    CustomersData customersData = GSON_INSTANCE.fromJson(rawBody, CustomersData.class);
+                    CustomersData customersData = Constants.GSON_INSTANCE.fromJson(rawBody, CustomersData.class);
                     List<CustomerData> customerDataList = customersData.getCustomers();
                     List<CustomerModel> tempCustomerModelList = ModelUtils.makeCustomerModelList(customerDataList);
                     customerModelList = tempCustomerModelList;
