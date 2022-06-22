@@ -125,25 +125,5 @@
             </TabPane>
          </content>
       </ScrollPane>
-      <ScrollPane fx:id="loginPane">
-         <content>
-            <VBox alignment="CENTER" prefHeight="613.0" prefWidth="644.0">
-               <children>
-                  <Label alignment="CENTER" text="Enter Admin Name" />
-                  <TextField fx:id="adminNameTextField" maxWidth="100.0" />
-                  <Button minWidth="80.0" mnemonicParsing="false" onAction="#loginButtonAction" text="Login">
-                     <VBox.margin>
-                        <Insets top="10.0" />
-                     </VBox.margin>
-                  </Button>
-                  <Label fx:id="loginErrorLabel">
-                     <VBox.margin>
-                        <Insets top="30.0" />
-                     </VBox.margin>
-                  </Label>
-               </children>
-            </VBox>
-         </content>
-      </ScrollPane>
    </children>
 </StackPane>
