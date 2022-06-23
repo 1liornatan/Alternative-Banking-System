@@ -40,8 +40,7 @@ public class TradeServlet extends HttpServlet {
             response.getOutputStream().print("Only customers are authorized for this request.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
-            Properties prop = new Properties();
-            String type = prop.getProperty(Constants.TYPE);
+            String type = request.getParameter(Constants.TYPE);
             if(type == null)
             {
                 response.getOutputStream().print("Invalid Parameters!");

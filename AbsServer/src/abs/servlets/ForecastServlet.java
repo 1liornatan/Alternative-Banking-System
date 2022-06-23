@@ -34,9 +34,7 @@ public class ForecastServlet extends HttpServlet {
             outputStream.print("Only Admins are authorized for this request.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
-            Properties prop = new Properties();
-            prop.load(request.getInputStream());
-            String type = prop.getProperty(Constants.TYPE);
+            String type = request.getParameter(Constants.TYPE);
             if (type == null) {
                 outputStream.print("Invalid Parameters!");
                 return;

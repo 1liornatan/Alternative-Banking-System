@@ -37,10 +37,8 @@ public class LoanServlet extends HttpServlet {
         if (usernameFromSession == null) { //user is not logged in yet
             response.getOutputStream().print("Not logged in yet.");
         } else {
-            Properties prop = new Properties();
-            prop.load(request.getInputStream());
             //user is already logged in
-            String type = prop.getProperty(Constants.TYPE);
+            String type = request.getParameter(Constants.TYPE);
             if(type == null)
             {
                 response.getOutputStream().print("Invalid Parameters!");
