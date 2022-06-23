@@ -1,4 +1,4 @@
-package abs.constants;
+package http.constants;
 
 import com.google.gson.Gson;
 
@@ -32,4 +32,21 @@ public class Constants {
     public static final String TRANSACTION_DEPOSIT = "deposit";
     public static final String IS_ADMIN = "is_admin";
     public static final Gson GSON_INSTANCE = new Gson();
+
+    public static final String URL_BASE = "http://localhost:8080/Abs";
+    public static final String URL_TRADE = URL_BASE + "/bank/trade";
+    public static final String URL_LOAN = URL_BASE + "/bank/loan";
+    public static final String URL_INTEGRATION = URL_LOAN + "/integration";
+    public static final String URL_PAYMENTS = URL_BASE + "/bank/payment";
+    public static final String URL_INFO = URL_BASE + "/bank/info";
+    public static final String URL_TRANSACTIONS = URL_BASE + "/bank/transactions";
+
+    public static final String URL_NOTIFICATIONS = URL_BASE + "/bank/notifications";
+    public static final String URL_FORECAST = URL_BASE + "/bank/forecast";
+    public static final String FORECAST_PAYMENTS = "forecast_customer";
+    public static final String URL_LOGOUT = URL_BASE + "/logout";
+    public static final String URL_CUSTOMERS = URL_BASE + "/bank/accounts";
+    public static final String URL_LOGIN = URL_BASE + "/bank/login";
+    public static final String URL_LOGIN_ADMIN = URL_LOGIN + "/admin";
+    public static final String DATA = "data";
 }

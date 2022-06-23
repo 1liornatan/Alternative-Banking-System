@@ -1,6 +1,6 @@
 package abs.servlets;
 
-import abs.constants.Constants;
+import http.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.manager.BankManager;

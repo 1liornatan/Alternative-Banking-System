@@ -5,7 +5,7 @@ import bank.users.UserManager;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 
-import static abs.constants.Constants.INT_PARAMETER_ERROR;
+import static http.constants.Constants.INT_PARAMETER_ERROR;
 
 public class ServletUtils {
 

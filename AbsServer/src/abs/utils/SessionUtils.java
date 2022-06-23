@@ -1,6 +1,6 @@
 package abs.utils;
 
-import abs.constants.Constants;
+import http.constants.Constants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 

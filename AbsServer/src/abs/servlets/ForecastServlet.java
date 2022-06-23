@@ -1,16 +1,15 @@
 package abs.servlets;
 
-import abs.constants.Constants;
+import bank.logic.impl.exceptions.DataNotFoundException;
+import http.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.manager.BankManager;
-import com.google.gson.Gson;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import manager.investments.InvestmentsSellData;
 import manager.investments.PaymentsData;
 
 import java.io.IOException;
@@ -31,8 +30,18 @@ public class ForecastServlet extends HttpServlet {
         if (usernameFromSession == null) { //user is not logged in yet
             outputStream.print("Not logged in yet.");
         } else if (!SessionUtils.isAdmin(request)) {
-            outputStream.print("Only Admins are authorized for this request.");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            try {
+                PaymentsData data = bankManager.getPaymentsData(usernameFromSession);
+                String jsonResponse = Constants.GSON_INSTANCE.toJson(data);
+
+                PrintWriter out = response.getWriter();
+                out.print(jsonResponse);
+                out.flush();
+
+            } catch (Exception e) {
+                outputStream.print("Data not found.");
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+            }
         } else {
             String type = request.getParameter(Constants.TYPE);
             if (type == null) {
