@@ -15,6 +15,7 @@ import manager.loans.LoansData;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Properties;
 
 @WebServlet(name = "Loan Integration Servlet", urlPatterns = "/bank/loan/integration")
 public class LoanIntegrationServlet extends HttpServlet {

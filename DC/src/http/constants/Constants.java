@@ -12,7 +12,7 @@ public class Constants {
     public static final String ALL_TRANSACTIONS = "all_transactions";
     public static final String ALL_CUSTOMERS = "all_customers";
     public static final String TYPE = "type";
-    public static final String DATA="data";
+
     public static final int INT_PARAMETER_ERROR = Integer.MIN_VALUE;
     public static final String INTEGRATION_REQUEST = "request";
     public static final String INTEGRATION_SUBMIT = "submit";

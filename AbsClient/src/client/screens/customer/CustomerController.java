@@ -1,6 +1,7 @@
 package client.screens.customer;
 
 import http.constants.Constants;
+import http.utils.HttpClientUtil;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -203,8 +204,7 @@ public class CustomerController {
                     prop.setProperty(Constants.TYPE, Constants.BUY_INVESTMENT_REQUEST);
                     prop.setProperty(Constants.INVESTMENT_DATA, jsonRequest);
 
-                    OkHttpClient client = new OkHttpClient().newBuilder()
-                            .build();
+ 
                     MediaType mediaType = MediaType.parse("text/plain");
                     RequestBody body = RequestBody.create(mediaType, prop.toString());
                     Request request = new Request.Builder()
@@ -213,7 +213,7 @@ public class CustomerController {
                             .addHeader("Content-Type", "text/plain")
                             .build();
 
-                    Response response = client.newCall(request).execute();
+                    Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                     Platform.runLater(() -> {
                         updateData();
@@ -261,9 +261,7 @@ public class CustomerController {
 
                     prop.setProperty(Constants.TYPE, Constants.LIST_INVESTMENT_REQUEST);
                     prop.setProperty(Constants.INVESTMENT_DATA, jsonRequest);
-
-                    OkHttpClient client = new OkHttpClient().newBuilder()
-                            .build();
+                    
                     MediaType mediaType = MediaType.parse("text/plain");
                     RequestBody body = RequestBody.create(mediaType, prop.toString());
                     Request request = new Request.Builder()
@@ -271,7 +269,7 @@ public class CustomerController {
                             .method("POST", body)
                             .addHeader("Content-Type", "text/plain")
                             .build();
-                    Response response = client.newCall(request).execute();
+                    Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                     Platform.runLater(() -> {
                         updateOwnedInvestments();
@@ -300,16 +298,13 @@ public class CustomerController {
                         .addQueryParameter(Constants.TYPE, Constants.INVESTMENTS_FOR_SELL)
                         .build()
                         .toString();
-
-
-                OkHttpClient client = new OkHttpClient().newBuilder()
-                        .build();
+                
 
                 Request request = new Request.Builder()
                         .url(finalUrl)
                         .build();
 
-                Response response = client.newCall(request).execute();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                 InvestmentsSellData investmentsForSell = Constants.GSON_INSTANCE.fromJson(response.body().string(), InvestmentsSellData.class);
 
@@ -353,8 +348,7 @@ public class CustomerController {
                     prop.setProperty(Constants.TYPE, Constants.UNLIST_INVESTMENT_REQUEST);
                     prop.setProperty(Constants.INVESTMENT_DATA, jsonRequest);
 
-                    OkHttpClient client = new OkHttpClient().newBuilder()
-                            .build();
+ 
                     MediaType mediaType = MediaType.parse("text/plain");
                     RequestBody body = RequestBody.create(mediaType, prop.toString());
                     Request request = new Request.Builder()
@@ -362,7 +356,7 @@ public class CustomerController {
                             .method("POST", body)
                             .addHeader("Content-Type", "text/plain")
                             .build();
-                    Response response = client.newCall(request).execute();
+                    Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
                     Platform.runLater(() -> {
                         updateOwnedInvestments();
                         sellErrorLabel.setText("Unlisted investment successfully!");
@@ -463,15 +457,14 @@ public class CustomerController {
                     prop.setProperty(Constants.TYPE, Constants.INTEGRATION_REQUEST);
                     prop.setProperty(Constants.DATA, jsonRequest);
 
-                    OkHttpClient client = new OkHttpClient().newBuilder()
-                            .build();
+ 
                     MediaType mediaType = MediaType.parse("text/plain");
                     RequestBody body = RequestBody.create(mediaType, prop.toString());
                     Request request = new Request.Builder()
                             .url(Constants.URL_INTEGRATION)
                             .method("POST", body)
                             .build();
-                    Response response = client.newCall(request).execute();
+                    Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                     LoansData loansData = Constants.GSON_INSTANCE.fromJson(response.body().string(), LoansData.class);
                     Thread.sleep(1000);
@@ -522,8 +515,7 @@ public class CustomerController {
                     prop.setProperty(Constants.LOAN_DATA, selectedLoan.getId());
                     prop.setProperty(Constants.AMOUNT, "-1");
 
-                    OkHttpClient client = new OkHttpClient().newBuilder()
-                            .build();
+ 
                     MediaType mediaType = MediaType.parse("text/plain");
                     RequestBody body = RequestBody.create(mediaType, prop.toString());
                     Request request = new Request.Builder()
@@ -531,7 +523,7 @@ public class CustomerController {
                             .method("POST", body)
                             .addHeader("Content-Type", "text/plain")
                             .build();
-                    Response response = client.newCall(request).execute();
+                    Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                     Platform.runLater(() -> {
                         updateData();
@@ -564,8 +556,7 @@ public class CustomerController {
                     prop.setProperty(Constants.LOAN_DATA, selectedLoan.getId());
                     prop.setProperty(Constants.AMOUNT, "-1");
 
-                    OkHttpClient client = new OkHttpClient().newBuilder()
-                            .build();
+ 
                     MediaType mediaType = MediaType.parse("text/plain");
                     RequestBody body = RequestBody.create(mediaType, prop.toString());
                     Request request = new Request.Builder()
@@ -573,7 +564,7 @@ public class CustomerController {
                             .method("POST", body)
                             .addHeader("Content-Type", "text/plain")
                             .build();
-                    Response response = client.newCall(request).execute();
+                    Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
                     Platform.runLater(() -> {
                         updateData();
                         paymentErrorLabel.setText("Successfully paid " + selectedLoan.getPaymentAmount());
@@ -615,8 +606,7 @@ public class CustomerController {
                 prop.setProperty(Constants.LOAN_DATA, selectedDebtLoan.getId());
                 prop.setProperty(Constants.AMOUNT, String.valueOf(debtAmountProperty.get()));
 
-                OkHttpClient client = new OkHttpClient().newBuilder()
-                        .build();
+ 
                 MediaType mediaType = MediaType.parse("text/plain");
                 RequestBody body = RequestBody.create(mediaType, prop.toString());
                 Request request = new Request.Builder()
@@ -624,7 +614,7 @@ public class CustomerController {
                         .method("POST", body)
                         .addHeader("Content-Type", "text/plain")
                         .build();
-                Response response = client.newCall(request).execute();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                 Platform.runLater(() -> {
                     updateData();
@@ -833,15 +823,14 @@ public class CustomerController {
                 prop.setProperty(Constants.DATA, jsonRequest);
 
 
-                OkHttpClient client = new OkHttpClient().newBuilder()
-                        .build();
+ 
                 MediaType mediaType = MediaType.parse("application/json");
                 RequestBody body = RequestBody.create(mediaType, jsonRequest);
                 Request request = new Request.Builder()
                         .url(Constants.URL_INTEGRATION)
                         .method("POST", body)
                         .build();
-                Response response = client.newCall(request).execute();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                 Platform.runLater(() -> {
                     clearAllFields();
@@ -905,13 +894,12 @@ public class CustomerController {
 
         Thread updateCategories = new Thread(() -> {
             try {
-                OkHttpClient client = new OkHttpClient().newBuilder()
-                        .build();
+ 
                 MediaType mediaType = MediaType.parse("text/plain");
                 Request request = new Request.Builder()
                         .url(Constants.URL_INFO)
                         .build();
-                Response response = client.newCall(request).execute();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                 ClientInfoData data = Constants.GSON_INSTANCE.fromJson(response.body().string(), ClientInfoData.class);
 
@@ -975,7 +963,7 @@ public class CustomerController {
             Request request = new Request.Builder()
                     .url(finalUrl)
                     .build();
-            Response response = client.newCall(request).execute();
+            Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
             return Constants.GSON_INSTANCE.fromJson(response.body().string(), LoansData.class);
         }
@@ -1025,12 +1013,11 @@ public class CustomerController {
         Thread updateTransactions = new Thread(() -> {
             try {
 
-                OkHttpClient client = new OkHttpClient().newBuilder()
-                        .build();
+ 
                 Request request = new Request.Builder()
                         .url(Constants.URL_TRANSACTIONS)
                         .build();
-                Response response = client.newCall(request).execute();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                 TransactionsData jsonResponse = Constants.GSON_INSTANCE.fromJson(response.body().string(), TransactionsData.class);
                 List<TransactionData> transactionsData = jsonResponse.getTransactions();
@@ -1102,12 +1089,11 @@ public class CustomerController {
         Thread updateNotifications = new Thread(() -> {
             List<NotificationData> notificationsData = null;
             try {
-                OkHttpClient client = new OkHttpClient().newBuilder()
-                        .build();
+ 
                 Request request = new Request.Builder()
                         .url(Constants.URL_NOTIFICATIONS)
                         .build();
-                Response response = client.newCall(request).execute();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                 NotificationsData jsonResponse = Constants.GSON_INSTANCE.fromJson(response.body().string(), NotificationsData.class);
                 notificationsData = jsonResponse.getNotificationsList();
@@ -1158,7 +1144,7 @@ public class CustomerController {
                     .method("POST", body)
                     .addHeader("Content-Type", "text/plain")
                     .build();
-            Response response = client.newCall(request).execute();
+            Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -1211,13 +1197,12 @@ public class CustomerController {
                         .build()
                         .toString();
 
-                OkHttpClient client = new OkHttpClient().newBuilder()
-                        .build();
+ 
                 MediaType mediaType = MediaType.parse("text/plain");
                 Request request = new Request.Builder()
                         .url(finalUrl)
                         .build();
-                Response response = client.newCall(request).execute();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                 InvestmentsSellData customerInvestments = Constants.GSON_INSTANCE.fromJson(response.body().string(), InvestmentsSellData.class);
                 sellInvestmentModels = getInvModels(customerInvestments);
@@ -1240,13 +1225,12 @@ public class CustomerController {
         new Thread(() -> {
             int i;
             try {
-                OkHttpClient client = new OkHttpClient().newBuilder()
-                        .build();
+ 
                 Request request = new Request.Builder()
                         .url(Constants.URL_FORECAST)
                         .addHeader("Content-Type", "text/plain")
                         .build();
-                Response response = client.newCall(request).execute();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                 PaymentsData data = Constants.GSON_INSTANCE.fromJson(response.body().string(), PaymentsData.class);
                 XYChart.Series series = new XYChart.Series();

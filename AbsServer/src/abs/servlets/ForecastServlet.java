@@ -34,15 +34,14 @@ public class ForecastServlet extends HttpServlet {
                 PaymentsData data = bankManager.getPaymentsData(usernameFromSession);
                 String jsonResponse = Constants.GSON_INSTANCE.toJson(data);
 
-                PrintWriter out = response.getWriter();
-                out.print(jsonResponse);
-                out.flush();
+                outputStream.print(jsonResponse);
 
             } catch (Exception e) {
                 outputStream.print("Data not found.");
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
             }
         } else {
+
             String type = request.getParameter(Constants.TYPE);
             if (type == null) {
                 outputStream.print("Invalid Parameters!");
@@ -66,14 +65,10 @@ public class ForecastServlet extends HttpServlet {
             }
             String jsonResponse = Constants.GSON_INSTANCE.toJson(paymentsData);
 
-            try (PrintWriter out = response.getWriter()) {
-                out.print(jsonResponse);
-                out.flush();
-                logServerMessage("Loan Trade Response (" + usernameFromSession + "): " + jsonResponse);
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                outputStream.print("Invalid parameters found!");
-            }
+            outputStream.print(jsonResponse);
+            outputStream.flush();
+            logServerMessage("Loan Trade Response (" + usernameFromSession + "): " + jsonResponse);
+            response.setStatus(HttpServletResponse.SC_OK);
         }
     }
 

@@ -2,6 +2,7 @@ package client.screens.login;
 
 import client.screens.admin.AdminController;
 import http.constants.Constants;
+import http.utils.HttpClientUtil;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,6 +20,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import okhttp3.*;
 import screens.resources.BankScreenConsts;
+import sun.net.www.http.HttpClient;
 
 import java.io.IOException;
 import java.net.URL;
@@ -80,13 +82,11 @@ public class LoginController {
     }
 
     private Response makeDisconnectRequest() throws IOException {
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
         MediaType mediaType = MediaType.parse("text/plain");
         Request request = new Request.Builder()
                 .url(Constants.URL_LOGOUT)
                 .build();
-        return client.newCall(request).execute();
+        return HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
     }
 
     @FXML
@@ -175,14 +175,18 @@ public class LoginController {
     }
 
     private Response makeAdminLoginRequest(String username) throws IOException {
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
+        String finalUrl = HttpUrl
+                .parse(Constants.URL_LOGIN_ADMIN)
+                .newBuilder()
+                .addQueryParameter(Constants.USERNAME, username)
+                .build()
+                .toString();
+
         MediaType mediaType = MediaType.parse("text/plain");
-        RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url(Constants.URL_LOGIN_ADMIN + "?username=" + username)
+                .url(finalUrl)
                 .build();
-        return client.newCall(request).execute();
+        return HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
     }
 
     private void setErrorMessage(String message) {

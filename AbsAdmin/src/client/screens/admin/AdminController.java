@@ -103,14 +103,11 @@ public class AdminController {
                         .build()
                         .toString();
 
-                OkHttpClient client = new OkHttpClient().newBuilder()
-                        .build();
-                MediaType mediaType = MediaType.parse("text/plain");
                 Request request = new Request.Builder()
                         .url(finalUrl)
-                        .addHeader("Content-Type", "text/plain")
                         .build();
-                Response response = client.newCall(request).execute();
+
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                 if (response.code() != 200) {
                     String responseBody = response.body().string();
@@ -287,14 +284,10 @@ public class AdminController {
                         .build()
                         .toString();
 
-                OkHttpClient client = new OkHttpClient().newBuilder()
-                        .build();
-                MediaType mediaType = MediaType.parse("text/plain");
                 Request request = new Request.Builder()
                         .url(finalUrl)
-                        .addHeader("Content-Type", "text/plain")
                         .build();
-                Response response = client.newCall(request).execute();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
                 if (response.code() != 200) {
                     String responseBody = response.body().string();
                     Platform.runLater(() ->
