@@ -22,44 +22,8 @@ import java.util.Properties;
 public class LoanIntegrationServlet extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("application/json");
-
-        String usernameFromSession = SessionUtils.getUsername(request);
-
-        BankManager bankManager = ServletUtils.getBankManager(getServletContext());
-
-        if (usernameFromSession == null) { //user is not logged in yet
-            response.getOutputStream().print("Not logged in yet.");
-        } else if (SessionUtils.isAdmin(request)) {
-            response.getOutputStream().print("Only customers are authorized for this request.");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        } else {
-            String jsonRequest = request.getInputStream().toString();
-
-            if(jsonRequest == null)
-                return;
-
-            RequestDTO requestDTO = Constants.GSON_INSTANCE.fromJson(jsonRequest, RequestDTO.class);
-            try {
-                LoansData integrationLoans = bankManager.getIntegrationLoans(requestDTO);
-                String jsonResponse = Constants.GSON_INSTANCE.toJson(integrationLoans);
-
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(jsonResponse);
-                    out.flush();
-                }
-                logServerMessage("Loan Integration Response (" + usernameFromSession + "): " + jsonRequest);
-            } catch (InvalidPercentException e) {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                response.getOutputStream().print("Invalid parameters found!");
-            }
-        }
-    }
-
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/plain;charset=UTF-8");
+        response.setContentType("application/json");
         String usernameFromSession = SessionUtils.getUsername(request);
 
         BankManager bankManager = ServletUtils.getBankManager(getServletContext());
@@ -67,14 +31,40 @@ public class LoanIntegrationServlet extends HttpServlet {
         if (usernameFromSession == null) { //user is not logged in yet
             response.getOutputStream().print("Not logged in yet.");
         } else {
-            //user is already logged in
-            String jsonRequest = request.getInputStream().toString();
-            InvestmentsData investmentsData = Constants.GSON_INSTANCE.fromJson(jsonRequest, InvestmentsData.class);
-            try {
-                bankManager.setInvestment(investmentsData);
-                response.setStatus(HttpServletResponse.SC_OK);
-            } catch (Exception e) {
-                response.getOutputStream().print(e.getMessage());
+            Properties prop = new Properties();
+            prop.load(request.getInputStream());
+            String type = prop.getProperty(Constants.TYPE);
+            String jsonRequest = prop.getProperty(Constants.DATA);
+
+            switch(type) {
+                case(Constants.INTEGRATION_REQUEST): {
+                    RequestDTO requestDTO = Constants.GSON_INSTANCE.fromJson(jsonRequest,RequestDTO.class);
+                    try {
+                        LoansData integrationLoans = bankManager.getIntegrationLoans(requestDTO);
+                        String jsonResponse = Constants.GSON_INSTANCE.toJson(integrationLoans);
+
+                        try (PrintWriter out = response.getWriter()) {
+                            out.print(jsonResponse);
+                            out.flush();
+                        }
+                        logServerMessage("Loan Integration Response (" + usernameFromSession + "): " + jsonRequest);
+                    } catch (InvalidPercentException e) {
+                        response.setStatus(HttpServletResponse.SC_CONFLICT);
+                        response.getOutputStream().print("Invalid parameters found!");
+                    }
+                    break;
+                }
+                case(Constants.INTEGRATION_SUBMIT): {
+                    InvestmentsData investmentsData = Constants.GSON_INSTANCE.fromJson(jsonRequest, InvestmentsData.class);
+                    try {
+                        bankManager.setInvestment(investmentsData);
+                        response.setStatus(HttpServletResponse.SC_OK);
+                    } catch (Exception e) {
+                        response.getOutputStream().print(e.getMessage());
+                    }
+                    response.getOutputStream().print("Submitted Successfully.");
+                    break;
+                }
             }
         }
     }
