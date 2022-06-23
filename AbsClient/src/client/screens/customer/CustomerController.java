@@ -268,7 +268,7 @@ public class CustomerController {
                     RequestBody body = RequestBody.create(mediaType, prop.toString());
                     Request request = new Request.Builder()
                             .url(Constants.URL_TRADE)
-                            .method("GET", body)
+                            .method("POST", body)
                             .addHeader("Content-Type", "text/plain")
                             .build();
                     Response response = client.newCall(request).execute();
@@ -294,18 +294,21 @@ public class CustomerController {
     void searchInvestmentButtonAction(ActionEvent ignoredEvent) {
         Thread searchInvestmentsThread = new Thread(() -> {
             try {
-                Properties prop = new Properties();
-                prop.setProperty(Constants.TYPE, Constants.INVESTMENT_DATA);
+                String finalUrl = HttpUrl
+                        .parse(Constants.URL_TRADE)
+                        .newBuilder()
+                        .addQueryParameter(Constants.TYPE, Constants.INVESTMENTS_FOR_SELL)
+                        .build()
+                        .toString();
+
 
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .build();
-                MediaType mediaType = MediaType.parse("text/plain");
-                RequestBody body = RequestBody.create(mediaType, prop.toString());
+
                 Request request = new Request.Builder()
-                        .url(Constants.URL_TRADE)
-                        .method("GET", body)
-                        .addHeader("Content-Type", "text/plain")
+                        .url(finalUrl)
                         .build();
+
                 Response response = client.newCall(request).execute();
 
                 InvestmentsSellData investmentsForSell = Constants.GSON_INSTANCE.fromJson(response.body().string(), InvestmentsSellData.class);
@@ -356,7 +359,7 @@ public class CustomerController {
                     RequestBody body = RequestBody.create(mediaType, prop.toString());
                     Request request = new Request.Builder()
                             .url(Constants.URL_TRADE)
-                            .method("GET", body)
+                            .method("POST", body)
                             .addHeader("Content-Type", "text/plain")
                             .build();
                     Response response = client.newCall(request).execute();
@@ -454,14 +457,19 @@ public class CustomerController {
                     Thread.sleep(2000);
                     Platform.runLater(() -> searchLoansProgressBar.setProgress(0.3));
                     updateMessage("Searching Loans...");
+                    Properties prop = new Properties();
+
                     String jsonRequest = Constants.GSON_INSTANCE.toJson(requestDTO);
+                    prop.setProperty(Constants.TYPE, Constants.INTEGRATION_REQUEST);
+                    prop.setProperty(Constants.DATA, jsonRequest);
+
                     OkHttpClient client = new OkHttpClient().newBuilder()
                             .build();
-                    MediaType mediaType = MediaType.parse("application/json");
-                    RequestBody body = RequestBody.create(mediaType, jsonRequest);
+                    MediaType mediaType = MediaType.parse("text/plain");
+                    RequestBody body = RequestBody.create(mediaType, prop.toString());
                     Request request = new Request.Builder()
                             .url(Constants.URL_INTEGRATION)
-                            .method("GET", body)
+                            .method("POST", body)
                             .build();
                     Response response = client.newCall(request).execute();
 
@@ -819,6 +827,12 @@ public class CustomerController {
             try {
                 String jsonRequest = Constants.GSON_INSTANCE.toJson(investmentsData);
 
+                Properties prop = new Properties();
+
+                prop.setProperty(Constants.TYPE, Constants.INTEGRATION_SUBMIT);
+                prop.setProperty(Constants.DATA, jsonRequest);
+
+
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .build();
                 MediaType mediaType = MediaType.parse("application/json");
@@ -894,10 +908,8 @@ public class CustomerController {
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .build();
                 MediaType mediaType = MediaType.parse("text/plain");
-                RequestBody body = RequestBody.create(mediaType, "");
                 Request request = new Request.Builder()
                         .url(Constants.URL_INFO)
-                        .method("GET", body)
                         .build();
                 Response response = client.newCall(request).execute();
 
@@ -950,18 +962,18 @@ public class CustomerController {
     }
 
     private LoansData makeLoanRequest(String type) {
-        Properties prop = new Properties();
-        prop.setProperty(Constants.TYPE, type);
-
         try {
+            String finalUrl = HttpUrl
+                    .parse(Constants.URL_LOAN)
+                    .newBuilder()
+                    .addQueryParameter(Constants.TYPE, type)
+                    .build()
+                    .toString();
+
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .build();
-            MediaType mediaType = MediaType.parse("text/plain");
-            RequestBody body = RequestBody.create(mediaType, prop.toString());
             Request request = new Request.Builder()
-                    .url(Constants.URL_LOAN)
-                    .method("GET", body)
-                    .addHeader("Content-Type", "text/plain")
+                    .url(finalUrl)
                     .build();
             Response response = client.newCall(request).execute();
 
@@ -1015,11 +1027,8 @@ public class CustomerController {
 
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .build();
-                MediaType mediaType = MediaType.parse("text/plain");
-                RequestBody body = RequestBody.create(mediaType, "");
                 Request request = new Request.Builder()
                         .url(Constants.URL_TRANSACTIONS)
-                        .method("GET", body)
                         .build();
                 Response response = client.newCall(request).execute();
 
@@ -1095,11 +1104,8 @@ public class CustomerController {
             try {
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .build();
-                MediaType mediaType = MediaType.parse("text/plain");
-                RequestBody body = RequestBody.create(mediaType, "");
                 Request request = new Request.Builder()
                         .url(Constants.URL_NOTIFICATIONS)
-                        .method("GET", body)
                         .build();
                 Response response = client.newCall(request).execute();
 
@@ -1198,17 +1204,18 @@ public class CustomerController {
     private void updateOwnedInvestments() {
         Thread updateOwnedInvestments = new Thread(() -> {
             try {
-                Properties prop = new Properties();
-                prop.setProperty(Constants.TYPE, Constants.INVESTMENTS_FOR_SELL);
+                String finalUrl = HttpUrl
+                        .parse(Constants.URL_TRADE)
+                        .newBuilder()
+                        .addQueryParameter(Constants.TYPE, Constants.LISTED_INVESTMENTS)
+                        .build()
+                        .toString();
 
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .build();
                 MediaType mediaType = MediaType.parse("text/plain");
-                RequestBody body = RequestBody.create(mediaType, prop.toString());
                 Request request = new Request.Builder()
-                        .url(Constants.URL_TRADE)
-                        .method("GET", body)
-                        .addHeader("Content-Type", "text/plain")
+                        .url(finalUrl)
                         .build();
                 Response response = client.newCall(request).execute();
 
@@ -1235,11 +1242,8 @@ public class CustomerController {
             try {
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .build();
-                MediaType mediaType = MediaType.parse("text/plain");
-                RequestBody body = RequestBody.create(mediaType, "");
                 Request request = new Request.Builder()
                         .url(Constants.URL_FORECAST)
-                        .method("GET", body)
                         .addHeader("Content-Type", "text/plain")
                         .build();
                 Response response = client.newCall(request).execute();

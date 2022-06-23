@@ -1,11 +1,11 @@
 package client.screens;
 
-import client.screens.admin.AdminController;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
+
 import javafx.stage.Stage;
 import screens.resources.BankScreenConsts;
 
@@ -21,7 +21,7 @@ public class AdminMain extends Application {
         FXMLLoader loader = new FXMLLoader();
 
         // load main fxml
-        URL adminFXML = getClass().getResource(BankScreenConsts.ADMIN_FXML_RESOURCE_IDENTIFIER);
+        URL adminFXML = getClass().getResource(BankScreenConsts.LOGIN_FXML_RESOURCE_IDENTIFIER);
         loader.setLocation(adminFXML);
         Parent root = loader.load();
 

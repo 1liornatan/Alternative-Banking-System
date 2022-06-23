@@ -6,39 +6,37 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 
-<ScrollPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
-   <content>
-      <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
-         <center>
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="30.0" BorderPane.alignment="CENTER">
+<BorderPane fx:id="borderPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.screens.login.LoginController">
+   <top>
+      <ScrollPane BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets top="10.0" />
+         </BorderPane.margin>
+         <content>
+            <VBox alignment="CENTER" spacing="10.0">
                <children>
-                  <VBox alignment="CENTER">
+                  <Label fx:id="welcomeLabel" alignment="CENTER" text="Welcome to Abs" />
+                  <HBox alignment="BOTTOM_CENTER" spacing="30.0">
                      <children>
-                        <Label fx:id="usernameLabel" text="Admin Name" />
-                        <TextField fx:id="usernameField" maxWidth="100.0" />
+                        <VBox alignment="CENTER">
+                           <children>
+                              <Label fx:id="usernameLabel" text="Admin Name" />
+                              <TextField fx:id="usernameField" maxWidth="100.0" />
+                           </children>
+                        </VBox>
+                        <Button fx:id="loginButton" mnemonicParsing="false" onAction="#loginButtonAction" prefWidth="80.0" text="Login" />
+                        <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#logoutButtonAction" prefWidth="80.0" text="Logout" />
+                        <Label fx:id="connectionLabel" />
                      </children>
-                  </VBox>
-                  <Button fx:id="loginButton" mnemonicParsing="false" onAction="#loginButtonAction" prefWidth="80.0" text="Login" />
+                  </HBox>
+                  <Label fx:id="loginErrorLabel" alignment="CENTER" />
                </children>
             </VBox>
-         </center>
-         <bottom>
-            <Label fx:id="loginErrorLabel" alignment="CENTER" BorderPane.alignment="CENTER">
-               <BorderPane.margin>
-                  <Insets bottom="30.0" />
-               </BorderPane.margin>
-            </Label>
-         </bottom>
-         <top>
-            <Label fx:id="welcomeLabel" alignment="CENTER" text="Welcome to Abs" BorderPane.alignment="CENTER">
-               <BorderPane.margin>
-                  <Insets top="10.0" />
-               </BorderPane.margin>
-            </Label>
-         </top>
-      </BorderPane>
-   </content>
-</ScrollPane>
+         </content>
+      </ScrollPane>
+   </top>
+</BorderPane>

@@ -96,13 +96,18 @@ public class AdminController {
     private void makeForecastRequest(String type) {
         new Thread(() -> {
             try {
+                String finalUrl = HttpUrl
+                        .parse(Constants.URL_FORECAST)
+                        .newBuilder()
+                        .addQueryParameter(Constants.TYPE, type)
+                        .build()
+                        .toString();
+
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .build();
                 MediaType mediaType = MediaType.parse("text/plain");
-                RequestBody body = RequestBody.create(mediaType, "type=" + type);
                 Request request = new Request.Builder()
-                        .url(Constants.URL_FORECAST)
-                        .method("GET", body)
+                        .url(finalUrl)
                         .addHeader("Content-Type", "text/plain")
                         .build();
                 Response response = client.newCall(request).execute();
@@ -275,13 +280,18 @@ public class AdminController {
         new Thread(() -> {
 
             try {
+                String finalUrl = HttpUrl
+                        .parse(Constants.URL_LOAN)
+                        .newBuilder()
+                        .addQueryParameter(Constants.TYPE, Constants.ALL_LOANS)
+                        .build()
+                        .toString();
+
                 OkHttpClient client = new OkHttpClient().newBuilder()
                         .build();
                 MediaType mediaType = MediaType.parse("text/plain");
-                RequestBody body = RequestBody.create(mediaType, "type=" + Constants.ALL_LOANS);
                 Request request = new Request.Builder()
-                        .url(Constants.URL_LOAN)
-                        .method("GET", body)
+                        .url(finalUrl)
                         .addHeader("Content-Type", "text/plain")
                         .build();
                 Response response = client.newCall(request).execute();
