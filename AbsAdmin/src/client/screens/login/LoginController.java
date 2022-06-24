@@ -64,11 +64,14 @@ public class LoginController {
             try {
                 Response response = makeDisconnectRequest();
                 if(response.isSuccessful()) {
-                    Platform.runLater(() -> setDisconnected());
+                    Platform.runLater(() -> {
+                                setDisconnected();
+                                borderPane.setCenter(null);
+                            });
 
                     adminController.isLoggedInProperty().set(false);
                     adminController.stopUpdateThread();
-                    borderPane.setCenter(null);
+
                 }
                 else {
                     Platform.runLater(() -> setErrorMessage("Something went wrong."));
@@ -106,6 +109,7 @@ public class LoginController {
             new Thread(() -> {
                 try {
                     Response response = makeAdminLoginRequest(username);
+
                     if(response.isSuccessful()) {
                         currAdmin.set(username);
                         setAdminPage();
@@ -117,8 +121,10 @@ public class LoginController {
                     }
                     else {
                         String errorMessage = "";
-                        if(response.body() != null)
-                            errorMessage = response.body().string();
+                        try (ResponseBody body = response.body()) {
+                            if (body != null)
+                                errorMessage = body.string();
+                        }
 
                         String finalErrorMessage = errorMessage;
                         Platform.runLater(() -> setErrorMessage(finalErrorMessage));

@@ -481,4 +481,19 @@ public class AdminController {
 
 
     }
+
+    private void updateCustomersList(List<CustomerModel> tempCustomerModelList) {
+        ObservableList<CustomerModel> items = adminsCustomersTable.getItems();
+        int size = items.size();
+        int i;
+        for(i = 0; i < size; i++) {
+            CustomerModel customerModel = items.get(i);
+            customerModel = tempCustomerModelList.get(i);
+        }
+        int size1 = tempCustomerModelList.size();
+        for(i = size; i < size1; i++) {
+            items.add(tempCustomerModelList.get(i));
+        }
+
+    }
 }

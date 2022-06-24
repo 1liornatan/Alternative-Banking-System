@@ -116,6 +116,9 @@ public class CustomerController {
     private Button searchLoansButton;
 
     @FXML
+    private Button loadFileButton;
+
+    @FXML
     private TableView<LoanModel> loanerLoansPTable;
 
     @FXML
@@ -180,6 +183,10 @@ public class CustomerController {
     private LineChart<String, Number> timeLineChart;
     private Timeline walkTimeline;
 
+    @FXML
+    void loadFileButtonAction(ActionEvent ignoredEvent) {
+
+    }
     @FXML
     void buyInvestmentButtonAction(ActionEvent ignoredEvent) {
         InvestmentModel selectedItem = buyInvestmentTable.getSelectionModel().getSelectedItem();
@@ -391,7 +398,10 @@ public class CustomerController {
             infErrorLabel.setText("Amount must be higher than 0! ");
             infErrorLabel.setTextFill(Color.RED);
         }
-        else {
+        else if(amount > balanceProperty.get()) {
+            infErrorLabel.setText("Not enough money in account!");
+            infErrorLabel.setTextFill(Color.RED);
+        } else {
             createWithdraw(amount);
             infAmountField.setText("0");
             updateData();
@@ -638,7 +648,13 @@ public class CustomerController {
         setDataTables();
         setSplitComps();
         setFieldLimits(amountField);
-        setFieldLimits(infAmountField);
+        infAmountField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                maxLoanerLoansField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+            else if(newValue.isEmpty())
+                maxLoanerLoansField.setText("0");
+        });
         minInterestField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
                 minInterestField.setText(newValue.replaceAll("[^\\d]", ""));

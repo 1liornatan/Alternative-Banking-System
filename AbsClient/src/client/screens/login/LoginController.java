@@ -17,10 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
-import okhttp3.HttpUrl;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import screens.resources.BankScreenConsts;
 
 import java.io.IOException;
@@ -117,11 +114,13 @@ public class LoginController {
                     }
                     else {
                         String errorMessage = "";
-                        if(response.body() != null)
-                            errorMessage = response.body().string();
+                        try (ResponseBody body = response.body()) {
+                            if (body != null)
+                                errorMessage = body.string();
 
-                        String finalErrorMessage = errorMessage;
-                        Platform.runLater(() -> setErrorMessage(finalErrorMessage));
+                            String finalErrorMessage = errorMessage;
+                            Platform.runLater(() -> setErrorMessage(finalErrorMessage));
+                        }
                     }
                 } catch (IOException e) {
                     Platform.runLater(() -> setSuccessMessage(e.getMessage()));

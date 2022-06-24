@@ -18,112 +18,100 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.screens.admin.AdminController">
-   <children>
-      <ScrollPane fitToHeight="true" fitToWidth="true">
+
+<TabPane tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.screens.admin.AdminController">
+   <tabs>
+      <Tab text="Users Information">
          <content>
-            <TabPane tabClosingPolicy="UNAVAILABLE">
-               <tabs>
-                  <Tab text="Users Information">
-                     <content>
-                        <ScrollPane fitToHeight="true" fitToWidth="true">
-                           <content>
-                              <GridPane vgap="10.0">
-                                 <columnConstraints>
-                                    <ColumnConstraints hgrow="NEVER" minWidth="100.0" prefWidth="100.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="419.0" minWidth="100.0" prefWidth="419.0" />
-                                    <ColumnConstraints hgrow="NEVER" maxWidth="115.0" minWidth="105.0" prefWidth="105.0" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints vgrow="NEVER" />
-                                    <RowConstraints minHeight="10.0" valignment="CENTER" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="300.0" vgrow="SOMETIMES" />
-                                 </rowConstraints>
-                                 <children>
-                                    <AnchorPane>
-                                       <GridPane.margin>
-                                          <Insets />
-                                       </GridPane.margin>
-                                       <children>
-                                          <Button fx:id="increaseYazButton" minHeight="85.0" minWidth="85.0" mnemonicParsing="false" onAction="#increaseYazButtonAction" prefHeight="85.0" prefWidth="85.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                                       </children>
-                                    </AnchorPane>
-                                    <ScrollPane fitToHeight="true" fitToWidth="true" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                       <content>
-                                          <VBox spacing="20.0">
-                                             <children>
-                                                <TableView fx:id="adminLoansTable" minHeight="200.0" minWidth="400.0" prefHeight="200.0" prefWidth="400.0">
-                                                   <columns>
-                                                      <TableColumn editable="false" maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" sortable="false" text="C2" />
-                                                   </columns>
-                                                </TableView>
-                                                <TableView fx:id="adminsCustomersTable" minHeight="200.0" minWidth="400.0" prefHeight="200.0" prefWidth="400.0">
-                                                   <columns>
-                                                      <TableColumn maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" text="C2" />
-                                                   </columns>
-                                                </TableView>
-                                             </children>
-                                             <padding>
-                                                <Insets bottom="15.0" />
-                                             </padding>
-                                          </VBox>
-                                       </content>
-                                    </ScrollPane>
-                                    <VBox alignment="CENTER" minHeight="85.0" minWidth="85.0" prefHeight="85.0" prefWidth="85.0" GridPane.columnIndex="1">
-                                       <children>
-                                          <Label text="Current Yaz" />
-                                          <TextField fx:id="currYazTextField" maxWidth="100.0" />
-                                       </children>
-                                    </VBox>
-                                    <AnchorPane GridPane.columnIndex="2">
-                                       <children>
-                                          <Button fx:id="logoutButton" minHeight="85.0" minWidth="85.0" mnemonicParsing="false" onAction="#logoutButtonYaz" prefHeight="85.0" prefWidth="85.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                                       </children>
-                                    </AnchorPane>
-                                 </children>
-                                 <padding>
-                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                 </padding>
-                              </GridPane>
-                           </content>
-                        </ScrollPane>
-                     </content>
-                  </Tab>
-                  <Tab text="Charts">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+            <ScrollPane fitToHeight="true" fitToWidth="true">
+               <content>
+                  <GridPane vgap="10.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" minWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" />
+                        <ColumnConstraints hgrow="NEVER" minWidth="105.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints vgrow="NEVER" />
+                        <RowConstraints minHeight="10.0" valignment="CENTER" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="300.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <AnchorPane>
+                           <GridPane.margin>
+                              <Insets />
+                           </GridPane.margin>
                            <children>
-                              <BorderPane prefHeight="597.0" prefWidth="690.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <center>
-                                    <LineChart fx:id="timeLineChart" title="Time Graph" BorderPane.alignment="CENTER">
-                                       <xAxis>
-                                          <CategoryAxis label="Yaz" side="BOTTOM" />
-                                       </xAxis>
-                                       <yAxis>
-                                          <NumberAxis side="LEFT" />
-                                       </yAxis>
-                                    </LineChart>
-                                 </center>
-                                 <bottom>
-                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0" BorderPane.alignment="CENTER">
-                                       <children>
-                                          <Button fx:id="customersButton" mnemonicParsing="false" onAction="#customersButtonAction" prefWidth="100.0" text="Customers" />
-                                          <Button fx:id="loansButton" mnemonicParsing="false" onAction="#loansButtonAction" prefWidth="100.0" text="Loans" />
-                                          <Button fx:id="transactionsButton" mnemonicParsing="false" onAction="#transactionsButtonAction" prefWidth="100.0" text="Transactions" />
-                                       </children>
-                                    </HBox>
-                                 </bottom>
-                              </BorderPane>
+                              <Button fx:id="increaseYazButton" minHeight="85.0" minWidth="85.0" mnemonicParsing="false" onAction="#increaseYazButtonAction" prefHeight="85.0" prefWidth="85.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                            </children>
                         </AnchorPane>
-                    </content>
-                  </Tab>
-               </tabs>
-            </TabPane>
+                        <ScrollPane fitToHeight="true" fitToWidth="true" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                           <content>
+                              <VBox spacing="20.0">
+                                 <children>
+                                    <TableView fx:id="adminLoansTable" minHeight="200.0" minWidth="400.0" prefHeight="200.0" prefWidth="400.0">
+                                       <columns>
+                                          <TableColumn editable="false" maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" sortable="false" text="C2" />
+                                       </columns>
+                                    </TableView>
+                                    <TableView fx:id="adminsCustomersTable" minHeight="200.0" minWidth="400.0" prefHeight="200.0" prefWidth="400.0">
+                                       <columns>
+                                          <TableColumn maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" text="C2" />
+                                       </columns>
+                                    </TableView>
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="15.0" />
+                                 </padding>
+                              </VBox>
+                           </content>
+                        </ScrollPane>
+                        <VBox alignment="CENTER" minHeight="85.0" minWidth="85.0" prefHeight="85.0" prefWidth="85.0" GridPane.columnIndex="1">
+                           <children>
+                              <Label text="Current Yaz" />
+                              <TextField fx:id="currYazTextField" maxWidth="100.0" />
+                           </children>
+                        </VBox>
+                        <AnchorPane GridPane.columnIndex="2" />
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </GridPane>
+               </content>
+            </ScrollPane>
          </content>
-      </ScrollPane>
-   </children>
-</StackPane>
+      </Tab>
+      <Tab text="Charts">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <BorderPane prefHeight="597.0" prefWidth="690.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <center>
+                        <LineChart fx:id="timeLineChart" title="Time Graph" BorderPane.alignment="CENTER">
+                           <xAxis>
+                              <CategoryAxis label="Yaz" side="BOTTOM" />
+                           </xAxis>
+                           <yAxis>
+                              <NumberAxis side="LEFT" />
+                           </yAxis>
+                        </LineChart>
+                     </center>
+                     <bottom>
+                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="30.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <Button fx:id="customersButton" mnemonicParsing="false" onAction="#customersButtonAction" prefWidth="100.0" text="Customers" />
+                              <Button fx:id="loansButton" mnemonicParsing="false" onAction="#loansButtonAction" prefWidth="100.0" text="Loans" />
+                              <Button fx:id="transactionsButton" mnemonicParsing="false" onAction="#transactionsButtonAction" prefWidth="100.0" text="Transactions" />
+                           </children>
+                        </HBox>
+                     </bottom>
+                  </BorderPane>
+               </children>
+            </AnchorPane>
+        </content>
+      </Tab>
+   </tabs>
+</TabPane>
