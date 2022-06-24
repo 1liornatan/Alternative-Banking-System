@@ -27,7 +27,8 @@ public class AccountServlet extends HttpServlet {
 
         ServletOutputStream outputStream = resp.getOutputStream();
         if(usernameFromSession == null) {
-
+            outputStream.print("You must login first.");
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
         else if(!SessionUtils.isAdmin(req)) {
             outputStream.print("Only admins are authorized for this request.");
@@ -37,11 +38,10 @@ public class AccountServlet extends HttpServlet {
             try {
                 CustomersData customerDataList = bankManager.getCustomersData();
                 String jsonResponse = Constants.GSON_INSTANCE.toJson(customerDataList);
-                try (PrintWriter out = resp.getWriter()) {
-                    out.print(jsonResponse);
-                    out.flush();
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                }
+                outputStream.print(jsonResponse);
+                outputStream.flush();
+                resp.setStatus(HttpServletResponse.SC_OK);
+
             } catch (DataNotFoundException e) {
                 outputStream.print(e.getMessage());
                 resp.setStatus(HttpServletResponse.SC_CONFLICT);

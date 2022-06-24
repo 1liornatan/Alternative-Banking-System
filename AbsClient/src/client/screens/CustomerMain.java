@@ -7,7 +7,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-
 import javafx.stage.Stage;
 import okhttp3.Request;
 import screens.resources.BankScreenConsts;
@@ -15,7 +14,7 @@ import screens.resources.BankScreenConsts;
 import java.io.IOException;
 import java.net.URL;
 
-public class AdminMain extends Application {
+public class CustomerMain extends Application {
 
     @SuppressWarnings("unchecked")
     @Override
@@ -31,7 +30,7 @@ public class AdminMain extends Application {
 
 
         // set stage
-        primaryStage.setTitle("Alternative Banking System - Admin Client");
+        primaryStage.setTitle("Alternative Banking System - Customers Client");
         Scene scene = new Scene(root, 1050, 600);
         scene.getStylesheets().add(getClass().getResource("/screens/resources/mainStyle.css").toExternalForm());
         primaryStage.setScene(scene);

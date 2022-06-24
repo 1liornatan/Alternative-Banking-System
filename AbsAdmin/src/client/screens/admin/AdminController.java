@@ -66,6 +66,7 @@ public class AdminController {
 
     private StringProperty loginErrorMessageProperty;
     private BooleanProperty isLoggedIn;
+    private Thread updateThread;
 
 
     @FXML
@@ -397,30 +398,44 @@ public class AdminController {
         customerModelList = new ArrayList<>();
         loanModelList = new ArrayList<>();
         isLoggedIn = new SimpleBooleanProperty(false);
+        setUpdateThread();
     }
 
     public IntegerProperty getCurrYazProperty() { return currYazProperty; }
 
+    public void startUpdateThread() {
+        updateThread.start();
+    }
+
+    public void stopUpdateThread() {
+        updateThread.interrupt();
+    }
     @FXML
     void initialize() {
         setDataTables();
         increaseYazButton.setText("Increase\nYaz");
         increaseYazButton.setStyle("-fx-text-alignment: CENTER;");
-        startUpdateThread();
     }
 
-    private void startUpdateThread() {
-        Thread updateThread = new Thread(() -> {
+    public boolean isIsLoggedIn() {
+        return isLoggedIn.get();
+    }
+
+    public BooleanProperty isLoggedInProperty() {
+        return isLoggedIn;
+    }
+
+    private void setUpdateThread() {
+        updateThread = new Thread(() -> {
             while(true) {
-                updateBankData();
                 try {
+                    updateBankData();
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    System.out.println(e.getMessage());
+                    System.out.println("check update: " + e.getMessage());
                 }
             }
         });
-        updateThread.start();
     }
 
     public void updateCustomersData() {

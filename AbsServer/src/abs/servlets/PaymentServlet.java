@@ -1,11 +1,11 @@
 package abs.servlets;
 
-import abs.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.manager.BankManager;
 import com.google.gson.Gson;
+import http.constants.Constants;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -19,8 +19,6 @@ import manager.transactions.TransactionsData;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
-
-import static abs.constants.Constants.GSON_INSTANCE;
 
 @WebServlet(name = "Payment Servlet", urlPatterns = "/bank/payments")
 public class PaymentServlet extends HttpServlet {

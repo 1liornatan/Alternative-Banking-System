@@ -1,11 +1,11 @@
 package abs.servlets;
 
-import abs.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.loans.interest.exceptions.InvalidPercentException;
 import bank.logic.manager.BankManager;
 import com.google.gson.Gson;
+import http.constants.Constants;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

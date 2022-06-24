@@ -1,10 +1,10 @@
 package abs.servlets;
 
-import abs.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.manager.BankManager;
 import com.google.gson.Gson;
+import http.constants.Constants;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -59,15 +59,10 @@ public class ForecastServlet extends HttpServlet {
             }
             String jsonResponse = Constants.GSON_INSTANCE.toJson(paymentsData);
 
-            try (PrintWriter out = response.getWriter()) {
-                out.print(jsonResponse);
-                out.flush();
-                logServerMessage("Loan Trade Response (" + usernameFromSession + "): " + jsonResponse);
-                response.setStatus(HttpServletResponse.SC_OK);
-            } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                outputStream.print("Invalid parameters found!");
-            }
+            outputStream.print(jsonResponse);
+            outputStream.flush();
+            logServerMessage("Loan Trade Response (" + usernameFromSession + "): " + jsonResponse);
+            response.setStatus(HttpServletResponse.SC_OK);
         }
     }
 

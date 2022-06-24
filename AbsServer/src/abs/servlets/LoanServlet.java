@@ -1,12 +1,12 @@
 package abs.servlets;
 
-import abs.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.manager.BankManager;
 import bank.users.UserManager;
 import com.google.gson.Gson;
+import http.constants.Constants;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,9 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
-
-import static abs.constants.Constants.GSON_INSTANCE;
-import static abs.constants.Constants.USERNAME;
 
 @WebServlet(name = "Loans Servlet", urlPatterns = "/bank/loan")
 public class LoanServlet extends HttpServlet {
@@ -93,11 +90,9 @@ public class LoanServlet extends HttpServlet {
 
                 logServerMessage("Loans Request (" + usernameFromSession + "): " + jsonResponse);
 
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(jsonResponse);
-                    out.flush();
-                    response.setStatus(HttpServletResponse.SC_OK);
-                }
+                outputStream.print(jsonResponse);
+                outputStream.flush();
+                response.setStatus(HttpServletResponse.SC_OK);
             }
         }
     }

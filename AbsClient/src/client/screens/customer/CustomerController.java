@@ -930,6 +930,12 @@ public class CustomerController {
 
             LoansData loaner = makeLoanRequest(Constants.REQUESTED_LOANS);
             LoansData lender = makeLoanRequest(Constants.INVESTED_LOANS);
+
+            if(loaner == null || lender == null) {
+                System.out.println("Cannot update loans");
+                return;
+            }
+
             List<LoanData>  loanerDataList = loaner.getLoans();
             List<LoanData>  lenderDataList = lender.getLoans();
 
@@ -958,8 +964,6 @@ public class CustomerController {
                     .build()
                     .toString();
 
-            OkHttpClient client = new OkHttpClient().newBuilder()
-                    .build();
             Request request = new Request.Builder()
                     .url(finalUrl)
                     .build();
@@ -1275,8 +1279,6 @@ public class CustomerController {
         animationProperty.set(false);
         animationImage.setVisible(false);
     }
-
-
 
 }
 

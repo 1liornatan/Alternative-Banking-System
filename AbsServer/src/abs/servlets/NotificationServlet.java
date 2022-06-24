@@ -1,11 +1,11 @@
 package abs.servlets;
 
-import abs.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.manager.BankManager;
 import com.google.gson.Gson;
+import http.constants.Constants;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,8 +16,6 @@ import manager.transactions.TransactionsData;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import static abs.constants.Constants.GSON_INSTANCE;
 
 @WebServlet(name = "Notification Servlet", urlPatterns = "/bank/notifications")
 public class NotificationServlet extends HttpServlet {

@@ -1,6 +1,6 @@
 package client.screens.login;
 
-import client.screens.admin.AdminController;
+import client.screens.customer.CustomerController;
 import http.constants.Constants;
 import http.utils.HttpClientUtil;
 import javafx.application.Platform;
@@ -12,22 +12,23 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
-import okhttp3.*;
+import okhttp3.HttpUrl;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.Response;
 import screens.resources.BankScreenConsts;
-import sun.net.www.http.HttpClient;
 
 import java.io.IOException;
 import java.net.URL;
 
 public class LoginController {
 
-    private final StringProperty currAdmin;
+    private final StringProperty currCustomer;
     private final BooleanProperty isConnected;
 
     @FXML
@@ -53,7 +54,7 @@ public class LoginController {
 
     @FXML
     private Button logoutButton;
-    private AdminController adminController;
+    private CustomerController customerController;
 
     @FXML
     void logoutButtonAction(ActionEvent event) {
@@ -64,11 +65,10 @@ public class LoginController {
             try {
                 Response response = makeDisconnectRequest();
                 if(response.isSuccessful()) {
-                    Platform.runLater(() -> setDisconnected());
-
-                    adminController.isLoggedInProperty().set(false);
-                    adminController.stopUpdateThread();
-                    borderPane.setCenter(null);
+                    Platform.runLater(() -> {
+                        setDisconnected();
+                        borderPane.setCenter(null);
+                    });
                 }
                 else {
                     Platform.runLater(() -> setErrorMessage("Something went wrong."));
@@ -105,10 +105,10 @@ public class LoginController {
         } else {
             new Thread(() -> {
                 try {
-                    Response response = makeAdminLoginRequest(username);
+                    Response response = makeLoginRequest(username);
                     if(response.isSuccessful()) {
-                        currAdmin.set(username);
-                        setAdminPage();
+                        currCustomer.set(username);
+                        setCustomerPage();
 
                         Platform.runLater(() -> {
                             setConnected();
@@ -144,15 +144,15 @@ public class LoginController {
 
     public LoginController() {
         isConnected = new SimpleBooleanProperty(false);
-        currAdmin = new SimpleStringProperty();
+        currCustomer = new SimpleStringProperty();
     }
 
-    public String getCurrAdmin() {
-        return currAdmin.get();
+    public String getCurrCustomer() {
+        return currCustomer.get();
     }
 
-    public StringProperty currAdminProperty() {
-        return currAdmin;
+    public StringProperty currCustomerProperty() {
+        return currCustomer;
     }
 
     public boolean isIsConnected() {
@@ -163,31 +163,30 @@ public class LoginController {
         return isConnected;
     }
 
-    private void setAdminPage() throws IOException {
+    private void setCustomerPage() throws IOException {
         FXMLLoader loader = new FXMLLoader();
 
         // load admin fxml
-        URL adminFXML = getClass().getResource(BankScreenConsts.ADMIN_FXML_RESOURCE_IDENTIFIER);
-        loader.setLocation(adminFXML);
+        URL customerFXML = getClass().getResource(BankScreenConsts.CUSTOMER_FXML_RESOURCE_IDENTIFIER);
+        loader.setLocation(customerFXML);
         Parent root = loader.load();
 
 
-        adminController = loader.getController();
-        adminController.isLoggedInProperty().set(true);
-        adminController.startUpdateThread();
+        customerController = loader.getController();
+        customerController.customerIdProperty().set(currCustomer.get());
+        customerController.updateData();
 
         Platform.runLater(() -> borderPane.setCenter(root));
     }
 
-    private Response makeAdminLoginRequest(String username) throws IOException {
+    private Response makeLoginRequest(String username) throws IOException {
         String finalUrl = HttpUrl
-                .parse(Constants.URL_LOGIN_ADMIN)
+                .parse(Constants.URL_LOGIN)
                 .newBuilder()
                 .addQueryParameter(Constants.USERNAME, username)
                 .build()
                 .toString();
 
-        MediaType mediaType = MediaType.parse("text/plain");
         Request request = new Request.Builder()
                 .url(finalUrl)
                 .build();
