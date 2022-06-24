@@ -1,10 +1,12 @@
 package abs.servlets;
 
-import http.constants.Constants;
+import abs.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.loans.interest.exceptions.InvalidPercentException;
 import bank.logic.manager.BankManager;
+import com.google.gson.Gson;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,11 +26,11 @@ public class LoanIntegrationServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         String usernameFromSession = SessionUtils.getUsername(request);
-
+        ServletOutputStream outputStream = response.getOutputStream();
         BankManager bankManager = ServletUtils.getBankManager(getServletContext());
 
         if (usernameFromSession == null) { //user is not logged in yet
-            response.getOutputStream().print("Not logged in yet.");
+            outputStream.print("Not logged in yet.");
         } else {
             Properties prop = new Properties();
             prop.load(request.getInputStream());
@@ -45,11 +47,12 @@ public class LoanIntegrationServlet extends HttpServlet {
                         try (PrintWriter out = response.getWriter()) {
                             out.print(jsonResponse);
                             out.flush();
+                            response.setStatus(HttpServletResponse.SC_OK);
                         }
                         logServerMessage("Loan Integration Response (" + usernameFromSession + "): " + jsonRequest);
                     } catch (InvalidPercentException e) {
                         response.setStatus(HttpServletResponse.SC_CONFLICT);
-                        response.getOutputStream().print("Invalid parameters found!");
+                        outputStream.print("Invalid parameters found!");
                     }
                     break;
                 }
@@ -58,10 +61,11 @@ public class LoanIntegrationServlet extends HttpServlet {
                     try {
                         bankManager.setInvestment(investmentsData);
                         response.setStatus(HttpServletResponse.SC_OK);
+                        outputStream.print("Submitted Successfully.");
                     } catch (Exception e) {
-                        response.getOutputStream().print(e.getMessage());
+                        outputStream.print(e.getMessage());
+                        response.setStatus(HttpServletResponse.SC_CONFLICT);
                     }
-                    response.getOutputStream().print("Submitted Successfully.");
                     break;
                 }
             }

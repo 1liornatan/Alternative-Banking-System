@@ -1,16 +1,24 @@
 package abs.servlets;
 
-import http.constants.Constants;
+import abs.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
+import bank.logic.accounts.impl.exceptions.NoMoneyException;
+import bank.logic.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.logic.impl.exceptions.DataNotFoundException;
+import bank.logic.loans.interest.exceptions.InvalidPercentException;
 import bank.logic.manager.BankManager;
+import com.google.gson.Gson;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import manager.investments.InvestmentData;
+import manager.investments.InvestmentsData;
 import manager.investments.InvestmentsSellData;
+import manager.investments.RequestDTO;
+import manager.loans.LoansData;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,19 +32,21 @@ public class TradeServlet extends HttpServlet {
         response.setContentType("application/json");
 
         String usernameFromSession = SessionUtils.getUsername(request);
-
+        ServletOutputStream outputStream = response.getOutputStream();
         BankManager bankManager = ServletUtils.getBankManager(getServletContext());
 
         if (usernameFromSession == null) { //user is not logged in yet
-            response.getOutputStream().print("Not logged in yet.");
+            outputStream.print("Not logged in yet.");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
         } else if (SessionUtils.isAdmin(request)) {
-            response.getOutputStream().print("Only customers are authorized for this request.");
+            outputStream.print("Only customers are authorized for this request.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
             String type = request.getParameter(Constants.TYPE);
             if(type == null)
             {
-                response.getOutputStream().print("Invalid Parameters!");
+                outputStream.print("Invalid Parameters!");
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
             }
 
@@ -54,7 +64,7 @@ public class TradeServlet extends HttpServlet {
                         jsonResponse = Constants.GSON_INSTANCE.toJson(listedInvestments);
                     } catch (Exception e) {
                         response.setStatus(HttpServletResponse.SC_CONFLICT);
-                        response.getOutputStream().print("Invalid parameters found!");
+                        outputStream.print("Invalid parameters found!");
                     }
                     break;
                 }
@@ -63,9 +73,10 @@ public class TradeServlet extends HttpServlet {
                     out.print(jsonResponse);
                     out.flush();
                     logServerMessage("Loan Trade Response (" + usernameFromSession + "): " + jsonResponse);
+                    response.setStatus(HttpServletResponse.SC_OK);
                 } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                response.getOutputStream().print("Invalid parameters found!");
+                    outputStream.print("Invalid parameters found!");
             }
         }
     }
@@ -74,14 +85,14 @@ public class TradeServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/plain;charset=UTF-8");
         String usernameFromSession = SessionUtils.getUsername(request);
-
+        ServletOutputStream outputStream = response.getOutputStream();
         BankManager bankManager = ServletUtils.getBankManager(getServletContext());
 
         if (usernameFromSession == null) { //user is not logged in yet
-            response.getOutputStream().print("Not logged in yet.");
+            outputStream.print("Not logged in yet.");
 
         }  else if (SessionUtils.isAdmin(request)) {
-        response.getOutputStream().print("Only customers are authorized for this request.");
+            outputStream.print("Only customers are authorized for this request.");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         } else {
@@ -93,7 +104,7 @@ public class TradeServlet extends HttpServlet {
 
             if(type == null) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                response.getOutputStream().print("Invalid parameters found!");
+                outputStream.print("Invalid type");
             }
             else {
                 switch (type) {
@@ -103,7 +114,7 @@ public class TradeServlet extends HttpServlet {
                             response.setStatus(HttpServletResponse.SC_OK);
                         } catch (Exception e) {
                             response.setStatus(HttpServletResponse.SC_CONFLICT);
-                            response.getOutputStream().print(e.getMessage());
+                            outputStream.print(e.getMessage());
                         }
                         break;
                     }
@@ -113,7 +124,7 @@ public class TradeServlet extends HttpServlet {
                             response.setStatus(HttpServletResponse.SC_OK);
                         } catch (DataNotFoundException e) {
                             response.setStatus(HttpServletResponse.SC_CONFLICT);
-                            response.getOutputStream().print(e.getMessage());
+                            outputStream.print(e.getMessage());
                         }
                         break;
                     }
@@ -123,7 +134,7 @@ public class TradeServlet extends HttpServlet {
                             response.setStatus(HttpServletResponse.SC_OK);
                         } catch (DataNotFoundException e) {
                             response.setStatus(HttpServletResponse.SC_CONFLICT);
-                            response.getOutputStream().print(e.getMessage());
+                            outputStream.print(e.getMessage());
                         }
                         break;
                     }
