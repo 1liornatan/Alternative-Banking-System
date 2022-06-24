@@ -110,18 +110,21 @@ public class AdminController {
 
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                if (response.code() != 200) {
-                    String responseBody = response.body().string();
-                    Platform.runLater(() ->
-                            System.out.println("Something went wrong: " + responseBody)
-                    );
-                } else {
-                    String rawBody = response.body().string();
-                    PaymentsData data = Constants.GSON_INSTANCE.fromJson(rawBody, PaymentsData.class);
+                try(ResponseBody body = response.body()) {
+                    if (response.code() != 200) {
 
-                    Platform.runLater(() -> {
-                        updateCharts(data);
-                    });
+                        String responseBody = body.string();
+                        Platform.runLater(() ->
+                                System.out.println("Something went wrong: " + responseBody)
+                        );
+                    } else {
+                        String rawBody = body.string();
+                        PaymentsData data = Constants.GSON_INSTANCE.fromJson(rawBody, PaymentsData.class);
+
+                        Platform.runLater(() -> {
+                            updateCharts(data);
+                        });
+                    }
                 }
 
             } catch (IOException e) {
@@ -289,20 +292,23 @@ public class AdminController {
                         .url(finalUrl)
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
-                if (response.code() != 200) {
-                    String responseBody = response.body().string();
-                    Platform.runLater(() ->
-                            System.out.println("Something went wrong: " + responseBody)
-                    );
-                } else {
-                    String rawBody = response.body().string();
-                    LoansData loansData = Constants.GSON_INSTANCE.fromJson(rawBody, LoansData.class);
-                    List<LoanData> loanDataList = loansData.getLoans();
-                    loanModelList = ModelUtils.makeLoanModelList(loanDataList);
 
-                    Platform.runLater(() -> {
-                        adminLoansTable.setItems(getLoans());
-                    });
+                try (ResponseBody body = response.body()) {
+                    if (response.code() != 200) {
+                        String responseBody = body.string();
+                        Platform.runLater(() ->
+                                System.out.println("Something went wrong: " + responseBody)
+                        );
+                    } else {
+                        String rawBody = body.string();
+                        LoansData loansData = Constants.GSON_INSTANCE.fromJson(rawBody, LoansData.class);
+                        List<LoanData> loanDataList = loansData.getLoans();
+                        loanModelList = ModelUtils.makeLoanModelList(loanDataList);
+
+                        Platform.runLater(() -> {
+                            adminLoansTable.setItems(getLoans());
+                        });
+                    }
                 }
             } catch (IOException e) {
                 System.out.println(e.getMessage());
@@ -455,18 +461,20 @@ public class AdminController {
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                if (response.code() != 200) {
-                    String responseBody = response.body().string();
-                    Platform.runLater(() ->
-                            System.out.println("Something went wrong: " + responseBody)
-                    );
-                } else {
-                    String rawBody = response.body().string();
-                    CustomersData customersData = Constants.GSON_INSTANCE.fromJson(rawBody, CustomersData.class);
-                    List<CustomerData> customerDataList = customersData.getCustomers();
-                    List<CustomerModel> tempCustomerModelList = ModelUtils.makeCustomerModelList(customerDataList);
-                    customerModelList = tempCustomerModelList;
-                    Platform.runLater(() -> adminsCustomersTable.setItems(getCustomers()));
+                try(ResponseBody body = response.body()) {
+                    if (response.code() != 200) {
+                        String responseBody = body.string();
+                        Platform.runLater(() ->
+                                System.out.println("Something went wrong: " + responseBody)
+                        );
+                    } else {
+                        String rawBody = body.string();
+                        CustomersData customersData = Constants.GSON_INSTANCE.fromJson(rawBody, CustomersData.class);
+                        List<CustomerData> customerDataList = customersData.getCustomers();
+                        List<CustomerModel> tempCustomerModelList = ModelUtils.makeCustomerModelList(customerDataList);
+                        customerModelList = tempCustomerModelList;
+                        Platform.runLater(() -> adminsCustomersTable.setItems(getCustomers()));
+                    }
                 }
             }
         });

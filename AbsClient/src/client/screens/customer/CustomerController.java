@@ -306,11 +306,13 @@ public class CustomerController {
 
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                InvestmentsSellData investmentsForSell = Constants.GSON_INSTANCE.fromJson(response.body().string(), InvestmentsSellData.class);
+                try (ResponseBody body = response.body()) {
+                    InvestmentsSellData investmentsForSell = Constants.GSON_INSTANCE.fromJson(body.string(), InvestmentsSellData.class);
 
-                buyInvestmentModels = getInvModels(investmentsForSell);
+                    buyInvestmentModels = getInvModels(investmentsForSell);
 
-                Platform.runLater(() -> buyInvestmentTable.setItems(getBuyInvestments()));
+                    Platform.runLater(() -> buyInvestmentTable.setItems(getBuyInvestments()));
+                }
 
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -466,18 +468,20 @@ public class CustomerController {
                             .build();
                     Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                    LoansData loansData = Constants.GSON_INSTANCE.fromJson(response.body().string(), LoansData.class);
-                    Thread.sleep(1000);
-                    Platform.runLater(() -> searchLoansProgressBar.setProgress(0.7));
-                    updateMessage("Printing Loans...");
-                    Thread.sleep(1000);
-                    Platform.runLater(() -> {
-                        clearAllFields();
-                        addFoundLoans(loansData.getLoans());
-                        setLoansIntegrationButtons();
-                        searchLoansProgressBar.setProgress(1.0);
-                    });
-                    updateMessage("Found " + loansData.getLoans().size() + " Loans");
+                    try (ResponseBody responseBody = response.body()) {
+                        LoansData loansData = Constants.GSON_INSTANCE.fromJson(responseBody.string(), LoansData.class);
+                        Thread.sleep(1000);
+                        Platform.runLater(() -> searchLoansProgressBar.setProgress(0.7));
+                        updateMessage("Printing Loans...");
+                        Thread.sleep(1000);
+                        Platform.runLater(() -> {
+                            clearAllFields();
+                            addFoundLoans(loansData.getLoans());
+                            setLoansIntegrationButtons();
+                            searchLoansProgressBar.setProgress(1.0);
+                        });
+                        updateMessage("Found " + loansData.getLoans().size() + " Loans");
+                    }
                     return "Success";
                 } catch (Exception e) {
                     return e.getMessage();
@@ -901,17 +905,19 @@ public class CustomerController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                ClientInfoData data = Constants.GSON_INSTANCE.fromJson(response.body().string(), ClientInfoData.class);
+                try (ResponseBody body = response.body()) {
+                    ClientInfoData data = Constants.GSON_INSTANCE.fromJson(body.string(), ClientInfoData.class);
 
-                Collection<String> categories = data.getCategories();
-                ObservableList<String> tempCategoriesList = FXCollections.observableArrayList();
-                tempCategoriesList.addAll(categories);
-                categoriesList = tempCategoriesList;
-                balanceProperty.set(data.getBalance());
-                Platform.runLater(() -> {
-                    categoriesComboBox.getItems().setAll(categoriesList);
-                    categoriesComboBox.getCheckModel().checkAll();
-                });
+                    Collection<String> categories = data.getCategories();
+                    ObservableList<String> tempCategoriesList = FXCollections.observableArrayList();
+                    tempCategoriesList.addAll(categories);
+                    categoriesList = tempCategoriesList;
+                    balanceProperty.set(data.getBalance());
+                    Platform.runLater(() -> {
+                        categoriesComboBox.getItems().setAll(categoriesList);
+                        categoriesComboBox.getCheckModel().checkAll();
+                    });
+                }
             } catch (Exception e) {
                 System.out.printf(e.getMessage());
             }
@@ -969,7 +975,10 @@ public class CustomerController {
                     .build();
             Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-            return Constants.GSON_INSTANCE.fromJson(response.body().string(), LoansData.class);
+            try (ResponseBody body = response.body()) {
+                LoansData loansData = Constants.GSON_INSTANCE.fromJson(body.string(), LoansData.class);
+                return loansData;
+            }
         }
         catch (Exception e) {
             System.out.printf(e.getMessage());
@@ -1023,18 +1032,20 @@ public class CustomerController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                TransactionsData jsonResponse = Constants.GSON_INSTANCE.fromJson(response.body().string(), TransactionsData.class);
-                List<TransactionData> transactionsData = jsonResponse.getTransactions();
-                List<TransactionModel> tempTransactionModels = new ArrayList<>();
-                for (TransactionData data : transactionsData) {
-                    tempTransactionModels.add(new TransactionModel.TransactionModelBuilder()
-                            .description(data.getDescription())
-                            .amount(data.getAmount())
-                            .previousBalance(data.getPreviousBalance())
-                            .yazMade(data.getYazMade())
-                            .build());
+                try (ResponseBody body = response.body()) {
+                    TransactionsData jsonResponse = Constants.GSON_INSTANCE.fromJson(body.string(), TransactionsData.class);
+                    List<TransactionData> transactionsData = jsonResponse.getTransactions();
+                    List<TransactionModel> tempTransactionModels = new ArrayList<>();
+                    for (TransactionData data : transactionsData) {
+                        tempTransactionModels.add(new TransactionModel.TransactionModelBuilder()
+                                .description(data.getDescription())
+                                .amount(data.getAmount())
+                                .previousBalance(data.getPreviousBalance())
+                                .yazMade(data.getYazMade())
+                                .build());
+                    }
+                    transactionModels = tempTransactionModels;
                 }
-                transactionModels = tempTransactionModels;
             }
             catch(Exception e) {
                 paymentErrorLabel.setText(e.getMessage());
@@ -1099,21 +1110,23 @@ public class CustomerController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                NotificationsData jsonResponse = Constants.GSON_INSTANCE.fromJson(response.body().string(), NotificationsData.class);
-                notificationsData = jsonResponse.getNotificationsList();
+                try (ResponseBody body = response.body()) {
+                    NotificationsData jsonResponse = Constants.GSON_INSTANCE.fromJson(body.string(), NotificationsData.class);
+                    notificationsData = jsonResponse.getNotificationsList();
 
-                List<NotificationModel> tempNotificationModels = new ArrayList<>();
-                for(NotificationData data : notificationsData) {
-                    tempNotificationModels.add(new NotificationModel.NotificationModelBuilder()
-                            .message(data.getMessage())
-                            .yazMade(data.getYazMade())
-                            .build());
+                    List<NotificationModel> tempNotificationModels = new ArrayList<>();
+                    for (NotificationData data : notificationsData) {
+                        tempNotificationModels.add(new NotificationModel.NotificationModelBuilder()
+                                .message(data.getMessage())
+                                .yazMade(data.getYazMade())
+                                .build());
+                    }
+                    notificationModels = tempNotificationModels;
+                    Platform.runLater(() -> {
+                        notificationsTable.setItems(getNotifications());
+                        notificationsTable.sort();
+                    });
                 }
-                notificationModels = tempNotificationModels;
-                Platform.runLater(() -> {
-                    notificationsTable.setItems(getNotifications());
-                    notificationsTable.sort();
-                });
 
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -1208,11 +1221,13 @@ public class CustomerController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                InvestmentsSellData customerInvestments = Constants.GSON_INSTANCE.fromJson(response.body().string(), InvestmentsSellData.class);
-                sellInvestmentModels = getInvModels(customerInvestments);
+                try (ResponseBody body = response.body()) {
+                    InvestmentsSellData customerInvestments = Constants.GSON_INSTANCE.fromJson(body.string(), InvestmentsSellData.class);
+                    sellInvestmentModels = getInvModels(customerInvestments);
 
 
-                Platform.runLater(() -> sellInvestmentTable.setItems(getSellInvestments()));
+                    Platform.runLater(() -> sellInvestmentTable.setItems(getSellInvestments()));
+                }
 
             } catch (Exception e) {
                 sellErrorLabel.setText(e.getMessage());
@@ -1236,31 +1251,34 @@ public class CustomerController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                PaymentsData data = Constants.GSON_INSTANCE.fromJson(response.body().string(), PaymentsData.class);
-                XYChart.Series series = new XYChart.Series();
-                XYChart.Series forecasting = new XYChart.Series();
-                series.setName("Payments Received");
-                forecasting.setName("Forecasting");
-                //populating the series with data
+                try (ResponseBody body = response.body()) {
+                    PaymentsData data = Constants.GSON_INSTANCE.fromJson(body.string(), PaymentsData.class);
 
-                List<Integer> payments = data.getPayments();
-                List<Integer> amounts = data.getAmount();
+                    XYChart.Series series = new XYChart.Series();
+                    XYChart.Series forecasting = new XYChart.Series();
+                    series.setName("Payments Received");
+                    forecasting.setName("Forecasting");
+                    //populating the series with data
 
-                int yaz = payments.size();
-                int sum = 0;
+                    List<Integer> payments = data.getPayments();
+                    List<Integer> amounts = data.getAmount();
 
-                for (i = 0; i < yaz; i++) {
-                    sum += amounts.get(i);
-                    series.getData().add(new XYChart.Data(String.valueOf(i + 1), amounts.get(i)));
+                    int yaz = payments.size();
+                    int sum = 0;
+
+                    for (i = 0; i < yaz; i++) {
+                        sum += amounts.get(i);
+                        series.getData().add(new XYChart.Data(String.valueOf(i + 1), amounts.get(i)));
+                    }
+
+                    int avg = sum / (i + 1);
+                    for (int j = 0; j < i + 5; j++) {
+                        forecasting.getData().add(new XYChart.Data(String.valueOf(j + 1), avg * j));
+                    }
+
+                    timeLineChart.getData().clear();
+                    timeLineChart.getData().addAll(series, forecasting);
                 }
-
-                int avg = sum / (i + 1);
-                for (int j = 0; j < i + 5; j++) {
-                    forecasting.getData().add(new XYChart.Data(String.valueOf(j + 1), avg * j));
-                }
-
-                timeLineChart.getData().clear();
-                timeLineChart.getData().addAll(series, forecasting);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
