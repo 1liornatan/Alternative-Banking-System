@@ -4,6 +4,7 @@ import abs.constants.Constants;
 import abs.utils.ServletUtils;
 import abs.utils.SessionUtils;
 import bank.logic.manager.BankManager;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,14 +22,15 @@ public class TransactionServlet extends HttpServlet {
         response.setContentType("application/json");
 
         String usernameFromSession = SessionUtils.getUsername(request);
-
+        ServletOutputStream outputStream = response.getOutputStream();
         BankManager bankManager = ServletUtils.getBankManager(getServletContext());
 
         if (usernameFromSession == null) { //user is not logged in yet
-            response.getOutputStream().print("Not logged in yet.");
+            outputStream.print("Not logged in yet.");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         }  else if (SessionUtils.isAdmin(request)) {
-                response.getOutputStream().print("Only customers are authorized for this request.");
+            outputStream.print("Only customers are authorized for this request.");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
                 TransactionsData transactions = bankManager.getTransactionsData(usernameFromSession);
@@ -37,6 +39,7 @@ public class TransactionServlet extends HttpServlet {
                 try (PrintWriter out = response.getWriter()) {
                     out.print(jsonResponse);
                     out.flush();
+                    response.setStatus(HttpServletResponse.SC_OK);
                 }
                 logServerMessage("Transaction Response (" + usernameFromSession + "): " + jsonResponse);
         }
@@ -50,11 +53,11 @@ public class TransactionServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/plain;charset=UTF-8");
         String usernameFromSession = SessionUtils.getUsername(request);
-
+        ServletOutputStream outputStream = response.getOutputStream();
         BankManager bankManager = ServletUtils.getBankManager(getServletContext());
 
         if (usernameFromSession == null) { //user is not logged in yet
-            response.getOutputStream().print("Not logged in yet.");
+            outputStream.print("Not logged in yet.");
 
         } else {
             //user is already logged in
@@ -64,7 +67,7 @@ public class TransactionServlet extends HttpServlet {
             String type = prop.getProperty(Constants.TYPE);
 
             if (amount <= 0 || type == null) {
-                response.getOutputStream().print("Invalid Parameters!");
+                outputStream.print("Invalid Parameters!");
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
             } else {
                 try {
@@ -78,8 +81,9 @@ public class TransactionServlet extends HttpServlet {
                             break;
                         }
                     }
+                    response.setStatus(HttpServletResponse.SC_OK);
                 } catch (Exception e) {
-                    response.getOutputStream().print(e.getMessage());
+                    outputStream.print(e.getMessage());
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                 }
             }

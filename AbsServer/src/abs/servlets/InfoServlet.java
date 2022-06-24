@@ -29,14 +29,18 @@ public class InfoServlet extends HttpServlet {
 
         PrintWriter writer = response.getWriter();
         if(usernameFromSession == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getOutputStream().print("User is not logged in.");
 
         } else {
             try {
                 ClientInfoData clientInfo = bankManager.getClientInfo(usernameFromSession);
                 String jsonResponse = Constants.GSON_INSTANCE.toJson(clientInfo, ClientInfoData.class);
                 writer.print(jsonResponse);
+                response.setStatus(HttpServletResponse.SC_OK);
 
             } catch (DataNotFoundException e) {
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
                 writer.print(e.getMessage());
             }
         }

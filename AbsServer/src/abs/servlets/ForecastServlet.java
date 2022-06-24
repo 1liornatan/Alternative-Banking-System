@@ -30,6 +30,7 @@ public class ForecastServlet extends HttpServlet {
 
         if (usernameFromSession == null) { //user is not logged in yet
             outputStream.print("Not logged in yet.");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else if (!SessionUtils.isAdmin(request)) {
             outputStream.print("Only Admins are authorized for this request.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -37,6 +38,7 @@ public class ForecastServlet extends HttpServlet {
             String type = request.getParameter(Constants.TYPE);
             if (type == null) {
                 outputStream.print("Invalid Parameters!");
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
                 return;
             }
 
@@ -61,6 +63,7 @@ public class ForecastServlet extends HttpServlet {
                 out.print(jsonResponse);
                 out.flush();
                 logServerMessage("Loan Trade Response (" + usernameFromSession + "): " + jsonResponse);
+                response.setStatus(HttpServletResponse.SC_OK);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 outputStream.print("Invalid parameters found!");

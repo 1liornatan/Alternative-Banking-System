@@ -6,6 +6,7 @@ import abs.utils.SessionUtils;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.manager.BankManager;
 import com.google.gson.Gson;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,21 +27,22 @@ public class NotificationServlet extends HttpServlet {
         response.setContentType("application/json");
 
         String usernameFromSession = SessionUtils.getUsername(request);
-
+        ServletOutputStream outputStream = response.getOutputStream();
         BankManager bankManager = ServletUtils.getBankManager(getServletContext());
 
         if (usernameFromSession == null) { //user is not logged in yet
-            response.getOutputStream().print("Not logged in yet.");
+            outputStream.print("Not logged in yet.");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         } else if (SessionUtils.isAdmin(request)) {
-            response.getOutputStream().print("Only customers are authorized for this request.");
+            outputStream.print("Only customers are authorized for this request.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
             NotificationsData notifications = null;
             try {
                 notifications = bankManager.getNotificationsData(usernameFromSession);
             } catch (Exception e) {
-                response.getOutputStream().print(e.getMessage());
+                outputStream.print(e.getMessage());
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
             }
             String jsonResponse = Constants.GSON_INSTANCE.toJson(notifications);
@@ -48,6 +50,7 @@ public class NotificationServlet extends HttpServlet {
             try (PrintWriter out = response.getWriter()) {
                 out.print(jsonResponse);
                 out.flush();
+                response.setStatus(HttpServletResponse.SC_OK);
             }
             logServerMessage("Notifications Response (" + usernameFromSession + "): " + jsonResponse);
         }

@@ -43,9 +43,11 @@ public class AccountServlet extends HttpServlet {
                 try (PrintWriter out = resp.getWriter()) {
                     out.print(jsonResponse);
                     out.flush();
+                    resp.setStatus(HttpServletResponse.SC_OK);
                 }
             } catch (DataNotFoundException e) {
                 outputStream.print(e.getMessage());
+                resp.setStatus(HttpServletResponse.SC_CONFLICT);
             }
         }
     }
