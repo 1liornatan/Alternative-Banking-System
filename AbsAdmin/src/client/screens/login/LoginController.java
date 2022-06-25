@@ -24,11 +24,19 @@ import sun.net.www.http.HttpClient;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 
 public class LoginController {
 
     private final StringProperty currAdmin;
     private final BooleanProperty isConnected;
+    private Parent mainScreen;
+
+    private static final String STYLE_DEFAULT = Objects.requireNonNull(LoginController.class.getResource("/screens/resources/mainStyle.css")).toString();
+    private static final String STYLE_DISCOUNT = Objects.requireNonNull(LoginController.class.getResource("/screens/resources/discount/styleDiscount.css")).toString();
+    private static final String STYLE_HAPOALIM = Objects.requireNonNull(LoginController.class.getResource("/screens/resources/hapoalim/styleHapoalim.css")).toString();
+    private static final String STYLE_ISRAEL = Objects.requireNonNull(LoginController.class.getResource("/screens/resources/israel/styleIsrael.css")).toString();
+
 
     @FXML
     private BorderPane borderPane;
@@ -54,6 +62,35 @@ public class LoginController {
     @FXML
     private Button logoutButton;
     private AdminController adminController;
+
+    @FXML
+    void styleDiscountAction(ActionEvent event) {
+        mainScreen.getStylesheets().clear();
+        mainScreen.getStylesheets().add(STYLE_DISCOUNT);
+        mainScreen.applyCss();
+    }
+
+    @FXML
+    void styleHapoalimAction(ActionEvent event) {
+        mainScreen.getStylesheets().clear();
+        mainScreen.getStylesheets().add(STYLE_HAPOALIM);
+        mainScreen.applyCss();
+    }
+
+    @FXML
+    void styleIsraelAction(ActionEvent event) {
+        mainScreen.getStylesheets().clear();
+        mainScreen.getStylesheets().add(STYLE_ISRAEL);
+        mainScreen.applyCss();
+    }
+
+    @FXML
+    void styleDefaultAction(ActionEvent event) {
+        mainScreen.getStylesheets().clear();
+        mainScreen.getStylesheets().add(STYLE_DEFAULT);
+        mainScreen.applyCss();
+    }
+
 
     @FXML
     void logoutButtonAction(ActionEvent event) {
@@ -210,5 +247,13 @@ public class LoginController {
         loginErrorLabel.setTextFill(Color.GREEN);
     }
 
+
+    public Parent getMainScreen() {
+        return mainScreen;
+    }
+
+    public void setMainScreen(Parent mainScreen) {
+        this.mainScreen = mainScreen;
+    }
 
 }

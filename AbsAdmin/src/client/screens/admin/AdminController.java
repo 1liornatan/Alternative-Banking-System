@@ -31,7 +31,9 @@ import utils.ModelUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AdminController {
 
@@ -306,7 +308,7 @@ public class AdminController {
                         loanModelList = ModelUtils.makeLoanModelList(loanDataList);
 
                         Platform.runLater(() -> {
-                            adminLoansTable.setItems(getLoans());
+                            Platform.runLater(() -> updateLoansTable());
                         });
                     }
                 }
@@ -473,7 +475,7 @@ public class AdminController {
                         List<CustomerData> customerDataList = customersData.getCustomers();
                         List<CustomerModel> tempCustomerModelList = ModelUtils.makeCustomerModelList(customerDataList);
                         customerModelList = tempCustomerModelList;
-                        Platform.runLater(() -> adminsCustomersTable.setItems(getCustomers()));
+                        Platform.runLater(() -> updateCustomersTable());
                     }
                 }
             }
@@ -482,18 +484,44 @@ public class AdminController {
 
     }
 
-    private void updateCustomersList(List<CustomerModel> tempCustomerModelList) {
+    private void updateCustomersTable() {
+        TableRowExpanderColumn<CustomerModel> customerModelTableColumn = (TableRowExpanderColumn<CustomerModel>) adminsCustomersTable.getColumns().get(3);
         ObservableList<CustomerModel> items = adminsCustomersTable.getItems();
+        Set<Integer> expanded = new HashSet<>();
+
         int size = items.size();
-        int i;
-        for(i = 0; i < size; i++) {
-            CustomerModel customerModel = items.get(i);
-            customerModel = tempCustomerModelList.get(i);
-        }
-        int size1 = tempCustomerModelList.size();
-        for(i = size; i < size1; i++) {
-            items.add(tempCustomerModelList.get(i));
+        ObservableList<CustomerModel> customers = getCustomers();
+
+        for (int i = 0; i < size; i++) {
+            if (customerModelTableColumn.getExpandedProperty(items.get(i)).get())
+                expanded.add(i);
         }
 
+        adminsCustomersTable.setItems(customers);
+
+        for (Integer index : expanded) {
+            customerModelTableColumn.toggleExpanded(index);
+        }
+    }
+
+    private void updateLoansTable() {
+
+        TableRowExpanderColumn<LoanModel> loanModelTableExpander = (TableRowExpanderColumn<LoanModel>) adminLoansTable.getColumns().get(3);
+        ObservableList<LoanModel> items = adminLoansTable.getItems();
+        Set<Integer> expanded = new HashSet<>();
+
+        int size = items.size();
+        ObservableList<LoanModel> loans = getLoans();
+
+        for (int i = 0; i < size; i++) {
+            if (loanModelTableExpander.getExpandedProperty(items.get(i)).get())
+                expanded.add(i);
+        }
+
+        adminLoansTable.setItems(loans);
+
+        for (Integer index : expanded) {
+            loanModelTableExpander.toggleExpanded(index);
+        }
     }
 }

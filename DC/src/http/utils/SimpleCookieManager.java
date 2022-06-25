@@ -31,7 +31,7 @@ public class SimpleCookieManager implements CookieJar {
             }
         }
         sb.append(" Total of ").append(cookiesPerDomain.size()).append(" cookie(s) will be loaded !");
-        logData.accept(sb.toString());
+        //logData.accept(sb.toString());
         return cookiesPerDomain;
     }
 

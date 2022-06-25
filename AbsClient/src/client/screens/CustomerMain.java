@@ -1,6 +1,7 @@
 package client.screens;
 
 
+import client.screens.login.LoginController;
 import http.constants.Constants;
 import http.utils.HttpClientUtil;
 import javafx.application.Application;
@@ -27,6 +28,9 @@ public class CustomerMain extends Application {
         URL adminFXML = getClass().getResource(BankScreenConsts.LOGIN_FXML_RESOURCE_IDENTIFIER);
         loader.setLocation(adminFXML);
         Parent root = loader.load();
+        LoginController controller = loader.getController();
+        controller.setMainScreen(root);
+        controller.setPrimaryStage(primaryStage);
 
 
         // set stage

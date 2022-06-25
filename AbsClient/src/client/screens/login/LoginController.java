@@ -3,12 +3,15 @@ package client.screens.login;
 import client.screens.customer.CustomerController;
 import http.constants.Constants;
 import http.utils.HttpClientUtil;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,16 +20,27 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 import okhttp3.*;
 import screens.resources.BankScreenConsts;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 
 public class LoginController {
 
     private final StringProperty currCustomer;
     private final BooleanProperty isConnected;
+    private Parent mainScreen;
+    private Stage primaryStage;
+    private int x, y;
+
+    private static final String STYLE_DEFAULT = Objects.requireNonNull(LoginController.class.getResource("/screens/resources/mainStyle.css")).toString();
+    private static final String STYLE_DISCOUNT = Objects.requireNonNull(LoginController.class.getResource("/screens/resources/discount/styleDiscount.css")).toString();
+    private static final String STYLE_HAPOALIM = Objects.requireNonNull(LoginController.class.getResource("/screens/resources/hapoalim/styleHapoalim.css")).toString();
+    private static final String STYLE_ISRAEL = Objects.requireNonNull(LoginController.class.getResource("/screens/resources/israel/styleIsrael.css")).toString();
 
     @FXML
     private BorderPane borderPane;
@@ -53,6 +67,86 @@ public class LoginController {
     private Button logoutButton;
     private CustomerController customerController;
 
+    @FXML
+    void styleDiscountAction(ActionEvent event) {
+        mainScreen.getStylesheets().clear();
+        mainScreen.getStylesheets().add(STYLE_DISCOUNT);
+        mainScreen.applyCss();
+    }
+
+    @FXML
+    void styleHapoalimAction(ActionEvent event) {
+        mainScreen.getStylesheets().clear();
+        mainScreen.getStylesheets().add(STYLE_HAPOALIM);
+        mainScreen.applyCss();
+    }
+
+    @FXML
+    void styleIsraelAction(ActionEvent event) {
+        mainScreen.getStylesheets().clear();
+        mainScreen.getStylesheets().add(STYLE_ISRAEL);
+        mainScreen.applyCss();
+    }
+
+    @FXML
+    void styleDefaultAction(ActionEvent event) {
+        mainScreen.getStylesheets().clear();
+        mainScreen.getStylesheets().add(STYLE_DEFAULT);
+        mainScreen.applyCss();
+    }
+
+
+    @FXML
+    void animationOffAction(ActionEvent event) {
+        customerController.animationOff();
+    }
+
+    @FXML
+    void animationOnAction(ActionEvent event) {
+        customerController.animationOn();
+    }
+
+    @FXML
+    void shakeScreenAction(ActionEvent event) {
+        shakeStage();
+    }
+
+    public void shakeStage() {
+        Timeline timelineX = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent t) {
+                if (x == 0) {
+                    primaryStage.setX(primaryStage.getX() + 10);
+                    x = 1;
+                } else {
+                    primaryStage.setX(primaryStage.getX() - 10);
+                    x = 0;
+                }
+            }
+        }));
+
+        timelineX.setCycleCount(22);
+        timelineX.setAutoReverse(false);
+        timelineX.play();
+
+
+        Timeline timelineY = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent t) {
+                if (y == 0) {
+                    primaryStage.setY(primaryStage.getY() + 10);
+                    y = 1;
+                } else {
+                    primaryStage.setY(primaryStage.getY() - 10);
+                    y = 0;
+                }
+            }
+        }));
+
+        timelineY.setCycleCount(22);
+        timelineY.setAutoReverse(false);
+        timelineY.play();
+    }
     @FXML
     void logoutButtonAction(ActionEvent event) {
         if(!isConnected.get())
@@ -202,5 +296,19 @@ public class LoginController {
         loginErrorLabel.setTextFill(Color.GREEN);
     }
 
+    public Parent getMainScreen() {
+        return mainScreen;
+    }
 
+    public void setMainScreen(Parent mainScreen) {
+        this.mainScreen = mainScreen;
+    }
+
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    public void setPrimaryStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
 }

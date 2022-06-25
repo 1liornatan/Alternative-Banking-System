@@ -322,7 +322,7 @@ public class CustomerController {
                 }
 
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                System.out.println(e.getMessage() + " (1)");
             }
         });
         searchInvestmentsThread.start();
@@ -935,7 +935,7 @@ public class CustomerController {
                     });
                 }
             } catch (Exception e) {
-                System.out.printf(e.getMessage());
+                System.out.printf(e.getMessage() + " (2)");
             }
         });
         updateCategories.start();
@@ -997,7 +997,7 @@ public class CustomerController {
             }
         }
         catch (Exception e) {
-            System.out.printf(e.getMessage());
+            System.out.printf(e.getMessage() + " (3)");
         }
         return null;
     }
@@ -1016,7 +1016,7 @@ public class CustomerController {
 
                 Platform.runLater(() -> loanerLoansPTable.setItems(getLoans(loanPModelList)));
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                System.out.println(e.getMessage() + " (4)");
             }
         });
 
@@ -1145,7 +1145,7 @@ public class CustomerController {
                 }
 
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                System.out.println(e.getMessage() + " (5)");
             }
         });
         updateNotifications.start();
@@ -1156,7 +1156,7 @@ public class CustomerController {
             try {
                 makePaymentRequest(Constants.TRANSACTION_WITHDRAW, amount);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                System.out.println(e.getMessage() + " (6)");
             }
         });
         withdrawThread.start();
@@ -1179,7 +1179,7 @@ public class CustomerController {
                     .build();
             Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println(e.getMessage() + " (7)");
         }
     }
 
@@ -1188,7 +1188,7 @@ public class CustomerController {
             try {
                 makePaymentRequest(Constants.TRANSACTION_DEPOSIT, amount);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                System.out.println(e.getMessage() + " (8)");
             }
         });
         depositThread.start();
@@ -1260,10 +1260,10 @@ public class CustomerController {
         new Thread(() -> {
             int i;
             try {
- 
+
+
                 Request request = new Request.Builder()
                         .url(Constants.URL_FORECAST)
-                        .addHeader("Content-Type", "text/plain")
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
@@ -1296,7 +1296,7 @@ public class CustomerController {
                     timeLineChart.getData().addAll(series, forecasting);
                 }
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                System.out.println(e.getMessage() + " (9)");
             }
         }).start();
 
