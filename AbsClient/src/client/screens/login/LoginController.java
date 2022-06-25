@@ -267,7 +267,7 @@ public class LoginController {
 
         customerController = loader.getController();
         customerController.customerIdProperty().set(currCustomer.get());
-        customerController.updateData();
+        customerController.startUpdateThread();
 
         Platform.runLater(() -> borderPane.setCenter(root));
     }

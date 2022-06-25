@@ -1,5 +1,6 @@
 package client.screens.customer;
 
+import client.screens.CustomerMain;
 import http.constants.Constants;
 import http.utils.HttpClientUtil;
 import javafx.animation.KeyFrame;
@@ -21,6 +22,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import manager.info.ClientInfoData;
 import manager.investments.*;
@@ -39,6 +41,9 @@ import models.utils.TradeTable;
 import okhttp3.*;
 import org.controlsfx.control.CheckComboBox;
 import utils.ModelUtils;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class CustomerController {
@@ -182,10 +187,38 @@ public class CustomerController {
     @FXML
     private LineChart<String, Number> timeLineChart;
     private Timeline walkTimeline;
+    private Thread updateThread;
 
     @FXML
     void loadFileButtonAction(ActionEvent ignoredEvent) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select loans file");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML Files", "*.xml"));
+        File selectedFile = fileChooser.showOpenDialog(null);
 
+        if (selectedFile == null) {
+            return;
+        }
+
+        String absolutePath = selectedFile.getAbsolutePath();
+
+        new Thread(() -> {
+            try {
+                MediaType mediaType = MediaType.parse("text/plain");
+                RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                        .addFormDataPart("file", absolutePath,
+                                RequestBody.create(MediaType.parse("application/octet-stream"),
+                                        new File(absolutePath)))
+                        .build();
+                Request request = new Request.Builder()
+                        .url(Constants.URL_UPLOAD)
+                        .method("POST", body)
+                        .build();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }).start();
     }
     @FXML
     void buyInvestmentButtonAction(ActionEvent ignoredEvent) {
@@ -809,6 +842,20 @@ public class CustomerController {
         paymentsAmountProperty = new SimpleIntegerProperty();
         debtAmountProperty = new SimpleIntegerProperty();
         animationProperty = new SimpleBooleanProperty(true);
+        setupUpdateThread();
+    }
+
+    private void setupUpdateThread() {
+        updateThread = new Thread(() -> {
+            while(true) {
+                try {
+                    updateData();
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    System.out.println("check update: " + e.getMessage());
+                }
+            }
+        });
     }
 
     private void setLoansIntegrationButtons() {
@@ -884,7 +931,7 @@ public class CustomerController {
         searchLoansProgressBar.setProgress(0);
     }
 
-    public void updateData() {
+    private void updateData() {
        // updateLoansExpander();
         updateLoansData();
         updatePaymentLoansData();
@@ -894,6 +941,13 @@ public class CustomerController {
         updateTimeChart();
     }
 
+    public void startUpdateThread() {
+        updateThread.start();
+    }
+
+    public void stopUpdateThread() {
+        updateThread.interrupt();
+    }
 
 
     private Set<String> getSelectedCategories() {
@@ -1292,8 +1346,10 @@ public class CustomerController {
                         forecasting.getData().add(new XYChart.Data(String.valueOf(j + 1), avg * j));
                     }
 
-                    timeLineChart.getData().clear();
-                    timeLineChart.getData().addAll(series, forecasting);
+                    Platform.runLater(() -> {
+                        timeLineChart.getData().clear();
+                        timeLineChart.getData().addAll(series, forecasting);
+                    });
                 }
             } catch (Exception e) {
                 System.out.println(e.getMessage() + " (9)");
