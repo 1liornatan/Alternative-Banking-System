@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import manager.customers.CustomersData;
+import manager.customers.CustomersWithVersion;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -37,7 +38,10 @@ public class AccountServlet extends HttpServlet {
         else {
             try {
                 CustomersData customerDataList = bankManager.getCustomersData();
-                String jsonResponse = Constants.GSON_INSTANCE.toJson(customerDataList);
+                int cVer = bankManager.getCustomersVersion();
+                int lVer = bankManager.getLoansVersion();
+
+                String jsonResponse = Constants.GSON_INSTANCE.toJson(new CustomersWithVersion(customerDataList, cVer, lVer));
                 outputStream.print(jsonResponse);
                 outputStream.flush();
                 resp.setStatus(HttpServletResponse.SC_OK);

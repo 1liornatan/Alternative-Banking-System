@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import manager.loans.LoansData;
+import manager.loans.LoansWithVersion;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,6 +30,8 @@ public class LoanServlet extends HttpServlet {
         String usernameFromSession = SessionUtils.getUsername(request);
         ServletOutputStream outputStream = response.getOutputStream();
         BankManager bankManager = ServletUtils.getBankManager(getServletContext());
+        LoansData data = null;
+        int cVer, lVer;
 
         UserManager userManager = ServletUtils.getUserManager(getServletContext());
 
@@ -42,13 +45,11 @@ public class LoanServlet extends HttpServlet {
                 outputStream.print("Invalid Parameters!");
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
             } else {
-                String jsonResponse = null;
 
                 if (SessionUtils.isAdmin(request)) {
                     if (type.equals(Constants.ALL_LOANS)) {
                         try {
-                            LoansData allLoans = bankManager.getLoansData();
-                            jsonResponse = Constants.GSON_INSTANCE.toJson(allLoans);
+                            data = bankManager.getLoansData();
                         } catch (DataNotFoundException e) {
                             e.printStackTrace();
                             response.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -61,24 +62,20 @@ public class LoanServlet extends HttpServlet {
                 } else {
                     switch (type) {
                         case (Constants.REQUESTED_LOANS): {
-                            LoansData requestedLoans = bankManager.getRequestedLoans(usernameFromSession);
-                            jsonResponse = Constants.GSON_INSTANCE.toJson(requestedLoans);
+                            data = bankManager.getRequestedLoans(usernameFromSession);
                             break;
                         }
                         case (Constants.INVESTED_LOANS): {
-                            LoansData investedLoans = bankManager.getInvestedLoans(usernameFromSession);
-                            jsonResponse = Constants.GSON_INSTANCE.toJson(investedLoans);
+                            data = bankManager.getInvestedLoans(usernameFromSession);
                             break;
                         }
                         case (Constants.UNFINISHED_LOANS): {
-                            LoansData unFinishedLoans = new LoansData();
                             try {
-                                unFinishedLoans.setLoans(bankManager.getUnFinishedLoans(usernameFromSession));
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                                data = bankManager.getUnFinishedLoans(usernameFromSession);
+                            } catch (DataNotFoundException e) {
+                                outputStream.print(e.getMessage());
                                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                             }
-                            jsonResponse = Constants.GSON_INSTANCE.toJson(unFinishedLoans);
                             break;
                         }
                         case (Constants.ALL_LOANS): {
@@ -88,11 +85,17 @@ public class LoanServlet extends HttpServlet {
                     }
                 }
 
-                logServerMessage("Loans Request (" + usernameFromSession + "): " + jsonResponse);
+                if(data != null) {
+                    cVer = bankManager.getCustomersVersion();
+                    lVer = bankManager.getLoansVersion();
 
-                outputStream.print(jsonResponse);
-                outputStream.flush();
-                response.setStatus(HttpServletResponse.SC_OK);
+                    String jsonResponse = Constants.GSON_INSTANCE.toJson(new LoansWithVersion(data, cVer, lVer));
+                    outputStream.print(jsonResponse);
+                    outputStream.flush();
+                    response.setStatus(HttpServletResponse.SC_OK);
+
+                    logServerMessage("Loans Request (" + usernameFromSession + "): " + jsonResponse);
+                }
             }
         }
     }

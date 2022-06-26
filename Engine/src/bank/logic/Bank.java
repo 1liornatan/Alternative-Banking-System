@@ -27,7 +27,6 @@ import manager.transactions.TransactionData;
 import manager.transactions.TransactionsDTO;
 import manager.transactions.TransactionsData;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
@@ -92,7 +91,7 @@ public interface Bank {
 
     LoanDTO getLoanDTO(Loan loan);
 
-    List<LoanData> getUnFinishedLoans(String customerId) throws DataNotFoundException;
+    LoansData getUnfinishedLoans(String customerId) throws DataNotFoundException;
 
     Set<String> getCategories();
 
@@ -147,4 +146,8 @@ public interface Bank {
     void addLoansFromFile(String customer, String filePath) throws XmlPaymentsException, NonPositiveAmountException, DataNotFoundException, DataAlreadyExistsException;
 
     ClientInfoData getClientInfo(String customer) throws DataNotFoundException;
+
+    int getCustomersVer();
+
+    int getLoansVer();
 }

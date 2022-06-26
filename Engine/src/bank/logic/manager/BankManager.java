@@ -10,12 +10,9 @@ import manager.customers.CustomersData;
 import manager.customers.CustomersNames;
 import manager.info.ClientInfoData;
 import manager.investments.*;
-import manager.loans.LoanData;
 import manager.loans.LoansData;
 import manager.messages.NotificationsData;
 import manager.transactions.TransactionsData;
-
-import java.util.List;
 
 public class BankManager {
     private final Bank bankInstance;
@@ -60,8 +57,8 @@ public class BankManager {
     }
 
     public PaymentsData getPaymentsData(String username) throws DataNotFoundException {return bankInstance.getPaymentsData(username);}
-    public List<LoanData> getUnFinishedLoans(String username) throws DataNotFoundException {
-        return bankInstance.getUnFinishedLoans(username);
+    public LoansData getUnFinishedLoans(String username) throws DataNotFoundException {
+        return bankInstance.getUnfinishedLoans(username);
     }
 
     public void closeLoan(String id) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
@@ -110,4 +107,12 @@ public class BankManager {
     public PaymentsData getAllLoansData() {return bankInstance.getAllLoansData();}
     public PaymentsData getAllCustomersData() {return bankInstance.getAllCustomersData();}
     public PaymentsData getAllTransactionsData() {return bankInstance.getAllTransactionsData();}
+
+    public int getCustomersVersion() {
+        return bankInstance.getCustomersVer();
+    }
+
+    public int getLoansVersion() {
+        return bankInstance.getLoansVer();
+    }
 }

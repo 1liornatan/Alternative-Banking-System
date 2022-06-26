@@ -18,9 +18,11 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.layout.GridPane;
 import manager.customers.CustomerData;
 import manager.customers.CustomersData;
+import manager.customers.CustomersWithVersion;
 import manager.investments.PaymentsData;
 import manager.loans.LoanData;
 import manager.loans.LoansData;
+import manager.loans.LoansWithVersion;
 import models.CustomerModel;
 import models.LoanModel;
 import models.LoanStatusModel;
@@ -43,6 +45,7 @@ public class AdminController {
 
     private List<CustomerModel> customerModelList;
     private List<LoanModel> loanModelList;
+    private int loansVer, customersVer;
 
     @FXML
     private Button increaseYazButton;
@@ -303,13 +306,20 @@ public class AdminController {
                         );
                     } else {
                         String rawBody = body.string();
-                        LoansData loansData = Constants.GSON_INSTANCE.fromJson(rawBody, LoansData.class);
+                        LoansWithVersion loansWithVersion = Constants.GSON_INSTANCE.fromJson(rawBody, LoansWithVersion.class);
+                        LoansData loansData = loansWithVersion.getData();
                         List<LoanData> loanDataList = loansData.getLoans();
-                        loanModelList = ModelUtils.makeLoanModelList(loanDataList);
 
-                        Platform.runLater(() -> {
-                            Platform.runLater(() -> updateLoansTable());
-                        });
+                        int ver = loansWithVersion.getLoansVer();
+
+                        if(loansVer != ver) {
+                            loansVer = ver;
+                            loanModelList = ModelUtils.makeLoanModelList(loanDataList);
+
+                            Platform.runLater(() -> {
+                                Platform.runLater(() -> updateLoansTable());
+                            });
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -407,6 +417,8 @@ public class AdminController {
         loanModelList = new ArrayList<>();
         isLoggedIn = new SimpleBooleanProperty(false);
         setUpdateThread();
+        customersVer = 0;
+        loansVer = 0;
     }
 
     public IntegerProperty getCurrYazProperty() { return currYazProperty; }
@@ -471,11 +483,17 @@ public class AdminController {
                         );
                     } else {
                         String rawBody = body.string();
-                        CustomersData customersData = Constants.GSON_INSTANCE.fromJson(rawBody, CustomersData.class);
-                        List<CustomerData> customerDataList = customersData.getCustomers();
-                        List<CustomerModel> tempCustomerModelList = ModelUtils.makeCustomerModelList(customerDataList);
-                        customerModelList = tempCustomerModelList;
-                        Platform.runLater(() -> updateCustomersTable());
+                        CustomersWithVersion customersWithVerData = Constants.GSON_INSTANCE.fromJson(rawBody, CustomersWithVersion.class);
+                        CustomersData customersData = customersWithVerData.getData();
+
+                        int ver = customersWithVerData.getCustomersVer();
+                        if(customersVer != ver) {
+                            customersVer = ver;
+                            List<CustomerData> customerDataList = customersData.getCustomers();
+                            List<CustomerModel> tempCustomerModelList = ModelUtils.makeCustomerModelList(customerDataList);
+                            customerModelList = tempCustomerModelList;
+                            Platform.runLater(() -> updateCustomersTable());
+                        }
                     }
                 }
             }

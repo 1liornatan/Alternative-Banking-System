@@ -61,6 +61,8 @@ public class BankImpl implements Bank {
     private Set<String> categories;
     private BankLoanHandler loanHandler;
     private TimeHandler timeHandler;
+    private int customersVer;
+    private int loansVer;
 
     public BankImpl() {
         timeHandler = new BankTimeHandler();
@@ -71,12 +73,15 @@ public class BankImpl implements Bank {
         loanHandler = new BankLoanHandler(transactions, loans, customersAccounts, timeHandler);
         categories = new HashSet<>();
         sellInvestmentsDataStorage = new BankDataStorage<>(timeHandler);
+        customersVer = 0;
+        loansVer = 0;
     }
 
     @Override
     public void addCustomer(String customerName) {
         CustomerAccount customer = new Customer(customerName, 0);
         customersAccounts.addData(customer);
+        customersVer++;
     }
 
     @Override
@@ -96,6 +101,8 @@ public class BankImpl implements Bank {
     @Override
     public void investmentTrade(InvestmentData data) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
         buyInvestment(data.getInvestmentId(), data.getBuyerId(), data.getOwnerId());
+        customersVer++;
+        loansVer++;
     }
     private void buyInvestment(String investmentId, String buyerId, String sellerId) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
         Investment investment = sellInvestmentsDataStorage.getDataById(investmentId);
@@ -302,6 +309,8 @@ public class BankImpl implements Bank {
     public void advanceCycle(String loanId) throws DataNotFoundException, NonPositiveAmountException {
         Loan loan = loans.getDataById(loanId);
         loanHandler.payOneCycle(loan);
+        customersVer++;
+        loansVer++;
     }
 
     @Override
@@ -316,6 +325,7 @@ public class BankImpl implements Bank {
         transactions.addData(transaction);
         account.addNotification(new BankNotification("Withdrew " + amount,
                 timeHandler.getCurrentTime()));
+        customersVer++;
     }
 
     @Override
@@ -325,6 +335,7 @@ public class BankImpl implements Bank {
         transactions.addData(transaction);
         account.addNotification(new BankNotification("Deposited " + amount,
                 timeHandler.getCurrentTime()));
+        customersVer++;
     }
 
     @Override
@@ -531,7 +542,7 @@ public class BankImpl implements Bank {
 
     }
     @Override
-    public List<LoanData> getUnFinishedLoans(String customerId) throws DataNotFoundException {
+    public LoansData getUnfinishedLoans(String customerId) throws DataNotFoundException {
             List<LoanData> loansList= new ArrayList<>();
             customersAccounts.getDataById(customerId).getLoansRequested().stream()
                     .filter(loan -> !loan.getStatus().equals(LoanStatus.FINISHED))
@@ -544,7 +555,9 @@ public class BankImpl implements Bank {
                             e.printStackTrace();
                         }
                     });
-            return loansList;
+        LoansData loansData = new LoansData();
+        loansData.setLoans(loansList);
+        return loansData;
     }
 
     @Override
@@ -824,6 +837,8 @@ public class BankImpl implements Bank {
         try {
             Loan loan = loans.getDataById(id);
             loanHandler.payLoanByAmount(loan, amount);
+            customersVer++;
+            loansVer++;
             updateActiveStatus(loan);
         } catch (DataNotFoundException | NoMoneyException | NonPositiveAmountException e) {
             System.out.println(e.getMessage());
@@ -858,6 +873,8 @@ public class BankImpl implements Bank {
         loanHandler.payLoanByAmount(loan, amountToCloseLoan);
         CustomerAccount customer = customersAccounts.getDataById(loan.getOwnerId());
         customer.addNotification(new BankNotification("Closed '" + loan.getId() + "' for " + amountToCloseLoan, getCurrentYaz()));
+        customersVer++;
+        loansVer++;
     }
 
     @Override
@@ -990,6 +1007,8 @@ public class BankImpl implements Bank {
             loans.addData(loanData);
             categories.add(categoryName);
         }
+        customersVer++;
+        loansVer++;
     }
 
     @Override
@@ -999,5 +1018,15 @@ public class BankImpl implements Bank {
                 .balance(customerAccount.getBalance())
                 .categories(categories)
                 .build();
+    }
+
+    @Override
+    public int getCustomersVer() {
+        return customersVer;
+    }
+
+    @Override
+    public int getLoansVer() {
+        return loansVer;
     }
 }
