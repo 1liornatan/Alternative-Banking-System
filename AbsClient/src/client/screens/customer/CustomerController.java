@@ -28,6 +28,7 @@ import manager.info.ClientInfoData;
 import manager.investments.*;
 import manager.loans.LoanData;
 import manager.loans.LoansData;
+import manager.loans.LoansWithVersion;
 import manager.messages.NotificationData;
 import manager.messages.NotificationsData;
 import manager.transactions.TransactionData;
@@ -40,6 +41,7 @@ import models.utils.LoanTable;
 import models.utils.TradeTable;
 import okhttp3.*;
 import org.controlsfx.control.CheckComboBox;
+import org.controlsfx.control.table.TableRowExpanderColumn;
 import utils.ModelUtils;
 
 import java.io.File;
@@ -68,6 +70,8 @@ public class CustomerController {
     private final IntegerProperty paymentsAmountProperty;
     private LoanModel selectedDebtLoan;
     private final BooleanProperty animationProperty;
+
+    private int loansVer;
 
 
     final static Image WALK_1 = new Image(Objects.requireNonNull(CustomerController.class.getResource("/screens/resources/animation/1.png")).toString());
@@ -842,6 +846,7 @@ public class CustomerController {
         paymentsAmountProperty = new SimpleIntegerProperty();
         debtAmountProperty = new SimpleIntegerProperty();
         animationProperty = new SimpleBooleanProperty(true);
+        loansVer = 0;
         setupUpdateThread();
     }
 
@@ -1004,34 +1009,62 @@ public class CustomerController {
             List<LoanModel> tempLenderModelList;
             List<LoanModel> tempLoanerModelList;
 
-            LoansData loaner = makeLoanRequest(Constants.REQUESTED_LOANS);
-            LoansData lender = makeLoanRequest(Constants.INVESTED_LOANS);
+            LoansWithVersion loaner = makeLoanRequest(Constants.REQUESTED_LOANS);
+            LoansWithVersion lender = makeLoanRequest(Constants.INVESTED_LOANS);
+            int loansVer = loaner.getLoansVer();
+            int loansVer1 = lender.getLoansVer();
 
-            if(loaner == null || lender == null) {
+            if (loaner == null || lender == null) {
                 System.out.println("Cannot update loans");
                 return;
+            } else if (loansVer == loansVer && loansVer1 == loansVer) {
+                return;
+            } else {
+                List<LoanData> loanerDataList = loaner.getData().getLoans();
+                List<LoanData> lenderDataList = lender.getData().getLoans();
+
+                tempLoanerModelList = ModelUtils.makeLoanModelList(loanerDataList);
+                tempLenderModelList = ModelUtils.makeLoanModelList(lenderDataList);
+
+                lenderModelList = tempLenderModelList;
+                loanerModelList = tempLoanerModelList;
+
+                updateLoansTable(loanerLoansTable, loanerModelList);
+                updateLoansTable(lenderLoansTable, lenderModelList);
+
+                requestedLoansAmountProperty.set(loanerModelList.size());
+
+/*                Platform.runLater(() -> {
+                    loanerLoansTable.setItems(getLoans(loanerModelList));
+                    lenderLoansTable.setItems(getLoans(lenderModelList));
+                });*/
             }
-
-            List<LoanData>  loanerDataList = loaner.getLoans();
-            List<LoanData>  lenderDataList = lender.getLoans();
-
-            tempLoanerModelList = ModelUtils.makeLoanModelList(loanerDataList);
-            tempLenderModelList = ModelUtils.makeLoanModelList(lenderDataList);
-
-            lenderModelList = tempLenderModelList;
-            loanerModelList = tempLoanerModelList;
-            requestedLoansAmountProperty.set(loanerModelList.size());
-
-            Platform.runLater(() -> {
-                loanerLoansTable.setItems(getLoans(loanerModelList));
-                lenderLoansTable.setItems(getLoans(lenderModelList));
-            });
         });
 
         updateThread.start();
     }
 
-    private LoansData makeLoanRequest(String type) {
+    private void updateLoansTable(TableView<LoanModel> table, List<LoanModel> modelList) {
+
+        TableRowExpanderColumn<LoanModel> loanModelTableExpander = (TableRowExpanderColumn<LoanModel>) table.getColumns().get(3);
+        ObservableList<LoanModel> items = table.getItems();
+        Set<Integer> expanded = new HashSet<>();
+
+        int size = items.size();
+
+        for (int i = 0; i < size; i++) {
+            if (loanModelTableExpander.getExpandedProperty(items.get(i)).get())
+                expanded.add(i);
+        }
+
+        table.setItems(FXCollections.observableArrayList(modelList));
+
+        for (Integer index : expanded) {
+            loanModelTableExpander.toggleExpanded(index);
+        }
+    }
+
+    private LoansWithVersion makeLoanRequest(String type) {
         try {
             String finalUrl = HttpUrl
                     .parse(Constants.URL_LOAN)
@@ -1046,7 +1079,7 @@ public class CustomerController {
             Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
             try (ResponseBody body = response.body()) {
-                LoansData loansData = Constants.GSON_INSTANCE.fromJson(body.string(), LoansData.class);
+                LoansWithVersion loansData = Constants.GSON_INSTANCE.fromJson(body.string(), LoansWithVersion.class);
                 return loansData;
             }
         }
@@ -1061,14 +1094,21 @@ public class CustomerController {
             List<LoanModel> tempLoanerModelList;
             List<LoanData>  loanerDataList = null;
             try {
-                loanerDataList = makeLoanRequest(Constants.UNFINISHED_LOANS).getLoans();
+                LoansWithVersion loansWithVersion = makeLoanRequest(Constants.UNFINISHED_LOANS);
+
+                if(loansWithVersion == null || loansWithVersion.getLoansVer() == loansVer)
+                    return;
+
+                loanerDataList = loansWithVersion.getData().getLoans();
 
                 tempLoanerModelList = ModelUtils.makeLoanModelList(loanerDataList);
 
                 loanPModelList = tempLoanerModelList;
+
                 paymentsAmountProperty.set(loanPModelList.size());
 
-                Platform.runLater(() -> loanerLoansPTable.setItems(getLoans(loanPModelList)));
+                updateLoansTable(loanerLoansPTable, loanPModelList);
+/*                Platform.runLater(() -> loanerLoansPTable.setItems(getLoans(loanPModelList)));*/
             } catch (Exception e) {
                 System.out.println(e.getMessage() + " (4)");
             }
