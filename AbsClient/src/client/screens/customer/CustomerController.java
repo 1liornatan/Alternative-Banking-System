@@ -72,6 +72,7 @@ public class CustomerController {
     private final BooleanProperty animationProperty;
 
     private int loansVer;
+    private int pLoansVer;
 
 
     final static Image WALK_1 = new Image(Objects.requireNonNull(CustomerController.class.getResource("/screens/resources/animation/1.png")).toString());
@@ -847,6 +848,7 @@ public class CustomerController {
         debtAmountProperty = new SimpleIntegerProperty();
         animationProperty = new SimpleBooleanProperty(true);
         loansVer = 0;
+        pLoansVer = 0;
         setupUpdateThread();
     }
 
@@ -1011,15 +1013,15 @@ public class CustomerController {
 
             LoansWithVersion loaner = makeLoanRequest(Constants.REQUESTED_LOANS);
             LoansWithVersion lender = makeLoanRequest(Constants.INVESTED_LOANS);
-            int loansVer = loaner.getLoansVer();
-            int loansVer1 = lender.getLoansVer();
+            int loansVer = lender.getLoansVer();
 
             if (loaner == null || lender == null) {
                 System.out.println("Cannot update loans");
                 return;
-            } else if (loansVer == loansVer && loansVer1 == loansVer) {
+            } else if (loansVer == this.loansVer) {
                 return;
             } else {
+                this.loansVer = loansVer;
                 List<LoanData> loanerDataList = loaner.getData().getLoans();
                 List<LoanData> lenderDataList = lender.getData().getLoans();
 
@@ -1096,8 +1098,11 @@ public class CustomerController {
             try {
                 LoansWithVersion loansWithVersion = makeLoanRequest(Constants.UNFINISHED_LOANS);
 
-                if(loansWithVersion == null || loansWithVersion.getLoansVer() == loansVer)
+                int loansVer = loansWithVersion.getLoansVer();
+                if(loansWithVersion == null || loansVer == pLoansVer)
                     return;
+
+                pLoansVer = loansVer;
 
                 loanerDataList = loansWithVersion.getData().getLoans();
 
