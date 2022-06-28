@@ -115,6 +115,7 @@ public class LoginController {
                 else {
                     Platform.runLater(() -> setErrorMessage("Something went wrong."));
                 }
+                response.close();
             } catch (IOException e) {
                 Platform.runLater(() -> setErrorMessage(e.getMessage()));
             }
@@ -165,15 +166,10 @@ public class LoginController {
                                 errorMessage = body.string();
                             }
                         }
-                        finally {
-                            if (response != null && response.body() != null) {
-                                response.body().close();
-                            }
-                        }
-
                         String finalErrorMessage = errorMessage;
                         Platform.runLater(() -> setErrorMessage(finalErrorMessage));
                     }
+                    response.close();
                 } catch (IOException e) {
                     Platform.runLater(() -> setSuccessMessage(e.getMessage()));
                 }

@@ -131,11 +131,6 @@ public class AdminController {
                         });
                     }
                 }
-                finally {
-                    if (response != null && response.body() != null) {
-                        response.body().close();
-                    }
-                }
 
             } catch (IOException e) {
                 System.out.println(e.getMessage());
@@ -305,7 +300,6 @@ public class AdminController {
 
                 try (ResponseBody body = response.body()) {
                     String responseBody = body.string();
-                    body.close();
                     if (response.code() != 200) {
                         Platform.runLater(() ->
                                 System.out.println("Something went wrong: " + responseBody)
@@ -499,11 +493,6 @@ public class AdminController {
                             customerModelList = tempCustomerModelList;
                             Platform.runLater(() -> updateCustomersTable());
                         }
-                    }
-                }
-                finally {
-                    if (response != null && response.body() != null) {
-                        response.body().close();
                     }
                 }
             }

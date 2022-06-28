@@ -63,7 +63,9 @@ public class TransactionServlet extends HttpServlet {
             //user is already logged in
             Properties prop = new Properties();
             prop.load(request.getInputStream());
-            int amount = Integer.parseInt(prop.getProperty(Constants.AMOUNT));
+            String test = prop.toString();
+            String property = prop.getProperty(Constants.AMOUNT);
+            int amount = Integer.parseInt(property);
             String type = prop.getProperty(Constants.TYPE);
 
             if (amount <= 0 || type == null) {

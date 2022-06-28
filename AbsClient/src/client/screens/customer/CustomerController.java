@@ -3,6 +3,7 @@ package client.screens.customer;
 import client.screens.CustomerMain;
 import http.constants.Constants;
 import http.utils.HttpClientUtil;
+import http.utils.Props;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -60,7 +61,6 @@ public class CustomerController {
     private final IntegerProperty maxRequestedLoansProperty;
     private final IntegerProperty maxOwnershipFieldProperty;
     private ObservableList<String> categoriesList;
-    private final BooleanProperty isFileSelected;
     private List<TransactionModel> transactionModels;
     private List<LoanModel> loanPModelList;
     private List<NotificationModel> notificationModels;
@@ -221,6 +221,7 @@ public class CustomerController {
                         .method("POST", body)
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                response.close();
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
@@ -243,12 +244,12 @@ public class CustomerController {
                         .build();
 
                 try {
-                    Properties prop = new Properties();
 
+                    Props prop = new Props();
                     String jsonRequest = Constants.GSON_INSTANCE.toJson(data);
 
-                    prop.setProperty(Constants.TYPE, Constants.BUY_INVESTMENT_REQUEST);
-                    prop.setProperty(Constants.INVESTMENT_DATA, jsonRequest);
+                    prop.add(Constants.TYPE, Constants.BUY_INVESTMENT_REQUEST);
+                    prop.add(Constants.INVESTMENT_DATA, jsonRequest);
 
  
                     MediaType mediaType = MediaType.parse("text/plain");
@@ -260,6 +261,7 @@ public class CustomerController {
                             .build();
 
                     Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                    response.close();
 
                     Platform.runLater(() -> {
                         updateData();
@@ -301,12 +303,12 @@ public class CustomerController {
                         .loan(loanId)
                         .build();
                 try {
-                    Properties prop = new Properties();
+                    Props prop = new Props();
 
                     String jsonRequest = Constants.GSON_INSTANCE.toJson(data);
 
-                    prop.setProperty(Constants.TYPE, Constants.LIST_INVESTMENT_REQUEST);
-                    prop.setProperty(Constants.INVESTMENT_DATA, jsonRequest);
+                    prop.add(Constants.TYPE, Constants.LIST_INVESTMENT_REQUEST);
+                    prop.add(Constants.INVESTMENT_DATA, jsonRequest);
                     
                     MediaType mediaType = MediaType.parse("text/plain");
                     RequestBody body = RequestBody.create(mediaType, prop.toString());
@@ -316,6 +318,7 @@ public class CustomerController {
                             .addHeader("Content-Type", "text/plain")
                             .build();
                     Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                    response.close();
 
                     Platform.runLater(() -> {
                         updateOwnedInvestments();
@@ -352,14 +355,16 @@ public class CustomerController {
 
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                try (ResponseBody body = response.body()) {
-                    InvestmentsSellData investmentsForSell = Constants.GSON_INSTANCE.fromJson(body.string(), InvestmentsSellData.class);
-                    body.close();
+                if(response.isSuccessful()) {
+                    try (ResponseBody body = response.body()) {
+                        InvestmentsSellData investmentsForSell = Constants.GSON_INSTANCE.fromJson(body.string(), InvestmentsSellData.class);
 
-                    buyInvestmentModels = getInvModels(investmentsForSell);
+                        buyInvestmentModels = getInvModels(investmentsForSell);
 
-                    Platform.runLater(() -> buyInvestmentTable.setItems(getBuyInvestments()));
+                        Platform.runLater(() -> buyInvestmentTable.setItems(getBuyInvestments()));
+                    }
                 }
+                response.close();
 
             } catch (Exception e) {
                 System.out.println(e.getMessage() + " (1)");
@@ -390,12 +395,12 @@ public class CustomerController {
                         .build();
 
                 try {
-                    Properties prop = new Properties();
+                    Props prop = new Props();
 
                     String jsonRequest = Constants.GSON_INSTANCE.toJson(data);
 
-                    prop.setProperty(Constants.TYPE, Constants.UNLIST_INVESTMENT_REQUEST);
-                    prop.setProperty(Constants.INVESTMENT_DATA, jsonRequest);
+                    prop.add(Constants.TYPE, Constants.UNLIST_INVESTMENT_REQUEST);
+                    prop.add(Constants.INVESTMENT_DATA, jsonRequest);
 
  
                     MediaType mediaType = MediaType.parse("text/plain");
@@ -406,6 +411,7 @@ public class CustomerController {
                             .addHeader("Content-Type", "text/plain")
                             .build();
                     Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                    response.close();
                     Platform.runLater(() -> {
                         updateOwnedInvestments();
                         sellErrorLabel.setText("Unlisted investment successfully!");
@@ -503,13 +509,13 @@ public class CustomerController {
                     Thread.sleep(2000);
                     Platform.runLater(() -> searchLoansProgressBar.setProgress(0.3));
                     updateMessage("Searching Loans...");
-                    Properties prop = new Properties();
+                    Props prop = new Props();
 
                     String jsonRequest = Constants.GSON_INSTANCE.toJson(requestDTO);
-                    prop.setProperty(Constants.TYPE, Constants.INTEGRATION_REQUEST);
-                    prop.setProperty(Constants.DATA, jsonRequest);
+                    prop.add(Constants.TYPE, Constants.INTEGRATION_REQUEST);
+                    prop.add(Constants.DATA, jsonRequest);
 
- 
+
                     MediaType mediaType = MediaType.parse("text/plain");
                     RequestBody body = RequestBody.create(mediaType, prop.toString());
                     Request request = new Request.Builder()
@@ -518,21 +524,23 @@ public class CustomerController {
                             .build();
                     Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                    try (ResponseBody responseBody = response.body()) {
-                        LoansData loansData = Constants.GSON_INSTANCE.fromJson(responseBody.string(), LoansData.class);
-                        responseBody.close();
-                        Thread.sleep(1000);
-                        Platform.runLater(() -> searchLoansProgressBar.setProgress(0.7));
-                        updateMessage("Printing Loans...");
-                        Thread.sleep(1000);
-                        Platform.runLater(() -> {
-                            clearAllFields();
-                            addFoundLoans(loansData.getLoans());
-                            setLoansIntegrationButtons();
-                            searchLoansProgressBar.setProgress(1.0);
-                        });
-                        updateMessage("Found " + loansData.getLoans().size() + " Loans");
+                    if(response.isSuccessful()) {
+                        try (ResponseBody responseBody = response.body()) {
+                            LoansData loansData = Constants.GSON_INSTANCE.fromJson(responseBody.string(), LoansData.class);
+                            Thread.sleep(1000);
+                            Platform.runLater(() -> searchLoansProgressBar.setProgress(0.7));
+                            updateMessage("Printing Loans...");
+                            Thread.sleep(1000);
+                            Platform.runLater(() -> {
+                                clearAllFields();
+                                addFoundLoans(loansData.getLoans());
+                                setLoansIntegrationButtons();
+                                searchLoansProgressBar.setProgress(1.0);
+                            });
+                            updateMessage("Found " + loansData.getLoans().size() + " Loans");
+                        }
                     }
+                    response.close();
                     return "Success";
                 } catch (Exception e) {
                     return e.getMessage();
@@ -565,10 +573,10 @@ public class CustomerController {
         else {
             Thread closeLoanThread = new Thread(() -> {
                 try {
-                    Properties prop = new Properties();
-                    prop.setProperty(Constants.TYPE, Constants.CLOSE_LOAN_REQUEST);
-                    prop.setProperty(Constants.LOAN_DATA, selectedLoan.getId());
-                    prop.setProperty(Constants.AMOUNT, "-1");
+                    Props prop = new Props();
+                    prop.add(Constants.TYPE, Constants.CLOSE_LOAN_REQUEST);
+                    prop.add(Constants.LOAN_DATA, selectedLoan.getId());
+                    prop.add(Constants.AMOUNT, "-1");
 
  
                     MediaType mediaType = MediaType.parse("text/plain");
@@ -579,6 +587,7 @@ public class CustomerController {
                             .addHeader("Content-Type", "text/plain")
                             .build();
                     Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                    response.close();
 
                     Platform.runLater(() -> {
                         updateData();
@@ -606,10 +615,10 @@ public class CustomerController {
         else {
             Thread payCycleThread = new Thread(() -> {
                 try {
-                    Properties prop = new Properties();
-                    prop.setProperty(Constants.TYPE, Constants.PAY_CYCLE_REQUEST);
-                    prop.setProperty(Constants.LOAN_DATA, selectedLoan.getId());
-                    prop.setProperty(Constants.AMOUNT, "-1");
+                    Props prop = new Props();
+                    prop.add(Constants.TYPE, Constants.PAY_CYCLE_REQUEST);
+                    prop.add(Constants.LOAN_DATA, selectedLoan.getId());
+                    prop.add(Constants.AMOUNT, "-1");
 
  
                     MediaType mediaType = MediaType.parse("text/plain");
@@ -620,6 +629,8 @@ public class CustomerController {
                             .addHeader("Content-Type", "text/plain")
                             .build();
                     Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+
+                    response.close();
                     Platform.runLater(() -> {
                         updateData();
                         paymentErrorLabel.setText("Successfully paid " + selectedLoan.getPaymentAmount());
@@ -656,10 +667,10 @@ public class CustomerController {
         debtAmountProperty.set(Integer.parseInt(debtAmountField.getText()));
         Thread debtThread = new Thread(() -> {
             try {
-                Properties prop = new Properties();
-                prop.setProperty(Constants.TYPE, Constants.PAY_DEBT_REQUEST);
-                prop.setProperty(Constants.LOAN_DATA, selectedDebtLoan.getId());
-                prop.setProperty(Constants.AMOUNT, String.valueOf(debtAmountProperty.get()));
+                Props prop = new Props();
+                prop.add(Constants.TYPE, Constants.PAY_DEBT_REQUEST);
+                prop.add(Constants.LOAN_DATA, selectedDebtLoan.getId());
+                prop.add(Constants.AMOUNT, String.valueOf(debtAmountProperty.get()));
 
  
                 MediaType mediaType = MediaType.parse("text/plain");
@@ -670,6 +681,7 @@ public class CustomerController {
                         .addHeader("Content-Type", "text/plain")
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                response.close();
 
                 Platform.runLater(() -> {
                     updateData();
@@ -835,7 +847,6 @@ public class CustomerController {
 
     public CustomerController() {
         customerId = new SimpleStringProperty();
-        isFileSelected = new SimpleBooleanProperty();
         transactionModels = new ArrayList<>();
         loanPModelList = new ArrayList<>();
         investAmount = new SimpleIntegerProperty();
@@ -895,20 +906,21 @@ public class CustomerController {
             try {
                 String jsonRequest = Constants.GSON_INSTANCE.toJson(investmentsData);
 
-                Properties prop = new Properties();
+                Props prop = new Props();
 
-                prop.setProperty(Constants.TYPE, Constants.INTEGRATION_SUBMIT);
-                prop.setProperty(Constants.DATA, jsonRequest);
+                prop.add(Constants.TYPE, Constants.INTEGRATION_SUBMIT);
+                prop.add(Constants.DATA, jsonRequest);
 
 
  
                 MediaType mediaType = MediaType.parse("application/json");
-                RequestBody body = RequestBody.create(mediaType, jsonRequest);
+                RequestBody body = RequestBody.create(mediaType, prop.toString());
                 Request request = new Request.Builder()
                         .url(Constants.URL_INTEGRATION)
                         .method("POST", body)
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                response.close();
 
                 Platform.runLater(() -> {
                     clearAllFields();
@@ -950,6 +962,7 @@ public class CustomerController {
         updateNotifications();
         updateOwnedInvestments();
         updateTimeChart();
+        updateCategories();
     }
 
     public void startUpdateThread() {
@@ -974,9 +987,6 @@ public class CustomerController {
 
 
     public void updateCategories() {
-        if(!isFileSelected.get())
-            return;
-
         Thread updateCategories = new Thread(() -> {
             try {
  
@@ -986,18 +996,20 @@ public class CustomerController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                try (ResponseBody body = response.body()) {
-                    ClientInfoData data = Constants.GSON_INSTANCE.fromJson(body.string(), ClientInfoData.class);
-                    body.close();
-                    Collection<String> categories = data.getCategories();
-                    ObservableList<String> tempCategoriesList = FXCollections.observableArrayList();
-                    tempCategoriesList.addAll(categories);
-                    categoriesList = tempCategoriesList;
-                    balanceProperty.set(data.getBalance());
-                    Platform.runLater(() -> {
-                        categoriesComboBox.getItems().setAll(categoriesList);
-                        categoriesComboBox.getCheckModel().checkAll();
-                    });
+                if(response.isSuccessful()) {
+                    try (ResponseBody body = response.body()) {
+                        ClientInfoData data = Constants.GSON_INSTANCE.fromJson(body.string(), ClientInfoData.class);
+                        Collection<String> categories = data.getCategories();
+                        ObservableList<String> tempCategoriesList = FXCollections.observableArrayList();
+                        tempCategoriesList.addAll(categories);
+                        categoriesList = tempCategoriesList;
+                        balanceProperty.set(data.getBalance());
+                        Platform.runLater(() -> {
+                            categoriesComboBox.getItems().setAll(categoriesList);
+                            categoriesComboBox.getCheckModel().checkAll();
+                        });
+                        response.close();
+                    }
                 }
             } catch (Exception e) {
                 System.out.printf(e.getMessage() + " (2)");
@@ -1090,10 +1102,10 @@ public class CustomerController {
             if(response.isSuccessful()) {
                 try (ResponseBody body = response.body()) {
                     LoansWithVersion loansData = Constants.GSON_INSTANCE.fromJson(body.string(), LoansWithVersion.class);
-                    body.close();
                     return loansData;
                 }
             }
+            response.close();
         }
         catch (Exception e) {
             System.out.printf(e.getMessage() + " (3)");
@@ -1137,9 +1149,6 @@ public class CustomerController {
     }
 
 
-    public BooleanProperty isFileSelectedProperty() {
-        return isFileSelected;
-    }
 
     private ObservableList<TransactionModel> getTransactions() {
         return FXCollections.observableArrayList(transactionModels);
@@ -1150,8 +1159,6 @@ public class CustomerController {
     }
 
     private void updateTransactions() {
-        if(!isFileSelected.get())
-            return;
         Thread updateTransactions = new Thread(() -> {
             try {
 
@@ -1161,21 +1168,23 @@ public class CustomerController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                try (ResponseBody body = response.body()) {
-                    TransactionsData jsonResponse = Constants.GSON_INSTANCE.fromJson(body.string(), TransactionsData.class);
-                    body.close();
-                    List<TransactionData> transactionsData = jsonResponse.getTransactions();
-                    List<TransactionModel> tempTransactionModels = new ArrayList<>();
-                    for (TransactionData data : transactionsData) {
-                        tempTransactionModels.add(new TransactionModel.TransactionModelBuilder()
-                                .description(data.getDescription())
-                                .amount(data.getAmount())
-                                .previousBalance(data.getPreviousBalance())
-                                .yazMade(data.getYazMade())
-                                .build());
+                if(response.isSuccessful()) {
+                    try (ResponseBody body = response.body()) {
+                        TransactionsData jsonResponse = Constants.GSON_INSTANCE.fromJson(body.string(), TransactionsData.class);
+                        List<TransactionData> transactionsData = jsonResponse.getTransactions();
+                        List<TransactionModel> tempTransactionModels = new ArrayList<>();
+                        for (TransactionData data : transactionsData) {
+                            tempTransactionModels.add(new TransactionModel.TransactionModelBuilder()
+                                    .description(data.getDescription())
+                                    .amount(data.getAmount())
+                                    .previousBalance(data.getPreviousBalance())
+                                    .yazMade(data.getYazMade())
+                                    .build());
+                        }
+                        transactionModels = tempTransactionModels;
                     }
-                    transactionModels = tempTransactionModels;
                 }
+                response.close();
             }
             catch(Exception e) {
                 paymentErrorLabel.setText(e.getMessage());
@@ -1229,8 +1238,7 @@ public class CustomerController {
     }
 
     private void updateNotifications() {
-        if(!isFileSelected.get())
-            return;
+
         Thread updateNotifications = new Thread(() -> {
             List<NotificationData> notificationsData = null;
             try {
@@ -1240,24 +1248,26 @@ public class CustomerController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                try (ResponseBody body = response.body()) {
-                    NotificationsData jsonResponse = Constants.GSON_INSTANCE.fromJson(body.string(), NotificationsData.class);
-                    body.close();
-                    notificationsData = jsonResponse.getNotificationsList();
+                if(response.isSuccessful()) {
+                    try (ResponseBody body = response.body()) {
+                        NotificationsData jsonResponse = Constants.GSON_INSTANCE.fromJson(body.string(), NotificationsData.class);
+                        notificationsData = jsonResponse.getNotificationsList();
 
-                    List<NotificationModel> tempNotificationModels = new ArrayList<>();
-                    for (NotificationData data : notificationsData) {
-                        tempNotificationModels.add(new NotificationModel.NotificationModelBuilder()
-                                .message(data.getMessage())
-                                .yazMade(data.getYazMade())
-                                .build());
+                        List<NotificationModel> tempNotificationModels = new ArrayList<>();
+                        for (NotificationData data : notificationsData) {
+                            tempNotificationModels.add(new NotificationModel.NotificationModelBuilder()
+                                    .message(data.getMessage())
+                                    .yazMade(data.getYazMade())
+                                    .build());
+                        }
+                        notificationModels = tempNotificationModels;
+                        Platform.runLater(() -> {
+                            notificationsTable.setItems(getNotifications());
+                            notificationsTable.sort();
+                        });
                     }
-                    notificationModels = tempNotificationModels;
-                    Platform.runLater(() -> {
-                        notificationsTable.setItems(getNotifications());
-                        notificationsTable.sort();
-                    });
                 }
+                response.close();
 
             } catch (Exception e) {
                 System.out.println(e.getMessage() + " (5)");
@@ -1279,20 +1289,19 @@ public class CustomerController {
 
     private void makePaymentRequest(String type, int amount) {
         try {
-            Properties prop = new Properties();
-            prop.setProperty(Constants.TYPE, type);
-            prop.setProperty(Constants.AMOUNT, String.valueOf(amount));
+            String value = String.valueOf(amount);
 
-            OkHttpClient client = new OkHttpClient().newBuilder()
-                    .build();
             MediaType mediaType = MediaType.parse("text/plain");
-            RequestBody body = RequestBody.create(mediaType, prop.toString());
+            String content = Constants.TYPE + '=' + type + '\n' +
+                            Constants.AMOUNT + '=' + value;
+
+            RequestBody body = RequestBody.create(mediaType, content);
             Request request = new Request.Builder()
                     .url(Constants.URL_TRANSACTIONS)
                     .method("POST", body)
-                    .addHeader("Content-Type", "text/plain")
                     .build();
             Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+            response.close();
         } catch (Exception e) {
             System.out.println(e.getMessage() + " (7)");
         }
@@ -1352,17 +1361,19 @@ public class CustomerController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                try (ResponseBody body = response.body()) {
-                    InvestmentsSellData customerInvestments = Constants.GSON_INSTANCE.fromJson(body.string(), InvestmentsSellData.class);
-                    body.close();
-                    sellInvestmentModels = getInvModels(customerInvestments);
+                if(response.isSuccessful()) {
+                    try (ResponseBody body = response.body()) {
+                        InvestmentsSellData customerInvestments = Constants.GSON_INSTANCE.fromJson(body.string(), InvestmentsSellData.class);
+                        sellInvestmentModels = getInvModels(customerInvestments);
 
 
-                    Platform.runLater(() -> sellInvestmentTable.setItems(getSellInvestments()));
+                        Platform.runLater(() -> sellInvestmentTable.setItems(getSellInvestments()));
+                    }
                 }
+                response.close();
 
             } catch (Exception e) {
-                sellErrorLabel.setText(e.getMessage());
+                Platform.runLater(() -> sellErrorLabel.setText(e.getMessage()));
             }
         });
         updateOwnedInvestments.start();
@@ -1386,7 +1397,6 @@ public class CustomerController {
                 if(response.isSuccessful()) {
                     try (ResponseBody body = response.body()) {
                         PaymentsData data = Constants.GSON_INSTANCE.fromJson(body.string(), PaymentsData.class);
-                        body.close();
 
                         XYChart.Series series = new XYChart.Series();
                         XYChart.Series forecasting = new XYChart.Series();
@@ -1416,6 +1426,7 @@ public class CustomerController {
                         });
                     }
                 }
+                response.close();
             } catch (Exception e) {
                 System.out.println(e.getMessage() + " (9)");
             }
