@@ -38,7 +38,7 @@ public class AdminMain extends Application {
         primaryStage.show();
     }
 
-    @Override
+/*    @Override
     public void stop() {
 
         new Thread(() -> {
@@ -52,7 +52,7 @@ public class AdminMain extends Application {
                 System.out.println(e.getMessage());
             }
         }).start();
-    }
+    }*/
 
     public static void main(String[] args) {
         launch(args);

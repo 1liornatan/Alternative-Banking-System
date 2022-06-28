@@ -41,21 +41,6 @@ public class CustomerMain extends Application {
         primaryStage.show();
     }
 
-    @Override
-    public void stop() {
-
-        new Thread(() -> {
-            try {
-                Request request = new Request.Builder()
-                        .url(Constants.URL_LOGOUT)
-                        .build();
-
-                HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
-        }).start();
-    }
 
     public static void main(String[] args) {
         launch(args);

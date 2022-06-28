@@ -70,6 +70,7 @@ public class CustomerController {
     private final IntegerProperty paymentsAmountProperty;
     private LoanModel selectedDebtLoan;
     private final BooleanProperty animationProperty;
+    private int stopSignal;
 
     private int loansVer;
     private int pLoansVer;
@@ -353,6 +354,7 @@ public class CustomerController {
 
                 try (ResponseBody body = response.body()) {
                     InvestmentsSellData investmentsForSell = Constants.GSON_INSTANCE.fromJson(body.string(), InvestmentsSellData.class);
+                    body.close();
 
                     buyInvestmentModels = getInvModels(investmentsForSell);
 
@@ -518,6 +520,7 @@ public class CustomerController {
 
                     try (ResponseBody responseBody = response.body()) {
                         LoansData loansData = Constants.GSON_INSTANCE.fromJson(responseBody.string(), LoansData.class);
+                        responseBody.close();
                         Thread.sleep(1000);
                         Platform.runLater(() -> searchLoansProgressBar.setProgress(0.7));
                         updateMessage("Printing Loans...");
@@ -854,7 +857,7 @@ public class CustomerController {
 
     private void setupUpdateThread() {
         updateThread = new Thread(() -> {
-            while(true) {
+            while(stopSignal != 1) {
                 try {
                     updateData();
                     Thread.sleep(500);
@@ -862,6 +865,7 @@ public class CustomerController {
                     System.out.println("check update: " + e.getMessage());
                 }
             }
+            stopSignal = 0;
         });
     }
 
@@ -953,7 +957,7 @@ public class CustomerController {
     }
 
     public void stopUpdateThread() {
-        updateThread.interrupt();
+        stopSignal = 1;
     }
 
 
@@ -984,7 +988,7 @@ public class CustomerController {
 
                 try (ResponseBody body = response.body()) {
                     ClientInfoData data = Constants.GSON_INSTANCE.fromJson(body.string(), ClientInfoData.class);
-
+                    body.close();
                     Collection<String> categories = data.getCategories();
                     ObservableList<String> tempCategoriesList = FXCollections.observableArrayList();
                     tempCategoriesList.addAll(categories);
@@ -1013,15 +1017,18 @@ public class CustomerController {
 
             LoansWithVersion loaner = makeLoanRequest(Constants.REQUESTED_LOANS);
             LoansWithVersion lender = makeLoanRequest(Constants.INVESTED_LOANS);
-            int loansVer = lender.getLoansVer();
 
             if (loaner == null || lender == null) {
                 System.out.println("Cannot update loans");
                 return;
-            } else if (loansVer == this.loansVer) {
+            }
+
+            int dataLoansVer = lender.getLoansVer();
+
+            if (dataLoansVer == loansVer) {
                 return;
             } else {
-                this.loansVer = loansVer;
+                loansVer = dataLoansVer;
                 List<LoanData> loanerDataList = loaner.getData().getLoans();
                 List<LoanData> lenderDataList = lender.getData().getLoans();
 
@@ -1080,9 +1087,12 @@ public class CustomerController {
                     .build();
             Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-            try (ResponseBody body = response.body()) {
-                LoansWithVersion loansData = Constants.GSON_INSTANCE.fromJson(body.string(), LoansWithVersion.class);
-                return loansData;
+            if(response.isSuccessful()) {
+                try (ResponseBody body = response.body()) {
+                    LoansWithVersion loansData = Constants.GSON_INSTANCE.fromJson(body.string(), LoansWithVersion.class);
+                    body.close();
+                    return loansData;
+                }
             }
         }
         catch (Exception e) {
@@ -1098,11 +1108,15 @@ public class CustomerController {
             try {
                 LoansWithVersion loansWithVersion = makeLoanRequest(Constants.UNFINISHED_LOANS);
 
-                int loansVer = loansWithVersion.getLoansVer();
-                if(loansWithVersion == null || loansVer == pLoansVer)
+                if(loansWithVersion == null)
                     return;
 
-                pLoansVer = loansVer;
+                int dataLoansVer = loansWithVersion.getLoansVer();
+
+                if(dataLoansVer == pLoansVer)
+                    return;
+
+                pLoansVer = dataLoansVer;
 
                 loanerDataList = loansWithVersion.getData().getLoans();
 
@@ -1149,6 +1163,7 @@ public class CustomerController {
 
                 try (ResponseBody body = response.body()) {
                     TransactionsData jsonResponse = Constants.GSON_INSTANCE.fromJson(body.string(), TransactionsData.class);
+                    body.close();
                     List<TransactionData> transactionsData = jsonResponse.getTransactions();
                     List<TransactionModel> tempTransactionModels = new ArrayList<>();
                     for (TransactionData data : transactionsData) {
@@ -1227,6 +1242,7 @@ public class CustomerController {
 
                 try (ResponseBody body = response.body()) {
                     NotificationsData jsonResponse = Constants.GSON_INSTANCE.fromJson(body.string(), NotificationsData.class);
+                    body.close();
                     notificationsData = jsonResponse.getNotificationsList();
 
                     List<NotificationModel> tempNotificationModels = new ArrayList<>();
@@ -1338,6 +1354,7 @@ public class CustomerController {
 
                 try (ResponseBody body = response.body()) {
                     InvestmentsSellData customerInvestments = Constants.GSON_INSTANCE.fromJson(body.string(), InvestmentsSellData.class);
+                    body.close();
                     sellInvestmentModels = getInvModels(customerInvestments);
 
 
@@ -1366,35 +1383,38 @@ public class CustomerController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
-                try (ResponseBody body = response.body()) {
-                    PaymentsData data = Constants.GSON_INSTANCE.fromJson(body.string(), PaymentsData.class);
+                if(response.isSuccessful()) {
+                    try (ResponseBody body = response.body()) {
+                        PaymentsData data = Constants.GSON_INSTANCE.fromJson(body.string(), PaymentsData.class);
+                        body.close();
 
-                    XYChart.Series series = new XYChart.Series();
-                    XYChart.Series forecasting = new XYChart.Series();
-                    series.setName("Payments Received");
-                    forecasting.setName("Forecasting");
-                    //populating the series with data
+                        XYChart.Series series = new XYChart.Series();
+                        XYChart.Series forecasting = new XYChart.Series();
+                        series.setName("Payments Received");
+                        forecasting.setName("Forecasting");
+                        //populating the series with data
 
-                    List<Integer> payments = data.getPayments();
-                    List<Integer> amounts = data.getAmount();
+                        List<Integer> payments = data.getPayments();
+                        List<Integer> amounts = data.getAmount();
 
-                    int yaz = payments.size();
-                    int sum = 0;
+                        int yaz = payments.size();
+                        int sum = 0;
 
-                    for (i = 0; i < yaz; i++) {
-                        sum += amounts.get(i);
-                        series.getData().add(new XYChart.Data(String.valueOf(i + 1), amounts.get(i)));
+                        for (i = 0; i < yaz; i++) {
+                            sum += amounts.get(i);
+                            series.getData().add(new XYChart.Data(String.valueOf(i + 1), amounts.get(i)));
+                        }
+
+                        int avg = sum / (i + 1);
+                        for (int j = 0; j < i + 5; j++) {
+                            forecasting.getData().add(new XYChart.Data(String.valueOf(j + 1), avg * j));
+                        }
+
+                        Platform.runLater(() -> {
+                            timeLineChart.getData().clear();
+                            timeLineChart.getData().addAll(series, forecasting);
+                        });
                     }
-
-                    int avg = sum / (i + 1);
-                    for (int j = 0; j < i + 5; j++) {
-                        forecasting.getData().add(new XYChart.Data(String.valueOf(j + 1), avg * j));
-                    }
-
-                    Platform.runLater(() -> {
-                        timeLineChart.getData().clear();
-                        timeLineChart.getData().addAll(series, forecasting);
-                    });
                 }
             } catch (Exception e) {
                 System.out.println(e.getMessage() + " (9)");

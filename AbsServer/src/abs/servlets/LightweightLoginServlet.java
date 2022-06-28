@@ -63,6 +63,7 @@ public class LightweightLoginServlet extends HttpServlet {
                         //add the new user to the users list
                         if(!bankManager.isUserExists(usernameFromParameter))
                             bankManager.addCustomer(usernameFromParameter);
+
                         userManager.addUser(usernameFromParameter);
                         //set the username in a session so it will be available on each request
                         //the true parameter means that if a session object does not exists yet

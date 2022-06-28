@@ -156,8 +156,12 @@ public class LoginController {
             try {
                 Response response = makeDisconnectRequest();
                 if(response.isSuccessful()) {
+                    HttpClientUtil.shutdown();
+                    HttpClientUtil.removeCookiesOf(Constants.ADDRESS);
+                    customerController.stopUpdateThread();
                     Platform.runLater(() -> {
                         setDisconnected();
+                        setSuccessMessage("Logged out Successfully");
                         borderPane.setCenter(null);
                     });
                 }
@@ -209,8 +213,10 @@ public class LoginController {
                     else {
                         String errorMessage = "";
                         try (ResponseBody body = response.body()) {
-                            if (body != null)
+                            if (body != null) {
                                 errorMessage = body.string();
+                                body.close();
+                            }
 
                             String finalErrorMessage = errorMessage;
                             Platform.runLater(() -> setErrorMessage(finalErrorMessage));

@@ -74,6 +74,7 @@ public class AdminController {
     private Thread updateThread;
 
 
+
     @FXML
     void logoutButtonYaz(ActionEvent event) {
         HttpClientUtil.runAsync(Constants.URL_LOGOUT, new Callback() {
@@ -116,19 +117,23 @@ public class AdminController {
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                 try(ResponseBody body = response.body()) {
+                    String responseBody = body.string();
                     if (response.code() != 200) {
-
-                        String responseBody = body.string();
                         Platform.runLater(() ->
                                 System.out.println("Something went wrong: " + responseBody)
                         );
                     } else {
-                        String rawBody = body.string();
-                        PaymentsData data = Constants.GSON_INSTANCE.fromJson(rawBody, PaymentsData.class);
+
+                        PaymentsData data = Constants.GSON_INSTANCE.fromJson(responseBody, PaymentsData.class);
 
                         Platform.runLater(() -> {
                             updateCharts(data);
                         });
+                    }
+                }
+                finally {
+                    if (response != null && response.body() != null) {
+                        response.body().close();
                     }
                 }
 
@@ -299,14 +304,14 @@ public class AdminController {
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
                 try (ResponseBody body = response.body()) {
+                    String responseBody = body.string();
+                    body.close();
                     if (response.code() != 200) {
-                        String responseBody = body.string();
                         Platform.runLater(() ->
                                 System.out.println("Something went wrong: " + responseBody)
                         );
                     } else {
-                        String rawBody = body.string();
-                        LoansWithVersion loansWithVersion = Constants.GSON_INSTANCE.fromJson(rawBody, LoansWithVersion.class);
+                        LoansWithVersion loansWithVersion = Constants.GSON_INSTANCE.fromJson(responseBody, LoansWithVersion.class);
                         LoansData loansData = loansWithVersion.getData();
                         List<LoanData> loanDataList = loansData.getLoans();
 
@@ -476,14 +481,14 @@ public class AdminController {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 try(ResponseBody body = response.body()) {
+                    String responseBody = body.string();
                     if (response.code() != 200) {
-                        String responseBody = body.string();
+
                         Platform.runLater(() ->
                                 System.out.println("Something went wrong: " + responseBody)
                         );
                     } else {
-                        String rawBody = body.string();
-                        CustomersWithVersion customersWithVerData = Constants.GSON_INSTANCE.fromJson(rawBody, CustomersWithVersion.class);
+                        CustomersWithVersion customersWithVerData = Constants.GSON_INSTANCE.fromJson(responseBody, CustomersWithVersion.class);
                         CustomersData customersData = customersWithVerData.getData();
 
                         int ver = customersWithVerData.getCustomersVer();
@@ -494,6 +499,11 @@ public class AdminController {
                             customerModelList = tempCustomerModelList;
                             Platform.runLater(() -> updateCustomersTable());
                         }
+                    }
+                }
+                finally {
+                    if (response != null && response.body() != null) {
+                        response.body().close();
                     }
                 }
             }
