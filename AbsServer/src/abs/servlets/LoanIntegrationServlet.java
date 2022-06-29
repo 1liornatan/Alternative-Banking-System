@@ -31,6 +31,7 @@ public class LoanIntegrationServlet extends HttpServlet {
 
         if (usernameFromSession == null) { //user is not logged in yet
             outputStream.print("Not logged in yet.");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
             Properties prop = new Properties();
             prop.load(request.getInputStream());
@@ -44,11 +45,10 @@ public class LoanIntegrationServlet extends HttpServlet {
                         LoansData integrationLoans = bankManager.getIntegrationLoans(requestDTO);
                         String jsonResponse = Constants.GSON_INSTANCE.toJson(integrationLoans);
 
-                        try (PrintWriter out = response.getWriter()) {
-                            out.print(jsonResponse);
-                            out.flush();
-                            response.setStatus(HttpServletResponse.SC_OK);
-                        }
+                        outputStream.print(jsonResponse);
+                        outputStream.flush();
+
+                        response.setStatus(HttpServletResponse.SC_OK);
                         logServerMessage("Loan Integration Response (" + usernameFromSession + "): " + jsonRequest);
                     } catch (InvalidPercentException e) {
                         response.setStatus(HttpServletResponse.SC_CONFLICT);

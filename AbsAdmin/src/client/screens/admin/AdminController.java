@@ -54,6 +54,9 @@ public class AdminController {
     private Button customersButton;
 
     @FXML
+    private TextField currYazTextField;
+
+    @FXML
     private Button loansButton;
 
     @FXML
@@ -261,22 +264,46 @@ public class AdminController {
 
     @FXML
     void increaseYazButtonAction(ActionEvent event) {
-/*        Thread increaseYazThread = new Thread(() -> {
+        Thread increaseYazThread = new Thread(() -> {
             try {
-                bankInstance.advanceOneYaz();
-                updateBankData();
-                int currYaz = bankInstance.getCurrentYaz();
-                Platform.runLater(() -> currYazProperty.set(currYaz));
+                MediaType mediaType = MediaType.parse("text/plain");
+                RequestBody body = RequestBody.create(mediaType, "");
+                Request request = new Request.Builder()
+                        .url(Constants.URL_TIME)
+                        .method("POST", body)
+                        .build();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                response.close();
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         });
-        increaseYazThread.start();*/
+        increaseYazThread.start();
     }
 
     public void updateBankData() {
         updateCustomersData();
         updateLoansData();
+        updateTimeData();
+    }
+
+    private void updateTimeData() {
+        new Thread(() -> {
+            try {
+                Request request = new Request.Builder()
+                        .url(Constants.URL_TIME)
+                        .build();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                if(response.isSuccessful()) {
+                    try (ResponseBody responseBody = response.body()) {
+                        currYazProperty.set(Integer.parseInt(responseBody.string()));
+                    }
+                }
+                response.close();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }).start();
     }
 
     private void updateLoansData() {
@@ -420,8 +447,6 @@ public class AdminController {
         loansVer = 0;
     }
 
-    public IntegerProperty getCurrYazProperty() { return currYazProperty; }
-
     public void startUpdateThread() {
         updateThread.start();
     }
@@ -434,6 +459,7 @@ public class AdminController {
         setDataTables();
         increaseYazButton.setText("Increase\nYaz");
         increaseYazButton.setStyle("-fx-text-alignment: CENTER;");
+        currYazTextField.textProperty().bind(currYazProperty.asString());
     }
 
     public boolean isIsLoggedIn() {

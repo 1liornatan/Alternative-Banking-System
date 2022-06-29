@@ -115,4 +115,12 @@ public class BankManager {
     public int getLoansVersion() {
         return bankInstance.getLoansVer();
     }
+
+    public int getCurrentYaz() {
+        return bankInstance.getCurrentYaz();
+    }
+
+    public void increaseYaz() throws DataNotFoundException, NonPositiveAmountException {
+        bankInstance.advanceOneYaz();
+    }
 }

@@ -1,6 +1,7 @@
 package client.screens.customer;
 
 import client.screens.CustomerMain;
+import com.sun.deploy.util.BlackList;
 import http.constants.Constants;
 import http.utils.HttpClientUtil;
 import http.utils.Props;
@@ -121,6 +122,9 @@ public class CustomerController {
     private ProgressBar searchLoansProgressBar;
 
     @FXML
+    private TextField currYazField;
+
+    @FXML
     private Label progressBarStatusLabel;
 
     @FXML
@@ -194,6 +198,9 @@ public class CustomerController {
     private LineChart<String, Number> timeLineChart;
     private Timeline walkTimeline;
     private Thread updateThread;
+    private IntegerProperty currYazProperty;
+    private int categoriesVer;
+    private int forecastVer;
 
     @FXML
     void loadFileButtonAction(ActionEvent ignoredEvent) {
@@ -309,7 +316,7 @@ public class CustomerController {
 
                     prop.add(Constants.TYPE, Constants.LIST_INVESTMENT_REQUEST);
                     prop.add(Constants.INVESTMENT_DATA, jsonRequest);
-                    
+
                     MediaType mediaType = MediaType.parse("text/plain");
                     RequestBody body = RequestBody.create(mediaType, prop.toString());
                     Request request = new Request.Builder()
@@ -746,6 +753,7 @@ public class CustomerController {
         minYazField.setText("0");
         maxOwnershipField.setText("0");
         maxLoanerLoansField.setText("0");
+        currYazField.textProperty().bind(currYazProperty.asString());
 
         investButton.setDisable(true);
         tablesLeftButton.setDisable(true);
@@ -861,8 +869,11 @@ public class CustomerController {
         paymentsAmountProperty = new SimpleIntegerProperty();
         debtAmountProperty = new SimpleIntegerProperty();
         animationProperty = new SimpleBooleanProperty(true);
+        currYazProperty = new SimpleIntegerProperty(0);
         loansVer = 0;
         pLoansVer = 0;
+        categoriesVer = 0;
+        forecastVer = 0;
         setupUpdateThread();
     }
 
@@ -963,6 +974,7 @@ public class CustomerController {
         updateOwnedInvestments();
         updateTimeChart();
         updateCategories();
+        updateTimeData();
     }
 
     public void startUpdateThread() {
@@ -1004,10 +1016,14 @@ public class CustomerController {
                         tempCategoriesList.addAll(categories);
                         categoriesList = tempCategoriesList;
                         balanceProperty.set(data.getBalance());
-                        Platform.runLater(() -> {
-                            categoriesComboBox.getItems().setAll(categoriesList);
-                            categoriesComboBox.getCheckModel().checkAll();
-                        });
+                        int categoriesVer = data.getCategoriesVer();
+                        if(this.categoriesVer != categoriesVer) {
+                            this.categoriesVer = categoriesVer;
+                            Platform.runLater(() -> {
+                                categoriesComboBox.getItems().setAll(categoriesList);
+                                categoriesComboBox.getCheckModel().checkAll();
+                            });
+                        }
                         response.close();
                     }
                 }
@@ -1396,34 +1412,40 @@ public class CustomerController {
 
                 if(response.isSuccessful()) {
                     try (ResponseBody body = response.body()) {
+
                         PaymentsData data = Constants.GSON_INSTANCE.fromJson(body.string(), PaymentsData.class);
 
-                        XYChart.Series series = new XYChart.Series();
-                        XYChart.Series forecasting = new XYChart.Series();
-                        series.setName("Payments Received");
-                        forecasting.setName("Forecasting");
-                        //populating the series with data
+                        int forecastVer = data.getForecastVer();
+                        if(this.forecastVer != forecastVer) {
 
-                        List<Integer> payments = data.getPayments();
-                        List<Integer> amounts = data.getAmount();
+                            this.forecastVer = forecastVer;
+                            XYChart.Series series = new XYChart.Series();
+                            XYChart.Series forecasting = new XYChart.Series();
+                            series.setName("Payments Received");
+                            forecasting.setName("Forecasting");
+                            //populating the series with data
 
-                        int yaz = payments.size();
-                        int sum = 0;
+                            List<Integer> payments = data.getPayments();
+                            List<Integer> amounts = data.getAmount();
 
-                        for (i = 0; i < yaz; i++) {
-                            sum += amounts.get(i);
-                            series.getData().add(new XYChart.Data(String.valueOf(i + 1), amounts.get(i)));
+                            int yaz = payments.size();
+                            int sum = 0;
+
+                            for (i = 0; i < yaz; i++) {
+                                sum += amounts.get(i);
+                                series.getData().add(new XYChart.Data(String.valueOf(i + 1), amounts.get(i)));
+                            }
+
+                            int avg = sum / (i + 1);
+                            for (int j = 0; j < i + 5; j++) {
+                                forecasting.getData().add(new XYChart.Data(String.valueOf(j + 1), avg * j));
+                            }
+
+                            Platform.runLater(() -> {
+                                timeLineChart.getData().clear();
+                                timeLineChart.getData().addAll(series, forecasting);
+                            });
                         }
-
-                        int avg = sum / (i + 1);
-                        for (int j = 0; j < i + 5; j++) {
-                            forecasting.getData().add(new XYChart.Data(String.valueOf(j + 1), avg * j));
-                        }
-
-                        Platform.runLater(() -> {
-                            timeLineChart.getData().clear();
-                            timeLineChart.getData().addAll(series, forecasting);
-                        });
                     }
                 }
                 response.close();
@@ -1446,5 +1468,23 @@ public class CustomerController {
         animationImage.setVisible(false);
     }
 
+    private void updateTimeData() {
+        new Thread(() -> {
+            try {
+                Request request = new Request.Builder()
+                        .url(Constants.URL_TIME)
+                        .build();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                if(response.isSuccessful()) {
+                    try (ResponseBody responseBody = response.body()) {
+                        currYazProperty.set(Integer.parseInt(responseBody.string()));
+                    }
+                }
+                response.close();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }).start();
+    }
 }
 

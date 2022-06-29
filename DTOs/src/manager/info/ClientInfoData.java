@@ -6,10 +6,16 @@ import java.util.Set;
 public class ClientInfoData {
     final Set<String> categories;
     final int balance;
+    private final int categoriesVer;
 
     private ClientInfoData(ClientInfoDataBuilder clientInfoDataBuilder) {
         this.categories = clientInfoDataBuilder.categories;
         this.balance = clientInfoDataBuilder.balance;
+        this.categoriesVer = clientInfoDataBuilder.categoriesVer;
+    }
+
+    public int getCategoriesVer() {
+        return categoriesVer;
     }
 
     public Set<String> getCategories() {
@@ -23,6 +29,7 @@ public class ClientInfoData {
     public static class ClientInfoDataBuilder {
         Set<String> categories;
         int balance;
+        private int categoriesVer;
 
         public ClientInfoDataBuilder() {
             categories = new HashSet<>();
@@ -41,6 +48,11 @@ public class ClientInfoData {
 
         public ClientInfoData build() {
             return new ClientInfoData(this);
+        }
+
+        public ClientInfoDataBuilder version(int categoriesVer) {
+            this.categoriesVer = categoriesVer;
+            return this;
         }
     }
 }

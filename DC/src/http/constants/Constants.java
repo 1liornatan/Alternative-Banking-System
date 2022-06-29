@@ -51,4 +51,5 @@ public class Constants {
     public static final String DATA = "data";
     public static final String URL_UPLOAD = URL_BASE + "/bank/upload-file";
     public static final String ADDRESS = "localhost";
+    public static final String URL_TIME = URL_BASE + "/bank/time";
 }

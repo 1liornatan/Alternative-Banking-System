@@ -1,12 +1,26 @@
 package manager.investments;
 
+import manager.info.ClientInfoData;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class PaymentsData {
+    private final int forecastVer;
+    private final List<Integer> payments;
+    private final List<Integer> amount;
+
+
     public static class PaymentsDataBuilder {
         List<Integer> payments;
         List<Integer> amount;
+        private int forecastVer;
 
+        public PaymentsDataBuilder() {
+            payments = new ArrayList<>();
+            amount = new ArrayList<>();
+            forecastVer = 0;
+        }
         public PaymentsDataBuilder payments(List<Integer> payments) {
             this.payments = payments;
             return this;
@@ -20,14 +34,17 @@ public class PaymentsData {
         public PaymentsData build() {
             return new PaymentsData(this);
         }
-    }
 
-    final List<Integer> payments;
-    final List<Integer> amount;
+        public PaymentsDataBuilder version(int forecastVer) {
+            this.forecastVer = forecastVer;
+            return this;
+        }
+    }
 
     private PaymentsData(PaymentsDataBuilder builder) {
         this.payments = builder.payments;
         this.amount = builder.amount;
+        this.forecastVer = builder.forecastVer;
     }
 
     public List<Integer> getPayments() {
@@ -36,5 +53,9 @@ public class PaymentsData {
 
     public List<Integer> getAmount() {
         return amount;
+    }
+
+    public int getForecastVer() {
+        return forecastVer;
     }
 }

@@ -53,6 +53,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BankImpl implements Bank {
+
     private DataStorage<CustomerAccount> customersAccounts;
     private DataStorage<Account> loanAccounts;
     private DataStorage<Transaction> transactions;
@@ -63,6 +64,8 @@ public class BankImpl implements Bank {
     private TimeHandler timeHandler;
     private int customersVer;
     private int loansVer;
+    private int categoriesVer;
+    private int forecastVer;
 
     public BankImpl() {
         timeHandler = new BankTimeHandler();
@@ -75,6 +78,8 @@ public class BankImpl implements Bank {
         sellInvestmentsDataStorage = new BankDataStorage<>(timeHandler);
         customersVer = 0;
         loansVer = 0;
+        categoriesVer = 0;
+        forecastVer = 0;
     }
 
     @Override
@@ -256,6 +261,7 @@ public class BankImpl implements Bank {
                     return getMissingCycles(loan) > 1;
                 })
                 .forEach(pair -> updateRiskStatus(pair.getKey()));
+        loansVer++;
     }
 
     private void updateRiskStatus(Loan loan) {
@@ -311,6 +317,7 @@ public class BankImpl implements Bank {
         loanHandler.payOneCycle(loan);
         customersVer++;
         loansVer++;
+        forecastVer++;
     }
 
     @Override
@@ -355,7 +362,7 @@ public class BankImpl implements Bank {
         try {
             deriskLoan(loans.getDataById(loanId));
         } catch (DataNotFoundException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -410,6 +417,7 @@ public class BankImpl implements Bank {
             loansList.add(loans.getDataById(loanId));
         }
         setInvestments(investmentsData.getInvestorId(), loansList, investmentsData.getAmount());
+        loansVer++;
     }
     @Override
     public void createInvestment(String investor, Loan loan, int amount) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
@@ -839,6 +847,7 @@ public class BankImpl implements Bank {
             loanHandler.payLoanByAmount(loan, amount);
             customersVer++;
             loansVer++;
+            forecastVer++;
             updateActiveStatus(loan);
         } catch (DataNotFoundException | NoMoneyException | NonPositiveAmountException e) {
             System.out.println(e.getMessage());
@@ -874,6 +883,7 @@ public class BankImpl implements Bank {
         CustomerAccount customer = customersAccounts.getDataById(loan.getOwnerId());
         customer.addNotification(new BankNotification("Closed '" + loan.getId() + "' for " + amountToCloseLoan, getCurrentYaz()));
         customersVer++;
+        forecastVer++;
         loansVer++;
     }
 
@@ -904,7 +914,7 @@ public class BankImpl implements Bank {
                         System.out.println(e.getMessage());
                     }
                 });
-        return new PaymentsData.PaymentsDataBuilder().payments(payments).amount(amounts).build();
+        return new PaymentsData.PaymentsDataBuilder().payments(payments).amount(amounts).version(forecastVer).build();
     }
 
     @Override
@@ -1007,6 +1017,7 @@ public class BankImpl implements Bank {
             loans.addData(loanData);
             categories.add(categoryName);
         }
+        categoriesVer++;
         customersVer++;
         loansVer++;
     }
@@ -1017,6 +1028,7 @@ public class BankImpl implements Bank {
         return new ClientInfoData.ClientInfoDataBuilder()
                 .balance(customerAccount.getBalance())
                 .categories(categories)
+                .version(categoriesVer)
                 .build();
     }
 
