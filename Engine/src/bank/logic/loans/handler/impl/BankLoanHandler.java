@@ -98,7 +98,7 @@ public class BankLoanHandler implements LoanHandler {
 
         if(loanAmount == loan.getLoanAccount().getBalance()) {
             requester = customers.getDataById(loan.getOwnerId());
-            transactions.addData(loanAccount.withdraw(loanAmount, "Loan started"));
+            transactions.addData(loanAccount.withdraw(loanAmount, "Loan '" + loan.getId() + "' started"));
             transactions.addData(requester.deposit(loanAmount, "Loan '" + loan.getId() + "' started"));
             loan.setPayments();
             loan.setStatus(LoanStatus.ACTIVE);

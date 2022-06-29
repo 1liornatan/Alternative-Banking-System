@@ -45,11 +45,9 @@ public class NotificationServlet extends HttpServlet {
             }
             String jsonResponse = Constants.GSON_INSTANCE.toJson(notifications);
 
-            try (PrintWriter out = response.getWriter()) {
-                out.print(jsonResponse);
-                out.flush();
-                response.setStatus(HttpServletResponse.SC_OK);
-            }
+            outputStream.print(jsonResponse);
+            outputStream.flush();
+            response.setStatus(HttpServletResponse.SC_OK);
             logServerMessage("Notifications Response (" + usernameFromSession + "): " + jsonResponse);
         }
     }
