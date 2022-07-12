@@ -75,6 +75,7 @@ public class CustomerController {
 
     private int loansVer;
     private int pLoansVer;
+    private int notificationsVer;
 
 
     final static Image WALK_1 = new Image(Objects.requireNonNull(CustomerController.class.getResource("/screens/resources/animation/1.png")).toString());
@@ -872,6 +873,7 @@ public class CustomerController {
         currYazProperty = new SimpleIntegerProperty(0);
         loansVer = 0;
         pLoansVer = 0;
+        notificationsVer = 0;
         categoriesVer = 0;
         forecastVer = 0;
         setupUpdateThread();
@@ -1255,6 +1257,7 @@ public class CustomerController {
 
     private void updateNotifications() {
 
+
         Thread updateNotifications = new Thread(() -> {
             List<NotificationData> notificationsData = null;
             try {
@@ -1268,7 +1271,9 @@ public class CustomerController {
                     try (ResponseBody body = response.body()) {
                         NotificationsData jsonResponse = Constants.GSON_INSTANCE.fromJson(body.string(), NotificationsData.class);
                         notificationsData = jsonResponse.getNotificationsList();
-
+                        if(jsonResponse.getNotificationVersion() != notificationsVer)
+                            return;
+                        notificationsVer = jsonResponse.getNotificationVersion();
                         List<NotificationModel> tempNotificationModels = new ArrayList<>();
                         for (NotificationData data : notificationsData) {
                             tempNotificationModels.add(new NotificationModel.NotificationModelBuilder()
