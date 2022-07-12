@@ -52,4 +52,9 @@ public class Constants {
     public static final String URL_UPLOAD = URL_BASE + "/bank/upload-file";
     public static final String ADDRESS = "localhost";
     public static final String URL_TIME = URL_BASE + "/bank/time";
+    public static final String REWIND = "rewind";
+    public static final String RESET = "reset";
+    public static final String NO_TYPE_MESSAGE = "Body type parameter not found.";
+    public static final String INVALID_TIME_MESSAGE = "Body time parameter is invalid";
+    public static final String URL_REWIND = URL_TIME + "/rewind";
 }

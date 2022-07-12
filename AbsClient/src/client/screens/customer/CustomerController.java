@@ -33,6 +33,7 @@ import manager.loans.LoansData;
 import manager.loans.LoansWithVersion;
 import manager.messages.NotificationData;
 import manager.messages.NotificationsData;
+import manager.time.TimeData;
 import manager.transactions.TransactionData;
 import manager.transactions.TransactionsData;
 import models.InvestmentModel;
@@ -71,6 +72,8 @@ public class CustomerController {
     private final IntegerProperty paymentsAmountProperty;
     private LoanModel selectedDebtLoan;
     private final BooleanProperty animationProperty;
+    private final BooleanProperty readOnlyProperty;
+
     private int stopSignal;
 
     private int loansVer;
@@ -90,6 +93,35 @@ public class CustomerController {
     final static Image WALK_11 = new Image(Objects.requireNonNull(CustomerController.class.getResource("/screens/resources/animation/11.png")).toString());
     final static Image WALK_12 = new Image(Objects.requireNonNull(CustomerController.class.getResource("/screens/resources/animation/12.png")).toString());
     final static Image WALK_13 = new Image(Objects.requireNonNull(CustomerController.class.getResource("/screens/resources/animation/13.png")).toString());
+
+
+
+    @FXML
+    private Button buyInvestmentButton;
+
+    @FXML
+    private Button listInvestmentButton;
+
+    @FXML
+    private Button unlistInvestmentButton;
+
+    @FXML
+    private Button investButton;
+
+    @FXML
+    private Button payCycleButton;
+
+    @FXML
+    private Button closeLoanButton;
+
+    @FXML
+    private Button payDebtButton;
+
+    @FXML
+    private Button chargeButton;
+
+    @FXML
+    private Button withdrawButton;
 
     @FXML
     private ImageView animationImage;
@@ -168,9 +200,6 @@ public class CustomerController {
 
     @FXML
     private Button tablesLeftButton;
-
-    @FXML
-    private Button investButton;
 
     @FXML
     private HBox debtPaymentHBox;
@@ -710,10 +739,10 @@ public class CustomerController {
         setFieldLimits(amountField);
         infAmountField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
-                maxLoanerLoansField.setText(newValue.replaceAll("[^\\d]", ""));
+                infAmountField.setText(newValue.replaceAll("[^\\d]", ""));
             }
             else if(newValue.isEmpty())
-                maxLoanerLoansField.setText("0");
+                infAmountField.setText("0");
         });
         minInterestField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
@@ -761,6 +790,24 @@ public class CustomerController {
         setLoansIntegrationButtons();
         debtPaymentHBox.setDisable(true);
         setWalkAnimation();
+
+        setReadOnlyDisables();
+
+    }
+
+    private void setReadOnlyDisables() {
+
+        loadFileButton.disableProperty().bind(readOnlyProperty);
+        withdrawButton.disableProperty().bind(readOnlyProperty);
+        chargeButton.disableProperty().bind(readOnlyProperty);
+        searchLoansButton.disableProperty().bind(readOnlyProperty);
+        investButton.disableProperty().bind(readOnlyProperty);
+        payCycleButton.disableProperty().bind(readOnlyProperty);
+        closeLoanButton.disableProperty().bind(readOnlyProperty);
+        payDebtButton.disableProperty().bind(readOnlyProperty);
+        buyInvestmentButton.disableProperty().bind(readOnlyProperty);
+        unlistInvestmentButton.disableProperty().bind(readOnlyProperty);
+        listInvestmentButton.disableProperty().bind(readOnlyProperty);
 
     }
 
@@ -875,6 +922,7 @@ public class CustomerController {
         categoriesVer = 0;
         forecastVer = 0;
         setupUpdateThread();
+        readOnlyProperty = new SimpleBooleanProperty(false);
     }
 
     private void setupUpdateThread() {
@@ -1477,7 +1525,10 @@ public class CustomerController {
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
                 if(response.isSuccessful()) {
                     try (ResponseBody responseBody = response.body()) {
-                        currYazProperty.set(Integer.parseInt(responseBody.string()));
+                        String jsonResponse = responseBody.string();
+                        TimeData data = Constants.GSON_INSTANCE.fromJson(jsonResponse, TimeData.class);
+                        currYazProperty.set(data.getTime());
+                        readOnlyProperty.set(data.isReadOnly());
                     }
                 }
                 response.close();

@@ -6,11 +6,13 @@ import bank.logic.accounts.impl.exceptions.NonPositiveAmountException;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.manager.BankManager;
 import bank.users.UserManager;
+import http.constants.Constants;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import manager.time.TimeData;
 
 import java.io.IOException;
 
@@ -29,8 +31,9 @@ public class TimeServlet extends HttpServlet {
             outputStream.print("You must login first.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
-            int currentYaz = bankManager.getCurrentYaz();
-            outputStream.print(currentYaz);
+            TimeData data = bankManager.getTimeData();
+            String jsonResponse = Constants.GSON_INSTANCE.toJson(data);
+            outputStream.print(jsonResponse);
             response.setStatus(HttpServletResponse.SC_OK);
         }
     }

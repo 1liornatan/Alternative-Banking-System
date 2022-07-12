@@ -21,6 +21,7 @@ import manager.loans.LoanData;
 import manager.loans.LoansDTO;
 import manager.loans.LoansData;
 import manager.messages.NotificationsData;
+import manager.time.TimeData;
 import manager.time.YazSystemDTO;
 import manager.transactions.TransactionDTO;
 import manager.transactions.TransactionData;
@@ -150,4 +151,11 @@ public interface Bank {
     int getCustomersVer();
 
     int getLoansVer();
+
+    void setRewind(int time);
+
+    void resetRewind();
+
+    TimeData getTimeData();
+
 }

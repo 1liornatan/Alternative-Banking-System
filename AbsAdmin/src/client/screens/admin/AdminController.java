@@ -3,6 +3,7 @@ package client.screens.admin;
 import com.sun.istack.internal.NotNull;
 import http.constants.Constants;
 import http.utils.HttpClientUtil;
+import http.utils.Props;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -70,6 +71,15 @@ public class AdminController {
 
     @FXML
     private LineChart<String, Integer> timeLineChart;
+
+    @FXML
+    private TextField rewindTextField;
+
+    @FXML
+    private Button startRewindButton;
+
+    @FXML
+    private Button stopRewindButton;
 
 
     private StringProperty loginErrorMessageProperty;
@@ -260,6 +270,49 @@ public class AdminController {
 
         timeLineChart.getData().clear();
         timeLineChart.getData().addAll(series, forecasting/*, seriesA, forecastingA*/);
+    }
+
+    @FXML
+    void startRewindButtonAction(ActionEvent event) {
+        new Thread(() -> {
+            try {
+                Props props = new Props();
+                props.add(Constants.TYPE, Constants.REWIND);
+                props.add(Constants.AMOUNT, rewindTextField.getText());
+
+                MediaType mediaType = MediaType.parse("text/plain");
+                RequestBody body = RequestBody.create(mediaType, props.toString());
+                Request request = new Request.Builder()
+                        .url(Constants.URL_REWIND)
+                        .method("POST", body)
+                        .build();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                response.close();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }).start();
+    }
+
+    @FXML
+    void stopRewindButtonAction(ActionEvent event) {
+        new Thread(() -> {
+            try {
+                Props props = new Props();
+                props.add(Constants.TYPE, Constants.RESET);
+
+                MediaType mediaType = MediaType.parse("text/plain");
+                RequestBody body = RequestBody.create(mediaType, props.toString());
+                Request request = new Request.Builder()
+                        .url(Constants.URL_REWIND)
+                        .method("POST", body)
+                        .build();
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                response.close();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }).start();
     }
 
     @FXML
@@ -460,6 +513,19 @@ public class AdminController {
         increaseYazButton.setText("Increase\nYaz");
         increaseYazButton.setStyle("-fx-text-alignment: CENTER;");
         currYazTextField.textProperty().bind(currYazProperty.asString());
+        stopRewindButton.disableProperty().bind(startRewindButton.disableProperty().not());
+        rewindTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            int currYaz = currYazProperty.get();
+            if (!newValue.matches("\\d*")) {
+                rewindTextField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+            else if(newValue.isEmpty()) {
+                rewindTextField.setText("1");
+            }
+            else if(Integer.parseInt(newValue) > currYaz) {
+                rewindTextField.setText(String.valueOf(currYaz));
+            }
+        });
     }
 
     public boolean isIsLoggedIn() {

@@ -3,6 +3,7 @@ package bank.logic.data.storage.impl;
 import bank.logic.data.storage.DataStorage;
 import bank.logic.data.Singular;
 import bank.logic.impl.exceptions.DataNotFoundException;
+import bank.logic.impl.exceptions.ReadOnlyException;
 import bank.logic.time.TimeHandler;
 import javafx.util.Pair;
 
@@ -10,14 +11,14 @@ import java.io.Serializable;
 import java.util.*;
 
 public class BankDataStorage<E extends Singular> implements DataStorage<E>, Serializable {
-    private final Map<String, F> container;
+    private final Map<String, DataTimePair> container;
     private final TimeHandler timeHandler;
 
-    public class F implements Serializable {
+    public class DataTimePair implements Serializable {
         final E data;
         final int time;
 
-        public F(E data) {
+        public DataTimePair(E data) {
             this.data = data;
             this.time = timeHandler.getCurrentTime();
         }
@@ -51,9 +52,10 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
     public void remove(String id) {
         container.remove(id);
     }
+
     @Override
     public Pair<E, Integer> getDataPair(String id) throws DataNotFoundException {
-        F dataBox;
+        DataTimePair dataBox;
         synchronized (this) {
             dataBox = container.get(id);
         }
@@ -61,12 +63,18 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
         if(dataBox == null)
             throw new DataNotFoundException(id);
 
-        return new Pair<>(dataBox.getData(), dataBox.getTime());
+
+        int time = dataBox.getTime();
+
+/*        if (timeHandler.isReadOnly() && time > timeHandler.getCurrentTime())
+            throw new DataTimeException(id);*/
+
+        return new Pair<>(dataBox.getData(), time);
     }
 
     @Override
     public E getDataById(String id) throws DataNotFoundException {
-        F dataBox;
+        DataTimePair dataBox;
         synchronized (this) {
             dataBox = container.get(id);
         }
@@ -79,13 +87,17 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
     @Override
     public Collection<Pair<E, Integer>> getAllPairs() {
         Collection<Pair<E, Integer>> dataCollection = new ArrayList<>();
-        Collection<F> values;
+        Collection<DataTimePair> values;
         synchronized (this) {
             values = container.values();
         }
 
-        for (F value : values) {
-            dataCollection.add(new Pair<>(value.getData(), value.getTime()));
+        int currentTime = timeHandler.getCurrentTime();
+
+        for (DataTimePair value : values) {
+            int time = value.getTime();
+            if(time <= currentTime)
+                dataCollection.add(new Pair<>(value.getData(), time));
         }
         return dataCollection;
     }
@@ -94,15 +106,18 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
     public Collection<E> getDataByIds(Collection<String> ids) throws DataNotFoundException {
         Collection<E> data = new HashSet<>();
 
+        int currentTime = timeHandler.getCurrentTime();
+
         for(String currId : ids) {
-            F dataToAdd;
+            DataTimePair dataToAdd;
             synchronized (this) {
                 dataToAdd = container.get(currId);
             }
             if(dataToAdd == null)
                 throw new DataNotFoundException(currId);
 
-            data.add(dataToAdd.getData());
+            if(dataToAdd.getTime() <= currentTime)
+                data.add(dataToAdd.getData());
         }
 
         return data;
@@ -110,7 +125,9 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
 
     @Override
     public void addData(E data) {
-        F pairData = new F(data);
+        if(timeHandler.isReadOnly())
+            return;
+        DataTimePair pairData = new DataTimePair(data);
         String id = data.getId();
 
         synchronized (this) {
@@ -120,10 +137,13 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
 
     @Override
     public void addDataSet(Collection<E> dataSet) {
+        if(timeHandler.isReadOnly())
+            return;
+
         synchronized (this) {
             for (E data : dataSet) {
                 String id = data.getId();
-                F f = new F(data);
+                DataTimePair f = new DataTimePair(data);
                 container.put(id, f);
             }
         }

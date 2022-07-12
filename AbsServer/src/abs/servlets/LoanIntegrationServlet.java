@@ -6,6 +6,7 @@ import bank.logic.loans.interest.exceptions.InvalidPercentException;
 import bank.logic.manager.BankManager;
 import com.google.gson.Gson;
 import http.constants.Constants;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -28,13 +29,15 @@ public class LoanIntegrationServlet extends HttpServlet {
         String usernameFromSession = SessionUtils.getUsername(request);
         ServletOutputStream outputStream = response.getOutputStream();
         BankManager bankManager = ServletUtils.getBankManager(getServletContext());
+        ServletInputStream inputStream = request.getInputStream();
 
         if (usernameFromSession == null) { //user is not logged in yet
             outputStream.print("Not logged in yet.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
             Properties prop = new Properties();
-            prop.load(request.getInputStream());
+
+            prop.load(inputStream);
             String type = prop.getProperty(Constants.TYPE);
             String jsonRequest = prop.getProperty(Constants.DATA);
 

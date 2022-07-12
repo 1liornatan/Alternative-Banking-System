@@ -12,6 +12,7 @@ import manager.info.ClientInfoData;
 import manager.investments.*;
 import manager.loans.LoansData;
 import manager.messages.NotificationsData;
+import manager.time.TimeData;
 import manager.transactions.TransactionsData;
 
 public class BankManager {
@@ -122,5 +123,17 @@ public class BankManager {
 
     public void increaseYaz() throws DataNotFoundException, NonPositiveAmountException {
         bankInstance.advanceOneYaz();
+    }
+
+    public void setRewind(int time) {
+        bankInstance.setRewind(time);
+    }
+
+    public void resetRewind() {
+        bankInstance.resetRewind();
+    }
+
+    public TimeData getTimeData() {
+        return bankInstance.getTimeData();
     }
 }

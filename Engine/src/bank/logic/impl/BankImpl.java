@@ -42,6 +42,7 @@ import manager.loans.details.*;
 import manager.categories.CategoriesDTO;
 import manager.messages.NotificationData;
 import manager.messages.NotificationsData;
+import manager.time.TimeData;
 import manager.time.YazSystemDTO;
 import manager.transactions.TransactionDTO;
 import manager.transactions.TransactionData;
@@ -1040,5 +1041,27 @@ public class BankImpl implements Bank {
     @Override
     public int getLoansVer() {
         return loansVer;
+    }
+
+    @Override
+    public void setRewind(int time) {
+        if(timeHandler.isReadOnly())
+            timeHandler.resetRewind();
+
+        timeHandler.rewindTime(time);
+    }
+
+    @Override
+    public void resetRewind() {
+        if(timeHandler.isReadOnly())
+            timeHandler.resetRewind();
+    }
+
+    @Override
+    public TimeData getTimeData() {
+        int time = timeHandler.getCurrentTime();
+        boolean readOnly = timeHandler.isReadOnly();
+
+        return new TimeData(time, readOnly);
     }
 }
