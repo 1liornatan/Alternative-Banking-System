@@ -135,7 +135,7 @@ public class BankImpl implements Bank {
         CustomerAccount account = customersAccounts.getDataById(customerId);
         List<Investment> investments = new ArrayList<>();
 
-        account.getLoansInvested().stream().filter(loan -> loan.getStatus() == LoanStatus.ACTIVE).forEach(loan -> loan.getInvestments().stream().filter(investment -> investment.getInvestorId().equals(customerId)).forEach(investments::add));
+        account.getLoansInvested().stream().filter(loan -> loans.isDataExists(loan.getId())).filter(loan -> loan.getStatus() == LoanStatus.ACTIVE).forEach(loan -> loan.getInvestments().stream().filter(investment -> investment.getInvestorId().equals(customerId)).forEach(investments::add));
 
         return investmentsListToData(investments);
     }
@@ -554,6 +554,7 @@ public class BankImpl implements Bank {
     public LoansData getUnfinishedLoans(String customerId) throws DataNotFoundException {
             List<LoanData> loansList= new ArrayList<>();
             customersAccounts.getDataById(customerId).getLoansRequested().stream()
+                    .filter(loan -> loans.isDataExists(loan.getId()))
                     .filter(loan -> !loan.getStatus().equals(LoanStatus.FINISHED))
                     .filter(loan -> !loan.getStatus().equals(LoanStatus.NEW))
                     .filter(loan -> !loan.getStatus().equals(LoanStatus.PENDING))
@@ -608,7 +609,10 @@ public class BankImpl implements Bank {
         TransactionsDTO transactions = getTransactionsDTO(account);
         LoansDTO loansInvestedDTO = new LoansDTO(loansInvestedDTOList);
         LoansDTO loansRequestedDTO = new LoansDTO(loansRequestedDTOList);
-        AccountDTO accountDTO = new AccountDTO(account.getId(),account.getBalance(),transactions);
+
+        int balance = timeHandler.isReadOnly() ? calculateBalance(account):account.getBalance();
+
+        AccountDTO accountDTO = new AccountDTO(account.getId(), balance, transactions);
         return new CustomerDTO(loansInvestedDTO,loansRequestedDTO,accountDTO);
     }
 
@@ -640,12 +644,38 @@ public class BankImpl implements Bank {
     @Override
     public TransactionsDTO getTransactionsDTO(Account account) throws DataNotFoundException {
         List<TransactionDTO> transactionsList = new ArrayList<>();
-        List<Transaction> accountTransactions = account.getTransactions();
+        if(!timeHandler.isReadOnly()) {
+            List<Transaction> accountTransactions = account.getTransactions();
 
-        for(Transaction transaction : accountTransactions) {
-            transactionsList.add(getTransactionDTO(transaction));
+            for (Transaction transaction : accountTransactions) {
+                transactionsList.add(getTransactionDTO(transaction));
+            }
+        }
+        else {
+            transactionsList = calculateTransactions(account);
         }
         return new TransactionsDTO(transactionsList);
+    }
+
+    private List<TransactionDTO> calculateTransactions(Account account) {
+
+        HashSet<String> idSet = new HashSet<>();
+        List<Transaction> transactions = account.getTransactions();
+        List<TransactionDTO> transactionDTOList = new ArrayList<>();
+
+        transactions.stream().forEach(t -> idSet.add(t.getId()));
+        this.transactions.getAllPairs().stream()
+                .filter(t -> idSet.contains(t.getKey().getId())).forEach(pair -> {
+                            Transaction key = pair.getKey();
+                            transactionDTOList.add(new TransactionDTO(
+                                    key.getDescription(),
+                                    key.getAmount(),
+                                    key.getPreviousBalance(),
+                                    pair.getValue())
+                            );
+                        }
+                );
+        return transactionDTOList;
     }
 
     @Override
@@ -712,7 +742,7 @@ public class BankImpl implements Bank {
     @Override
     public CustomerData getCustomerData(CustomerAccount customer) {
         CustomerData customerData = new CustomerData();
-        customerData.setBalance(customer.getBalance());
+        customerData.setBalance(calculateBalance(customer));
         customerData.setName(customer.getId());
         customerData.setNumOfActiveLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.ACTIVE));
         customerData.setNumOfPendingLoansInvested(customer.getNumOfInvestedLoansByStatus(LoanStatus.PENDING));
@@ -765,6 +795,8 @@ public class BankImpl implements Bank {
         try {
             customersAccounts.getDataById(customerId)
                     .getLoansInvested()
+                    .stream()
+                    .filter(loan -> loans.isDataExists(loan.getId()))
                     .forEach(loan -> {
                         try {
                             loanDataList.add(getLoanData(loan));
@@ -786,6 +818,8 @@ public class BankImpl implements Bank {
         try {
             customersAccounts.getDataById(customerId)
                     .getLoansRequested()
+                    .stream()
+                    .filter(loan -> loans.isDataExists(loan.getId()))
                     .forEach(loan -> {
                         try {
                             loanDataList.add(getLoanData(loan));
@@ -801,16 +835,12 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public TransactionData getTransactionData(Transaction transaction) {
+    public TransactionData getTransactionData(Transaction transaction, int yazMade) {
         TransactionData transactionData = new TransactionData();
         transactionData.setAmount(transaction.getAmount());
         transactionData.setDescription(transaction.getDescription());
         transactionData.setPreviousBalance(transaction.getPreviousBalance());
-        try {
-            transactionData.setYazMade(transactions.getDataPair(transaction.getId()).getValue());
-        } catch (DataNotFoundException e) {
-            e.printStackTrace();
-        }
+        transactionData.setYazMade(yazMade);
         return transactionData;
     }
 
@@ -818,11 +848,22 @@ public class BankImpl implements Bank {
     public TransactionsData getTransactionsData(String customerId) {
         TransactionsData transactionsData = new TransactionsData();
         List<TransactionData> transactionsDataList = new ArrayList<>();
+        int currentYaz = getCurrentYaz();
         try {
             customersAccounts.getDataById(customerId).getTransactions()
-                    .forEach(transaction -> transactionsDataList.add(getTransactionData(transaction)));
+                    .forEach(transaction -> {
+                        try {
+                            int yazMade = transactions.getDataPair(transaction.getId()).getValue();
+
+                            if(yazMade <= currentYaz) {
+                                transactionsDataList.add(getTransactionData(transaction, yazMade));
+                            }
+                        } catch (DataNotFoundException e) {
+                            System.out.println(e.getMessage());
+                        }
+                    });
         } catch (DataNotFoundException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         transactionsData.setTransactions(transactionsDataList);
         return transactionsData;
@@ -901,6 +942,7 @@ public class BankImpl implements Bank {
 
         CustomerAccount customer = customersAccounts.getDataById(customerId);
         customer.getTransactions().stream()
+                .filter(transaction -> transactions.isDataExists(transaction.getId()))
                 .filter(transaction -> {
                     String description = transaction.getDescription().toLowerCase();
                     return description.contains("loan") && description.contains("payment");
@@ -1027,7 +1069,7 @@ public class BankImpl implements Bank {
     public ClientInfoData getClientInfo(String customer) throws DataNotFoundException {
         CustomerAccount customerAccount = customersAccounts.getDataById(customer);
         return new ClientInfoData.ClientInfoDataBuilder()
-                .balance(customerAccount.getBalance())
+                .balance(calculateBalance(customerAccount))
                 .categories(categories)
                 .version(categoriesVer)
                 .build();
@@ -1064,4 +1106,20 @@ public class BankImpl implements Bank {
 
         return new TimeData(time, readOnly);
     }
+
+    private int calculateBalance(CustomerAccount account) {
+        Integer balance = 0;
+        int currYaz = getCurrentYaz();
+
+        HashSet<String> idSet = new HashSet<>();
+        List<Transaction> collect = account.getTransactions().stream()
+                .filter(transaction -> transactions.isDataExists(transaction.getId())).collect(Collectors.toList());
+
+        for(Transaction transaction : collect)
+            balance += transaction.getAmount();
+
+        return balance;
+    }
+
+
 }

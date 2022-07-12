@@ -45,7 +45,11 @@ public class BankDataStorage<E extends Singular> implements DataStorage<E>, Seri
 
     @Override
     public boolean isDataExists(String id) {
-        return (container.get(id) != null);
+        DataTimePair dataTimePair = container.get(id);
+        if(dataTimePair != null && dataTimePair.getTime() <= timeHandler.getCurrentTime())
+            return true;
+
+        return false;
     }
 
     @Override

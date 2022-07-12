@@ -16,7 +16,7 @@ import manager.time.TimeData;
 
 import java.io.IOException;
 
-@WebServlet(name = "Time Servlet", urlPatterns = "/bank/time")
+@WebServlet(name = "Rewind Servlet", urlPatterns = "/bank/time")
 public class TimeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/plain;charset=UTF-8");

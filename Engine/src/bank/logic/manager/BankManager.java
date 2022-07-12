@@ -102,7 +102,7 @@ public class BankManager {
     }
 
     public InvestmentsSellData getCustomerInvestments(String customerId) throws DataNotFoundException {
-        return getCustomerInvestments(customerId);
+        return bankInstance.getCustomerInvestments(customerId);
     }
 
     public PaymentsData getAllLoansData() {return bankInstance.getAllLoansData();}

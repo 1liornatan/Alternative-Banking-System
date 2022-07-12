@@ -24,6 +24,7 @@ import manager.investments.PaymentsData;
 import manager.loans.LoanData;
 import manager.loans.LoansData;
 import manager.loans.LoansWithVersion;
+import manager.time.TimeData;
 import models.CustomerModel;
 import models.LoanModel;
 import models.LoanStatusModel;
@@ -288,6 +289,10 @@ public class AdminController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
                 response.close();
+
+                Platform.runLater(() -> {
+                    startRewindButton.setDisable(true);
+                });
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -309,6 +314,10 @@ public class AdminController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
                 response.close();
+
+                Platform.runLater(() -> {
+                    startRewindButton.setDisable(false);
+                });
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -347,9 +356,12 @@ public class AdminController {
                         .url(Constants.URL_TIME)
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+
                 if(response.isSuccessful()) {
                     try (ResponseBody responseBody = response.body()) {
-                        currYazProperty.set(Integer.parseInt(responseBody.string()));
+                        String jsonResponse = responseBody.string();
+                        TimeData data = Constants.GSON_INSTANCE.fromJson(jsonResponse, TimeData.class);
+                        currYazProperty.set(data.getTime());
                     }
                 }
                 response.close();
@@ -526,6 +538,7 @@ public class AdminController {
                 rewindTextField.setText(String.valueOf(currYaz));
             }
         });
+        increaseYazButton.disableProperty().bind(startRewindButton.disableProperty());
     }
 
     public boolean isIsLoggedIn() {

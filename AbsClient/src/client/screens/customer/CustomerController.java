@@ -11,6 +11,8 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -797,18 +799,22 @@ public class CustomerController {
 
     private void setReadOnlyDisables() {
 
-        loadFileButton.disableProperty().bind(readOnlyProperty);
-        withdrawButton.disableProperty().bind(readOnlyProperty);
-        chargeButton.disableProperty().bind(readOnlyProperty);
-        searchLoansButton.disableProperty().bind(readOnlyProperty);
-        investButton.disableProperty().bind(readOnlyProperty);
-        payCycleButton.disableProperty().bind(readOnlyProperty);
-        closeLoanButton.disableProperty().bind(readOnlyProperty);
-        payDebtButton.disableProperty().bind(readOnlyProperty);
-        buyInvestmentButton.disableProperty().bind(readOnlyProperty);
-        unlistInvestmentButton.disableProperty().bind(readOnlyProperty);
-        listInvestmentButton.disableProperty().bind(readOnlyProperty);
-
+        readOnlyProperty.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                loadFileButton.setDisable(newValue);
+                withdrawButton.setDisable(newValue);
+                chargeButton.setDisable(newValue);
+                searchLoansButton.setDisable(newValue);
+                investButton.setDisable(newValue);
+                payCycleButton.setDisable(newValue);
+                closeLoanButton.setDisable(newValue);
+                payDebtButton.setDisable(newValue);
+                buyInvestmentButton.setDisable(newValue);
+                unlistInvestmentButton.setDisable(newValue);
+                listInvestmentButton.setDisable(newValue);
+            }
+        });
     }
 
     private void setFieldLimits(TextField amountField) {

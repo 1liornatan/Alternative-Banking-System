@@ -124,7 +124,7 @@ public interface Bank {
 
     LoansData getInvestorData(String customerId);
 
-    TransactionData getTransactionData(Transaction transaction);
+    TransactionData getTransactionData(Transaction transaction, int yazMade);
 
     TransactionsData getTransactionsData(String cutsomerId);
 
