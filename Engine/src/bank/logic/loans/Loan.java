@@ -10,6 +10,12 @@ public interface Loan extends Singular {
 
     int getMissingCycles();
 
+    boolean isClosed();
+
+    int getClosedYaz();
+
+    void closeLoan();
+
     int getAmountToActive();
 
     int getNextYaz();
@@ -53,7 +59,6 @@ public interface Loan extends Singular {
 
     int getFullPaidCycles();
 
-    void nextPayment();
 
     String getOwnerId();
 

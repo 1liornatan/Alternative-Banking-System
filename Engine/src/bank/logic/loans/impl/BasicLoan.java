@@ -9,9 +9,7 @@ import bank.logic.loans.interest.Interest;
 import bank.logic.loans.investments.Investment;
 import bank.logic.time.TimeHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class BasicLoan implements Loan {
 
@@ -19,8 +17,6 @@ public class BasicLoan implements Loan {
     private final LoanBuilder loanDetails;
     private int startedYaz;
     private int finishedYaz;
-    private int currentPayment;
-    private int fullPaidCycles;
     private final int averagePayment;
     private final Interest interest;
     private LoanStatus status;
@@ -28,21 +24,19 @@ public class BasicLoan implements Loan {
     private final List<Integer> payments;
     private final Account loanAccount;
     private final TimeHandler timeHandler;
+    private final List<Integer> cyclesPaid;
+    private boolean isClosed;
+    private int closedYaz;
 
     @Override
     public void fullPaymentCycle() {
-        fullPaidCycles++;
-        currentPayment++;
+        cyclesPaid.add(timeHandler.getCurrentTime());
     }
 
     @Override
     public int getFullPaidCycles() {
-        return fullPaidCycles;
-    }
-
-    @Override
-    public void nextPayment() {
-        currentPayment++;
+        int currYaz = timeHandler.getCurrentTime();
+        return Math.toIntExact(cyclesPaid.stream().filter(time -> time <= currYaz).count());
     }
 
     @Override
@@ -89,6 +83,10 @@ public class BasicLoan implements Loan {
         this.loanDetails = loanDetails;
         this.interest = interest;
         this.status = LoanStatus.NEW;
+        this.timeHandler = timeHandler;
+
+        closedYaz = -1;
+        isClosed = false;
         loanAccount = new LoanAccount(0);
         id = loanDetails.getIdName();
 
@@ -96,17 +94,36 @@ public class BasicLoan implements Loan {
         startedYaz = 0;
         finishedYaz = 0;
 
-        currentPayment = 0;
-        fullPaidCycles = 0;
 
         averagePayment = interest.getFinalAmount() / (interest.getDuration() / interest.getCyclesPerPayment());
         payments = new ArrayList<>();
-        this.timeHandler = timeHandler;
+        cyclesPaid = new ArrayList<>();
     }
 
     @Override
     public int getMissingCycles() {
-        return currentPayment - fullPaidCycles;
+        int currYaz = timeHandler.getCurrentTime();
+        int cycles = Math.toIntExact(cyclesPaid.stream().filter(time -> time <= currYaz).count());
+        return getPaymentNeeded() - cycles;
+    }
+
+
+    @Override
+    public boolean isClosed() {
+        return isClosed;
+    }
+
+    @Override
+    public int getClosedYaz() {
+        return closedYaz;
+    }
+
+    @Override
+    public void closeLoan() {
+        isClosed = true;
+        closedYaz = timeHandler.getCurrentTime();
+        status = LoanStatus.FINISHED;
+        finishedYaz = closedYaz;
     }
 
     @Override
@@ -123,13 +140,15 @@ public class BasicLoan implements Loan {
 
     @Override
     public int getCurrentPayment() {
-        return currentPayment;
+        int currYaz = timeHandler.getCurrentTime();
+        int size = Math.toIntExact(cyclesPaid.stream().filter(time -> time <= currYaz).count());
+        return size;
     }
 
     @Override
     public int getNextPayment() {
         int currPayment = getPaymentNeeded();
-        if(getPaymentNeeded() >= payments.size())
+        if(currPayment >= payments.size())
             return 0;
 
         return payments.get(currPayment);
@@ -137,7 +156,18 @@ public class BasicLoan implements Loan {
 
     @Override
     public int getAmountToCloseLoan() {
-        int sum = payments.subList(getCurrentPayment(), payments.size()).stream().mapToInt(Integer::intValue).sum();
+        int currentPayment = getCurrentPayment();
+        int paymentNeeded = getPaymentNeeded() - 1;
+
+        if(paymentNeeded < 0)
+            paymentNeeded = 0;
+        else if(paymentNeeded >= payments.size()) {
+            paymentNeeded = payments.size() - 1;
+        }
+
+        int sum = payments.subList(currentPayment, paymentNeeded).stream().mapToInt(Integer::intValue).sum();
+        int left = payments.size() - paymentNeeded;
+        sum += left * (interest.getBaseAmount() / getDuration());
         return sum;
     }
 
@@ -203,7 +233,7 @@ public class BasicLoan implements Loan {
     @Override
     public int getPayment() {
         if(status == LoanStatus.ACTIVE || status == LoanStatus.RISKED)
-            return payments.get(currentPayment);
+            return payments.get(cyclesPaid.size());
 
         return averagePayment;
     }

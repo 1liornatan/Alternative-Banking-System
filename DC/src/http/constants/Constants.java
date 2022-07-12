@@ -37,7 +37,7 @@ public class Constants {
     public static final String URL_TRADE = URL_BASE + "/bank/trade";
     public static final String URL_LOAN = URL_BASE + "/bank/loan";
     public static final String URL_INTEGRATION = URL_LOAN + "/integration";
-    public static final String URL_PAYMENTS = URL_BASE + "/bank/payment";
+    public static final String URL_PAYMENTS = URL_BASE + "/bank/payments";
     public static final String URL_INFO = URL_BASE + "/bank/info";
     public static final String URL_TRANSACTIONS = URL_BASE + "/bank/transactions";
 

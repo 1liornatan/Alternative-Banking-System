@@ -94,7 +94,7 @@ public class LoanServlet extends HttpServlet {
                     outputStream.flush();
                     response.setStatus(HttpServletResponse.SC_OK);
 
-                    logServerMessage("Loans Request (" + usernameFromSession + "): " + jsonResponse);
+                    //logServerMessage("Loans Request (" + usernameFromSession + "): " + jsonResponse);
                 }
             }
         }

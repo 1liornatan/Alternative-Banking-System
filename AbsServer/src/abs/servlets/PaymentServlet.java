@@ -74,14 +74,9 @@ public class PaymentServlet extends HttpServlet {
                 }
                 response.setStatus(HttpServletResponse.SC_OK);
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
             }
         }
-    }
-
-
-    private void logServerMessage(String message) {
-        System.out.println(message);
     }
 }

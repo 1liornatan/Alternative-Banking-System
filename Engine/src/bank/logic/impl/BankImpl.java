@@ -301,10 +301,15 @@ public class BankImpl implements Bank {
 
     }
     private int getMissingCycles(Loan loan) {
-        int cyclesHadToPay = (getCurrentYaz() - loan.getStartedYaz()) / loan.getCyclesPerPayment();
-        int cyclesPaid = loan.getFullPaidCycles();
+        int delta = getCurrentYaz() - loan.getStartedYaz();
+        if (delta > 0) {
+            int cyclesHadToPay = delta / loan.getCyclesPerPayment();
+            int cyclesPaid = loan.getFullPaidCycles();
 
-        return Math.min((cyclesHadToPay - cyclesPaid), loan.getDuration() - cyclesPaid);
+            return Math.min((cyclesHadToPay - cyclesPaid), loan.getDuration() - cyclesPaid);
+        } else {
+            return 0;
+        }
     }
 
     @Override
@@ -331,8 +336,6 @@ public class BankImpl implements Bank {
         CustomerAccount account = customersAccounts.getDataById(accountId);
         Transaction transaction = account.withdraw(amount, description);
         transactions.addData(transaction);
-        account.addNotification(new BankNotification("Withdrew " + amount,
-                timeHandler.getCurrentTime()));
         customersVer++;
     }
 
@@ -341,8 +344,6 @@ public class BankImpl implements Bank {
         CustomerAccount account = customersAccounts.getDataById(accountId);
         Transaction transaction = account.deposit(amount, description);
         transactions.addData(transaction);
-        account.addNotification(new BankNotification("Deposited " + amount,
-                timeHandler.getCurrentTime()));
         customersVer++;
     }
 
@@ -430,7 +431,7 @@ public class BankImpl implements Bank {
 
         Interest interest = new BasicInterest(percent, amount, cyclesPerPayment, duration);
 
-        Investment loanInvestment = new LoanInvestment(investor, interest, loan.getId());
+        Investment loanInvestment = new LoanInvestment(investor, interest, loan.getId(), timeHandler);
         loanHandler.addInvestment(loan, loanInvestment, investingAccount);
         investingAccount.addNotification(new BankNotification("Invested " + amount + " in '" + loan.getId() + "'.",
                 timeHandler.getCurrentTime()));
@@ -824,7 +825,7 @@ public class BankImpl implements Bank {
                         try {
                             loanDataList.add(getLoanData(loan));
                         } catch (DataNotFoundException e) {
-                            e.printStackTrace();
+                            System.out.println(e.getMessage());;
                         }
                     });
             loansData.setLoans(loanDataList);
@@ -920,10 +921,7 @@ public class BankImpl implements Bank {
     @Override
     public void closeLoan(String id) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
         Loan loan = loans.getDataById(id);
-        int amountToCloseLoan = loan.getAmountToCloseLoan();
-        loanHandler.payLoanByAmount(loan, amountToCloseLoan);
-        CustomerAccount customer = customersAccounts.getDataById(loan.getOwnerId());
-        customer.addNotification(new BankNotification("Closed '" + loan.getId() + "' for " + amountToCloseLoan, getCurrentYaz()));
+        loanHandler.closeLoan(loan);
         customersVer++;
         forecastVer++;
         loansVer++;
@@ -1119,6 +1117,10 @@ public class BankImpl implements Bank {
             balance += transaction.getAmount();
 
         return balance;
+    }
+
+    private void calculateLoansStatus() {
+
     }
 
 

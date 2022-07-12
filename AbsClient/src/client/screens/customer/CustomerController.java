@@ -667,13 +667,21 @@ public class CustomerController {
                             .addHeader("Content-Type", "text/plain")
                             .build();
                     Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                    String responseBody = response.body().string();
 
+                    if(response.isSuccessful()) {
+                        Platform.runLater(() -> {
+                            updateData();
+                            paymentErrorLabel.setText("Successfully paid " + selectedLoan.getPaymentAmount());
+                            paymentErrorLabel.setTextFill(Color.GREEN);
+                        });
+                    } else {
+                        Platform.runLater(() -> {
+                            paymentErrorLabel.setText(responseBody);
+                            paymentErrorLabel.setTextFill(Color.RED);
+                        });
+                    }
                     response.close();
-                    Platform.runLater(() -> {
-                        updateData();
-                        paymentErrorLabel.setText("Successfully paid " + selectedLoan.getPaymentAmount());
-                        paymentErrorLabel.setTextFill(Color.GREEN);
-                    });
                 } catch (Exception e) {
                     Platform.runLater(() -> {
                         paymentErrorLabel.setText(e.getMessage());
@@ -1174,6 +1182,9 @@ public class CustomerController {
                     LoansWithVersion loansData = Constants.GSON_INSTANCE.fromJson(body.string(), LoansWithVersion.class);
                     return loansData;
                 }
+            }
+            else {
+                System.out.println(response.body().string());
             }
             response.close();
         }

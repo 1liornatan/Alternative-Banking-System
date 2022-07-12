@@ -2,6 +2,7 @@ package bank.logic.loans.investments.impl;
 
 import bank.logic.loans.interest.Interest;
 import bank.logic.loans.investments.Investment;
+import bank.logic.time.TimeHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,23 +13,22 @@ public class LoanInvestment implements Investment {
     private String investorId;
 
     private final Interest interest;
-    private int amountPaid;
-    private int paymentsReceived;
     private final int id;
     private final List<Integer> payments;
+    private final List<Integer> cyclesPaid;
     private final String loanId;
+    private final TimeHandler timeHandler;
 
-    public LoanInvestment(String investorId, Interest interest, String loanId) {
+    public LoanInvestment(String investorId, Interest interest, String loanId, TimeHandler timeHandler) {
         this.investorId = investorId;
         this.interest = interest;
         this.id = idGenerator++;
         this.loanId = loanId;
-
-        amountPaid = 0;
-        paymentsReceived = 0;
+        this.timeHandler = timeHandler;
 
         payments = new ArrayList<>();
         setPayments();
+        cyclesPaid = new ArrayList<>();
     }
 
     @Override
@@ -54,7 +54,8 @@ public class LoanInvestment implements Investment {
 
     @Override
     public int getPaymentsReceived() {
-        return paymentsReceived;
+        int currYaz = timeHandler.getCurrentTime();
+        return Math.toIntExact(cyclesPaid.stream().filter(time -> time <= currYaz).count());
     }
 
     @Override
@@ -63,7 +64,7 @@ public class LoanInvestment implements Investment {
         int cycles = interest.getCyclesPerPayment();
         int paymentsCount = (duration / cycles);
 
-        int paymentsLeft = paymentsCount - paymentsReceived;
+        int paymentsLeft = paymentsCount - getPaymentsReceived();
         int baseAmount = getBaseAmount();
         return (paymentsLeft / paymentsCount) * baseAmount;
     }
@@ -91,14 +92,16 @@ public class LoanInvestment implements Investment {
 
     @Override
     public int getAmountPaid() {
-        return amountPaid;
+        int currYaz = timeHandler.getCurrentTime();
+        int size = Math.toIntExact(cyclesPaid.stream().filter(time -> time <= currYaz).count());
+
+        return payments.subList(0, size - 1).stream().mapToInt(Integer::intValue).sum();
     }
 
     @Override
     public void payment() {
         if(!isFullyPaid()) {
-            amountPaid += getPayment();
-            paymentsReceived++;
+            cyclesPaid.add(timeHandler.getCurrentTime());
         }
     }
 
@@ -112,7 +115,9 @@ public class LoanInvestment implements Investment {
         if(isFullyPaid())
             return 0;
 
-        return payments.get(paymentsReceived);
+        int currYaz = timeHandler.getCurrentTime();
+
+        return payments.get(Math.toIntExact(cyclesPaid.stream().filter(time -> time <= currYaz).count()));
     }
 
     @Override
@@ -125,7 +130,7 @@ public class LoanInvestment implements Investment {
 
     @Override
     public int getRemainingPayment() {
-        return getTotalPayment() - amountPaid;
+        return getTotalPayment() - getAmountPaid();
     }
 
     @Override
@@ -140,7 +145,7 @@ public class LoanInvestment implements Investment {
 
     @Override
     public boolean isFullyPaid() {
-        return (amountPaid == getTotalPayment());
+        return (getAmountPaid() == getTotalPayment());
     }
 
     @Override

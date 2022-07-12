@@ -48,7 +48,7 @@ public class NotificationServlet extends HttpServlet {
             outputStream.print(jsonResponse);
             outputStream.flush();
             response.setStatus(HttpServletResponse.SC_OK);
-            logServerMessage("Notifications Response (" + usernameFromSession + "): " + jsonResponse);
+            //logServerMessage("Notifications Response (" + usernameFromSession + "): " + jsonResponse);
         }
     }
 

@@ -89,11 +89,33 @@ public class BankLoanHandler implements LoanHandler {
         }
     }
 
+    @Override
+    public void closeLoan(Loan loan) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
+        int amountToCloseLoan = loan.getAmountToCloseLoan();
+        CustomerAccount customer = customers.getDataById(loan.getOwnerId());
+        if(customer.getBalance() < amountToCloseLoan)
+            throw new NoMoneyException();
+
+        String loanId = loan.getId();
+        String description = "Close loan '" + loanId + "'.";
+        transactions.addData(customer.withdraw(amountToCloseLoan, description));
+        int baseAmount = loan.getBaseAmount();
+        int currentTime = timeHandler.getCurrentTime();
+        for(Investment investment : loan.getInvestments()) {
+            int payment = (investment.getBaseAmount() / baseAmount) * amountToCloseLoan;
+            CustomerAccount investor = customers.getDataById(investment.getInvestorId());
+            transactions.addData(investor.deposit(payment, description));
+            investor.addNotification(new BankNotification("Received " + payment + " from closing of '" + loanId + "'", currentTime));
+        }
+        customer.addNotification(new BankNotification("Closed '" + loanId + "' for " + amountToCloseLoan, currentTime));
+
+        loan.closeLoan();
+    }
+
     private void checkLoanStatus(Loan loan) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException {
         int loanAmount = loan.getBaseAmount();
-        Account loanAccount = loan.getLoanAccount();
-        int accountBalance = loanAccount.getBalance();
 
+        Account loanAccount = loan.getLoanAccount();
         Account requester;
 
         if(loanAmount == loan.getLoanAccount().getBalance()) {
@@ -124,8 +146,8 @@ public class BankLoanHandler implements LoanHandler {
     }
 
     public void payOneCycle(Loan loan) throws DataNotFoundException, NonPositiveAmountException {
-            makePayment(loan);
-        }
+        makePayment(loan);
+    }
 
     private void makePayment(Loan loan) throws DataNotFoundException, NonPositiveAmountException {
         CustomerAccount srcAcc = customers.getDataById(loan.getOwnerId());
