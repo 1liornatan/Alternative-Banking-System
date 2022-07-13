@@ -1499,8 +1499,10 @@ public class CustomerController {
                     try (ResponseBody body = response.body()) {
                         NotificationsData jsonResponse = Constants.GSON_INSTANCE.fromJson(body.string(), NotificationsData.class);
                         notificationsData = jsonResponse.getNotificationsList();
-                        if(jsonResponse.getNotificationVersion() != notificationsVer)
+
+                        if(jsonResponse.getNotificationVersion() == notificationsVer)
                             return;
+
                         notificationsVer = jsonResponse.getNotificationVersion();
                         List<NotificationModel> tempNotificationModels = new ArrayList<>();
                         for (NotificationData data : notificationsData) {
