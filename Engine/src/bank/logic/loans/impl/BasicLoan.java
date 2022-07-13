@@ -171,7 +171,7 @@ public class BasicLoan implements Loan {
 
         int sum = payments.subList(currentPayment, paymentNeeded).stream().mapToInt(Integer::intValue).sum();
         int left = payments.size() - paymentNeeded;
-        sum += left * (interest.getBaseAmount() / getDuration());
+        sum += left * (interest.getBaseAmount() / (getDuration() / getCyclesPerPayment()));
         return sum;
     }
 
