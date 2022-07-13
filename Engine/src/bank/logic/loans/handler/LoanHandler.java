@@ -18,4 +18,6 @@ public interface LoanHandler {
     void payLoanByAmount(Loan loanId, int amount) throws NoMoneyException, NonPositiveAmountException, DataNotFoundException;
 
     void closeLoan(Loan loan) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
+
+    void calculateLoansStatus();
 }

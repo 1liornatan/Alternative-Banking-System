@@ -100,6 +100,10 @@ public class LoanServlet extends HttpServlet {
         }
     }
 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    }
+
     private void logServerMessage(String message) {
         System.out.println(message);
     }

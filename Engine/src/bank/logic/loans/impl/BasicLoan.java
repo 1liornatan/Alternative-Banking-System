@@ -156,13 +156,17 @@ public class BasicLoan implements Loan {
 
     @Override
     public int getAmountToCloseLoan() {
-        int currentPayment = getCurrentPayment();
-        int paymentNeeded = getPaymentNeeded() - 1;
+        if(payments.size() <= 0)
+            return getBaseAmount();
 
-        if(paymentNeeded < 0)
+        int currentPayment = getCurrentPayment();
+        int paymentNeeded = getPaymentNeeded();
+
+        if(paymentNeeded < 0) {
             paymentNeeded = 0;
-        else if(paymentNeeded >= payments.size()) {
-            paymentNeeded = payments.size() - 1;
+        }
+        else if(paymentNeeded > payments.size()) {
+            paymentNeeded = payments.size();
         }
 
         int sum = payments.subList(currentPayment, paymentNeeded).stream().mapToInt(Integer::intValue).sum();

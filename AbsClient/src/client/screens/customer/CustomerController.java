@@ -207,6 +207,33 @@ public class CustomerController {
     private HBox debtPaymentHBox;
 
     @FXML
+    private TextField nameField;
+
+    @FXML
+    private TextField categoryField;
+
+    @FXML
+    private TextField requestAmountField;
+
+    @FXML
+    private TextField timeField;
+
+    @FXML
+    private TextField payEveryField;
+
+    @FXML
+    private TextField interestField;
+
+    @FXML
+    private Button requestLoanButton;
+
+    @FXML
+    private ProgressBar requestLoanProgress;
+
+    @FXML
+    private Label loanProgressStatusLabel;
+
+    @FXML
     private TextField debtAmountField;
 
     @FXML
@@ -265,6 +292,32 @@ public class CustomerController {
             }
         }).start();
     }
+
+    @FXML
+    void requestLoanButtonAction(ActionEvent event) {
+        requestLoan();
+    }
+
+    private void requestLoan() {
+        String loanId = nameField.getText();
+        String category = categoryField.getText();
+        int amount = Integer.parseInt(requestAmountField.getText());
+        int time = Integer.parseInt(timeField.getText());
+        int paymentPer = Integer.parseInt(payEveryField.getText());
+        int interest = Integer.parseInt(interestField.getText());
+
+        LoanData data = new LoanData();
+
+        data.setName(loanId);
+        data.setCategory(category);
+        data.setBaseAmount(amount);
+        data.setCyclesPerPayment(paymentPer);
+        data.setInterest(interest);
+        data.setFinishedYaz(time);
+
+        // TODO: HTTP REQUEST
+    }
+
     @FXML
     void buyInvestmentButtonAction(ActionEvent ignoredEvent) {
         InvestmentModel selectedItem = buyInvestmentTable.getSelectionModel().getSelectedItem();
@@ -956,7 +1009,12 @@ public class CustomerController {
     private void setLoansIntegrationButtons() {
         BooleanBinding emptyChosen = Bindings.isEmpty(loansChosenTable.getItems());
         BooleanBinding emptyFound = Bindings.isEmpty(loansFoundTable.getItems());
-        investButton.disableProperty().bind(emptyChosen);
+        emptyChosen.addListener((observable, oldValue, newValue) -> {
+            if(newValue)
+                investButton.setDisable(true);
+            else
+                investButton.setDisable(false);
+        });
         tablesRightButton.disableProperty().bind(emptyFound);
         tablesLeftButton.disableProperty().bind(emptyChosen);
     }

@@ -260,6 +260,108 @@
                         </AnchorPane>
                      </content>
                   </Tab>
+                  <Tab text="Loan Request">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <BorderPane prefHeight="371.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <center>
+                                    <VBox spacing="10.0" BorderPane.alignment="CENTER">
+                                       <children>
+                                          <HBox alignment="CENTER" spacing="10.0">
+                                             <children>
+                                                <VBox alignment="CENTER">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Name" />
+                                                      <TextField fx:id="nameField" alignment="CENTER" />
+                                                   </children>
+                                                   <opaqueInsets>
+                                                      <Insets />
+                                                   </opaqueInsets>
+                                                </VBox>
+                                                <VBox alignment="CENTER">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Category" />
+                                                      <TextField fx:id="categoryField" alignment="CENTER" />
+                                                   </children>
+                                                   <opaqueInsets>
+                                                      <Insets />
+                                                   </opaqueInsets>
+                                                </VBox>
+                                                <VBox alignment="CENTER">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Amount" />
+                                                      <TextField fx:id="requestAmountField" alignment="CENTER" />
+                                                   </children>
+                                                   <opaqueInsets>
+                                                      <Insets />
+                                                   </opaqueInsets>
+                                                </VBox>
+                                             </children>
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </HBox>
+                                          <HBox alignment="CENTER" spacing="10.0">
+                                             <children>
+                                                <VBox alignment="CENTER">
+                                                   <children>
+                                                      <Label alignment="CENTER" text="Time" />
+                                                      <TextField fx:id="timeField" alignment="CENTER" />
+                                                   </children>
+                                                   <opaqueInsets>
+                                                      <Insets />
+                                                   </opaqueInsets>
+                                                </VBox>
+                                                <VBox alignment="CENTER">
+                                                   <children>
+                                                      <Label alignment="CENTER" prefWidth="120.0" text="Pay Every" />
+                                                      <TextField fx:id="payEveryField" alignment="CENTER" />
+                                                   </children>
+                                                   <opaqueInsets>
+                                                      <Insets />
+                                                   </opaqueInsets>
+                                                </VBox>
+                                                <VBox alignment="CENTER">
+                                                   <children>
+                                                      <Label alignment="CENTER" prefWidth="120.0" text="Interest" />
+                                                      <TextField fx:id="interestField" alignment="CENTER" />
+                                                   </children>
+                                                   <opaqueInsets>
+                                                      <Insets />
+                                                   </opaqueInsets>
+                                                </VBox>
+                                             </children>
+                                          </HBox>
+                                          <AnchorPane>
+                                             <children>
+                                                <VBox alignment="CENTER" layoutX="30.0" layoutY="-1.0" prefHeight="128.0" prefWidth="600.0" AnchorPane.bottomAnchor="36.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <children>
+                                                      <VBox alignment="CENTER" spacing="10.0">
+                                                         <VBox.margin>
+                                                            <Insets top="35.0" />
+                                                         </VBox.margin>
+                                                         <children>
+                                                            <Button fx:id="requestLoanButton" maxHeight="25.0" maxWidth="103.0" mnemonicParsing="false" onAction="#requestLoanButtonAction" prefHeight="25.0" prefWidth="103.0" text="Request Loan" />
+                                                            <ProgressBar fx:id="requestLoanProgress" prefWidth="200.0" progress="0.0" />
+                                                            <Label fx:id="loanProgressStatusLabel" alignment="CENTER" />
+                                                         </children>
+                                                      </VBox>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </AnchorPane>
+                                       </children>
+                                       <BorderPane.margin>
+                                          <Insets top="20.0" />
+                                       </BorderPane.margin>
+                                    </VBox>
+                                 </center>
+                              </BorderPane>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
                 <Tab text="Payment">
                   <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">

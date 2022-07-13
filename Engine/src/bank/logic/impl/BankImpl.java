@@ -1089,12 +1089,18 @@ public class BankImpl implements Bank {
             timeHandler.resetRewind();
 
         timeHandler.rewindTime(time);
+        loanHandler.calculateLoansStatus();
+        customersVer++;
+        loansVer++;
+        forecastVer++;
     }
 
     @Override
     public void resetRewind() {
         if(timeHandler.isReadOnly())
             timeHandler.resetRewind();
+
+        loanHandler.calculateLoansStatus();
     }
 
     @Override
@@ -1117,10 +1123,6 @@ public class BankImpl implements Bank {
             balance += transaction.getAmount();
 
         return balance;
-    }
-
-    private void calculateLoansStatus() {
-
     }
 
 

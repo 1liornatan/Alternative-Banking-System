@@ -239,4 +239,27 @@ public class BankLoanHandler implements LoanHandler {
         }
     }
 
+    @Override
+    public void calculateLoansStatus() {
+        Collection<Pair<Loan, Integer>> allPairs = loans.getAllPairs();
+
+        for(Pair<Loan, Integer> pair : allPairs) {
+            Loan loan = pair.getKey();
+            int missingCycles = loan.getMissingCycles();
+            if(loan.getStartedYaz() == 0) {
+                if(loan.getInvestments().size() == 0)
+                    loan.setStatus(LoanStatus.NEW);
+                else
+                    loan.setStatus(LoanStatus.PENDING);
+            }
+            else if(loan.getAmountToCloseLoan() == 0) {
+                loan.setStatus(LoanStatus.FINISHED);
+            }
+            else if(loan.getMissingCycles() <= 1)
+                loan.setStatus(LoanStatus.ACTIVE);
+            else
+                loan.setStatus(LoanStatus.RISKED);
+        }
+    }
+
 }
