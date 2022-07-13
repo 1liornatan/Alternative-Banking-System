@@ -1141,6 +1141,9 @@ public class BankImpl implements Bank {
 
         account.addRequestedLoan(loan);
         loans.addData(loan);
+        loansVer++;
+        customersVer++;
+        forecastVer++;
     }
 
     private int calculateBalance(CustomerAccount account) {

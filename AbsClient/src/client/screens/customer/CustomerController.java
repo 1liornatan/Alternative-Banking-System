@@ -947,10 +947,10 @@ public class CustomerController {
     }
 
     private void setRequestFields() {
-        setFieldLimits(requestAmountField);
-        setFieldLimits(interestField);
-        setFieldLimits(payEveryField);
-        setFieldLimits(timeField);
+        setFieldLimitsZero(requestAmountField);
+        setFieldLimitsZero(interestField);
+        setFieldLimitsZero(payEveryField);
+        setFieldLimitsZero(timeField);
     }
 
     private void setReadOnlyDisables() {
@@ -982,6 +982,16 @@ public class CustomerController {
                 amountField.setText("0");
             } else if (Integer.parseInt(newValue) > balanceProperty.get()) {
                 amountField.setText(String.valueOf(balanceProperty.get()));
+            }
+        });
+    }
+
+    private void setFieldLimitsZero(TextField amountField) {
+        amountField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                amountField.setText(newValue.replaceAll("[^\\d]", ""));
+            } else if (newValue.isEmpty()) {
+                amountField.setText("0");
             }
         });
     }
