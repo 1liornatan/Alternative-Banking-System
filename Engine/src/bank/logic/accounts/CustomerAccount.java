@@ -20,5 +20,9 @@ public interface CustomerAccount extends Account {
 
     Collection<Loan> getLoansInvested();
 
+    void updateNotificationsVersion();
+    int getNotificationsVersion();
+
+
     int getNumOfRequestedLoansByStatus(LoanStatus status);
 }

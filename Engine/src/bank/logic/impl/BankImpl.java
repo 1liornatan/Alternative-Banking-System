@@ -874,12 +874,14 @@ public class BankImpl implements Bank {
     public NotificationsData getNotificationsData(String customerId) throws DataNotFoundException {
         NotificationsData notificationsData = new NotificationsData();
         List<NotificationData> notificationDataList = new ArrayList<>();
-        customersAccounts.getDataById(customerId).getNotificationList()
+        CustomerAccount customer = customersAccounts.getDataById(customerId);
+        customer.getNotificationList()
                 .forEach(notification -> notificationDataList.add(new NotificationData.NotificationDataBuilder()
                         .message(notification.getMessage())
                         .yazMade(notification.getYazMade())
                         .build()));
         notificationsData.setNotificationsList(notificationDataList);
+        notificationsData.setNotificationVersion(customer.getNotificationsVersion());
         return notificationsData;
     }
 
