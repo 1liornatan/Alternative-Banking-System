@@ -893,10 +893,14 @@ public class CustomerController {
                     updateData();
                     paymentErrorLabel.setText("Successfully paid " + debtAmountProperty.get());
                     paymentErrorLabel.setTextFill(Color.GREEN);
+                    selectedDebtLoan = null;
+                    debtPaymentHBox.setDisable(false);
                 });
             } catch (Exception e) {
                 paymentErrorLabel.setText(e.getMessage());
                 paymentErrorLabel.setTextFill(Color.RED);
+                selectedDebtLoan = null;
+                debtPaymentHBox.setDisable(false);
             }
         });
         debtThread.start();
