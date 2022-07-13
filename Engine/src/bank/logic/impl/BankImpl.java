@@ -124,7 +124,9 @@ public class BankImpl implements Bank {
         buyerAccount.getLoansInvested().add(loan);
         sellerAccount.getLoansInvested().remove(loan);
         buyerAccount.addNotification(new BankNotification("Bought " + investPrinting, getCurrentYaz()));
+        buyerAccount.updateNotificationsVersion();
         sellerAccount.addNotification(new BankNotification("Sold " + investPrinting, getCurrentYaz()));
+        sellerAccount.updateNotificationsVersion();
         investment.setInvestorId(buyerId);
 
         sellInvestmentsDataStorage.remove(investmentId);
@@ -242,6 +244,7 @@ public class BankImpl implements Bank {
                             loanRequester.addNotification(new BankNotification(
                                     "New payment of " + paymentAmount + " from loan '" + currLoan.getId() + "'",
                                     notificationYaz));
+                            loanRequester.updateNotificationsVersion();
                         }
                     } catch (DataNotFoundException e) {
                         System.out.println("Account '" + currLoan.getOwnerId() + "' was not found.");
@@ -278,6 +281,7 @@ public class BankImpl implements Bank {
                     invAcc.addNotification(new BankNotification(
                             "Investment in '" + loan.getId() + "' is unlisted from trading (loan in risk)",
                             notificationYaz));
+                    invAcc.updateNotificationsVersion();
                 } catch (DataNotFoundException e) {
                     System.out.println(e.getMessage());
                 }
@@ -288,6 +292,7 @@ public class BankImpl implements Bank {
                 CustomerAccount investorAcc = customersAccounts.getDataById(investor);
                 investorAcc.addNotification(new BankNotification(
                         "Loan '" + loan.getId() + "' is in Risk", notificationYaz));
+                investorAcc.updateNotificationsVersion();
             } catch (DataNotFoundException e) {
                 System.out.println(e.getMessage());
             }
@@ -295,6 +300,7 @@ public class BankImpl implements Bank {
         try {
             CustomerAccount owner = customersAccounts.getDataById(loan.getOwnerId());
             owner.addNotification(new BankNotification("Your loan '" + loan.getId() + "' is now in risk!", notificationYaz));
+            owner.updateNotificationsVersion();
         } catch (DataNotFoundException e) {
             System.out.println(e.getMessage());
         }
@@ -435,6 +441,7 @@ public class BankImpl implements Bank {
         loanHandler.addInvestment(loan, loanInvestment, investingAccount);
         investingAccount.addNotification(new BankNotification("Invested " + amount + " in '" + loan.getId() + "'.",
                 timeHandler.getCurrentTime()));
+        investingAccount.updateNotificationsVersion();
     }
 
     @Override
@@ -908,10 +915,12 @@ public class BankImpl implements Bank {
             loan.getInvestments().forEach(inv -> investors.add(inv.getInvestorId()));
 
             ownerAcc.addNotification(new BankNotification("Your Loan '" + loan.getId() + "' is not in risk an is active again!", messageYaz));
+            ownerAcc.updateNotificationsVersion();
             investors.forEach(investor -> {
                 try {
                     CustomerAccount invAcc = customersAccounts.getDataById(investor);
                     invAcc.addNotification(new BankNotification("The Loan '" + loan.getId() + "' is not in risk and is active again!", messageYaz));
+                    invAcc.updateNotificationsVersion();
                 } catch (DataNotFoundException e) {
                     System.out.println(e.getMessage());
                 }
