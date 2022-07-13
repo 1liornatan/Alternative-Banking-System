@@ -181,12 +181,8 @@ public class BankLoanHandler implements LoanHandler {
                 srcAcc.updateNotificationsVersion();
             }
 
-        } catch (NonPositiveAmountException e) {
+        } catch (NonPositiveAmountException | NoMoneyException e) {
             System.out.println(e.getMessage());
-        } catch (NoMoneyException e) {
-            loan.setStatus(LoanStatus.RISKED);
-            addRiskedNotification(loan);
-            partiallyPayment(loan);
         }
     }
 
