@@ -1141,6 +1141,8 @@ public class BankImpl implements Bank {
 
         account.addRequestedLoan(loan);
         loans.addData(loan);
+        categories.add(loan.getCategory());
+        categoriesVer++;
         loansVer++;
         customersVer++;
         forecastVer++;

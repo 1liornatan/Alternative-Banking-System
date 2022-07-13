@@ -93,6 +93,7 @@ public class BankLoanHandler implements LoanHandler {
     public void closeLoan(Loan loan) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException {
         int amountToCloseLoan = loan.getAmountToCloseLoan();
         CustomerAccount customer = customers.getDataById(loan.getOwnerId());
+
         if(customer.getBalance() < amountToCloseLoan)
             throw new NoMoneyException();
 
