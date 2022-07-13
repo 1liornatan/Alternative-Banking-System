@@ -133,6 +133,9 @@ public class CustomerController {
     private Label infErrorLabel;
 
     @FXML
+    private Label uploadErrorLabel;
+
+    @FXML
     private TextField balanceField;
 
     @FXML
@@ -287,6 +290,23 @@ public class CustomerController {
                         .method("POST", body)
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+
+                if(response.isSuccessful()) {
+                    Platform.runLater(() -> {
+                        uploadErrorLabel.setText("Uploaded File Successfully!");
+                        uploadErrorLabel.setTextFill(Color.GREEN);
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        try {
+                            uploadErrorLabel.setText(response.body().string());
+                            uploadErrorLabel.setTextFill(Color.RED);
+                        } catch (IOException e) {
+                            uploadErrorLabel.setText(e.getMessage());
+                            uploadErrorLabel.setTextFill(Color.RED);
+                        }
+                    });
+                }
                 response.close();
             } catch (IOException e) {
                 System.out.println(e.getMessage());

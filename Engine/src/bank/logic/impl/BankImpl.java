@@ -891,7 +891,6 @@ public class BankImpl implements Bank {
             customersVer++;
             loansVer++;
             forecastVer++;
-            updateActiveStatus(loan);
         } catch (DataNotFoundException | NoMoneyException | NonPositiveAmountException e) {
             System.out.println(e.getMessage());
         }
@@ -1101,6 +1100,9 @@ public class BankImpl implements Bank {
             timeHandler.resetRewind();
 
         loanHandler.calculateLoansStatus();
+        customersVer++;
+        loansVer++;
+        forecastVer++;
     }
 
     @Override
