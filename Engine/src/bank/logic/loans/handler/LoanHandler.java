@@ -20,4 +20,6 @@ public interface LoanHandler {
     void closeLoan(Loan loan) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
 
     void calculateLoansStatus();
+
+    void checkCurrentLoanStatus(Loan loan);
 }

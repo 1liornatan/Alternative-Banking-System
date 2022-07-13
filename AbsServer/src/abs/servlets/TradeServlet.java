@@ -44,21 +44,20 @@ public class TradeServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } else {
             String type = request.getParameter(Constants.TYPE);
-            if(type == null)
-            {
+            if (type == null) {
                 outputStream.print("Invalid Parameters!");
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
             }
 
             String jsonResponse = null;
 
-            switch(type) {
-                case(Constants.INVESTMENTS_FOR_SELL): {
+            switch (type) {
+                case (Constants.INVESTMENTS_FOR_SELL): {
                     InvestmentsSellData investmentsForSell = bankManager.getInvestmentsForSell(usernameFromSession);
                     jsonResponse = Constants.GSON_INSTANCE.toJson(investmentsForSell);
                     break;
                 }
-                case(Constants.LISTED_INVESTMENTS): {
+                case (Constants.LISTED_INVESTMENTS): {
                     try {
                         InvestmentsSellData listedInvestments = bankManager.getCustomerInvestments(usernameFromSession);
                         jsonResponse = Constants.GSON_INSTANCE.toJson(listedInvestments);
@@ -69,15 +68,9 @@ public class TradeServlet extends HttpServlet {
                     break;
                 }
             }
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(jsonResponse);
-                    out.flush();
-                    logServerMessage("Loan Trade Response (" + usernameFromSession + "): " + jsonResponse);
-                    response.setStatus(HttpServletResponse.SC_OK);
-                } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                    outputStream.print("Invalid parameters found!");
-            }
+            outputStream.print(jsonResponse);
+            outputStream.flush();
+            response.setStatus(HttpServletResponse.SC_OK);
         }
     }
 
