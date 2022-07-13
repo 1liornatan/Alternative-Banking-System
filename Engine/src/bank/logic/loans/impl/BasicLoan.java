@@ -236,8 +236,11 @@ public class BasicLoan implements Loan {
 
     @Override
     public int getPayment() {
-        if(status == LoanStatus.ACTIVE || status == LoanStatus.RISKED)
-            return payments.get(cyclesPaid.size());
+        if(status == LoanStatus.ACTIVE || status == LoanStatus.RISKED) {
+            if (cyclesPaid.size() < payments.size())
+                return payments.get(cyclesPaid.size());
+            return 0;
+        }
 
         return averagePayment;
     }

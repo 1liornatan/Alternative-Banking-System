@@ -42,6 +42,7 @@ import models.InvestmentModel;
 import models.LoanModel;
 import models.NotificationModel;
 import models.TransactionModel;
+import models.utils.LoanStatus;
 import models.utils.LoanTable;
 import models.utils.TradeTable;
 import okhttp3.*;
@@ -837,8 +838,8 @@ public class CustomerController {
     void payDebtButtonAction(ActionEvent ignoredEvent) {
         selectedDebtLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
 
-        if (selectedDebtLoan == null) {
-            paymentErrorLabel.setText("You must select a loan first!");
+        if (selectedDebtLoan == null || !selectedDebtLoan.getStatus().equals(LoanStatus.RISKED.name())) {
+            paymentErrorLabel.setText("You must select a loan with debt first!");
             paymentErrorLabel.setTextFill(Color.RED);
             debtPaymentHBox.setDisable(true);
         }
