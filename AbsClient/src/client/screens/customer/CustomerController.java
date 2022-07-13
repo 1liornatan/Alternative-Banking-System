@@ -838,7 +838,7 @@ public class CustomerController {
     void payDebtButtonAction(ActionEvent ignoredEvent) {
         selectedDebtLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
 
-        if (selectedDebtLoan == null || !selectedDebtLoan.getStatus().equals(LoanStatus.RISKED.name())) {
+        if (selectedDebtLoan == null || !selectedDebtLoan.getStatus().equals(LoanStatus.RISKED.toString())) {
             paymentErrorLabel.setText("You must select a loan with debt first!");
             paymentErrorLabel.setTextFill(Color.RED);
             debtPaymentHBox.setDisable(true);
