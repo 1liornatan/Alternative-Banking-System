@@ -68,6 +68,7 @@ public class BankLoanHandler implements LoanHandler {
 
         transactions.addData(srcAcc.withdraw(amount, "Loan '" + loan.getId() + "' Debt Payment"));
         customers.getDataById(srcAcc.getId()).addNotification(new BankNotification("Payment of " + amount + " for loan '" + loan.getId() + "'",timeHandler.getCurrentTime()));
+        customers.getDataById(srcAcc.getId()).updateNotificationsVersion();
         //int missingCycles = (loan.getCurrentPayment() - loan.getFullPaidCycles());
         int cyclesToPay = amount / loan.getPayment();
         for(int i = 0; i < cyclesToPay; i++)
@@ -85,6 +86,7 @@ public class BankLoanHandler implements LoanHandler {
         if(loan.getAmountToCloseLoan() == 0) {
             loan.setStatus(LoanStatus.FINISHED);
             srcAcc.addNotification(new BankNotification("Loan '" + loan.getId() + "' is now finished", timeHandler.getCurrentTime()));
+            srcAcc.updateNotificationsVersion();
             loan.setFinishedYaz(timeHandler.getCurrentTime());
         }
     }
@@ -107,9 +109,10 @@ public class BankLoanHandler implements LoanHandler {
             CustomerAccount investor = customers.getDataById(investment.getInvestorId());
             transactions.addData(investor.deposit(payment, description));
             investor.addNotification(new BankNotification("Received " + payment + " from closing of '" + loanId + "'", currentTime));
+            investor.updateNotificationsVersion();
         }
         customer.addNotification(new BankNotification("Closed '" + loanId + "' for " + amountToCloseLoan, currentTime));
-
+        customer.updateNotificationsVersion();
         loan.closeLoan();
     }
 
@@ -157,6 +160,7 @@ public class BankLoanHandler implements LoanHandler {
             int currYaz = timeHandler.getCurrentTime();
             transactions.addData(srcAcc.withdraw(payment, "Loan '" + loan.getId() + "' Payment of " + payment));
             srcAcc.addNotification(new BankNotification("Loan '" + loan.getId() + "' Payment of " + payment, currYaz));
+            srcAcc.updateNotificationsVersion();
             loan.fullPaymentCycle();
             Collection<Investment> investments = loan.getInvestments();
             boolean isFinished = true;
@@ -174,6 +178,7 @@ public class BankLoanHandler implements LoanHandler {
                 loan.setStatus(LoanStatus.FINISHED);
                 loan.setFinishedYaz(currYaz);
                 srcAcc.addNotification(new BankNotification("Loan '" + loan.getId() + "' is now finished!", currYaz));
+                srcAcc.updateNotificationsVersion();
             }
 
         } catch (NonPositiveAmountException e) {
@@ -189,6 +194,7 @@ public class BankLoanHandler implements LoanHandler {
         for(Investment investment : loan.getInvestments()) {
             customers.getDataById(investment.getInvestorId()).addNotification(new BankNotification("Loan '" +
                     loan.getId() + "' is in Risk", timeHandler.getCurrentTime()));;
+            customers.getDataById(investment.getInvestorId()).updateNotificationsVersion();
         }
     }
 
