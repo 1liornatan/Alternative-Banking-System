@@ -5,7 +5,7 @@ import abs.utils.SessionUtils;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.manager.BankManager;
 import bank.users.UserManager;
-import com.google.gson.Gson;
+
 import http.constants.Constants;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletOutputStream;
@@ -17,9 +17,9 @@ import manager.loans.LoanData;
 import manager.loans.LoansData;
 import manager.loans.LoansWithVersion;
 
-import java.io.File;
+
 import java.io.IOException;
-import java.io.PrintWriter;
+
 import java.util.Properties;
 
 @WebServlet(name = "Loans Servlet", urlPatterns = "/bank/loan")

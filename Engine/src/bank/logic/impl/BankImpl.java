@@ -319,11 +319,11 @@ public class BankImpl implements Bank {
 
     @Override
     public void advanceCycle(String loanId) throws DataNotFoundException, NonPositiveAmountException {
-        Loan loan = loans.getDataById(loanId);
-        loanHandler.payOneCycle(loan);
         customersVer++;
         loansVer++;
         forecastVer++;
+        Loan loan = loans.getDataById(loanId);
+        loanHandler.payOneCycle(loan);
     }
 
     @Override

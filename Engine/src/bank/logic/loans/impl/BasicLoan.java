@@ -162,8 +162,8 @@ public class BasicLoan implements Loan {
         int currentPayment = getCurrentPayment();
         int paymentNeeded = getPaymentNeeded();
 
-        if(paymentNeeded < 0) {
-            paymentNeeded = 0;
+        if(paymentNeeded < currentPayment) {
+            paymentNeeded = currentPayment;
         }
         else if(paymentNeeded > payments.size()) {
             paymentNeeded = payments.size();
