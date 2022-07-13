@@ -7,11 +7,13 @@ import bank.logic.manager.BankManager;
 import bank.users.UserManager;
 import com.google.gson.Gson;
 import http.constants.Constants;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import manager.loans.LoanData;
 import manager.loans.LoansData;
 import manager.loans.LoansWithVersion;
 
@@ -101,6 +103,36 @@ public class LoanServlet extends HttpServlet {
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        String usernameFromSession = SessionUtils.getUsername(request);
+        ServletOutputStream outputStream = response.getOutputStream();
+        BankManager bankManager = ServletUtils.getBankManager(getServletContext());
+        ServletInputStream inputStream = request.getInputStream();
+
+        if(usernameFromSession == null) {
+            outputStream.print("You must login first.");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+        else if(SessionUtils.isAdmin(request)) {
+            outputStream.print("Loan Request is not for admins.");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        } else {
+            try {
+                Properties prop = new Properties();
+                prop.load(inputStream);
+                String jsonRequest = prop.getProperty(Constants.DATA);
+                LoanData data = Constants.GSON_INSTANCE.fromJson(jsonRequest, LoanData.class);
+
+                bankManager.createLoan(usernameFromSession, data);
+                outputStream.print("Loan Created Successfully!");
+                response.setStatus(HttpServletResponse.SC_OK);
+
+            } catch (Exception e) {
+                outputStream.print(e.getMessage());
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+            }
+        }
+
 
     }
 

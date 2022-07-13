@@ -1111,6 +1111,36 @@ public class BankImpl implements Bank {
         return new TimeData(time, readOnly);
     }
 
+    @Override
+    public void createLoan(String customer, LoanData data) throws Exception {
+
+        CustomerAccount account = customersAccounts.getDataById(customer);
+
+        String category = data.getCategory();
+        String name = data.getName();
+        int interestAmount = data.getInterest();
+        int baseAmount = data.getBaseAmount();
+        int cyclesPerPayment = data.getCyclesPerPayment();
+        int duration = data.getFinishedYaz();
+
+        if(loans.isDataExists(name))
+            throw new DataAlreadyExistsException(name);
+
+        if(interestAmount <= 0 || baseAmount <= 0 || cyclesPerPayment <= 0 || duration <= 0)
+            throw new NonPositiveAmountException();
+
+        if(category.isEmpty())
+            throw new Exception("Category cannot be empty!");
+
+        LoanBuilder details = new LoanBuilder(customer, category, name);
+
+        Interest interest = new BasicInterest(interestAmount, baseAmount, cyclesPerPayment, duration);
+        Loan loan = loanHandler.createLoan(details, interest);
+
+        account.addRequestedLoan(loan);
+        loans.addData(loan);
+    }
+
     private int calculateBalance(CustomerAccount account) {
         Integer balance = 0;
         int currYaz = getCurrentYaz();

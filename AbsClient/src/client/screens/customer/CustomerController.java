@@ -306,6 +306,9 @@ public class CustomerController {
         int paymentPer = Integer.parseInt(payEveryField.getText());
         int interest = Integer.parseInt(interestField.getText());
 
+        if(!checkFields())
+            return;
+
         LoanData data = new LoanData();
 
         data.setName(loanId);
@@ -315,7 +318,90 @@ public class CustomerController {
         data.setInterest(interest);
         data.setFinishedYaz(time);
 
-        // TODO: HTTP REQUEST
+        new Thread(() -> {
+            try {
+                Props prop = new Props();
+                String jsonRequest = Constants.GSON_INSTANCE.toJson(data);
+
+                prop.add(Constants.DATA, jsonRequest);
+
+                MediaType mediaType = MediaType.parse("text/plain");
+                RequestBody body = RequestBody.create(mediaType, prop.toString());
+                Request request = new Request.Builder()
+                        .url(Constants.URL_LOAN)
+                        .method("POST", body)
+                        .addHeader("Content-Type", "application/json")
+                        .build();
+
+                Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                String responseBody = response.body().string();
+                if(response.isSuccessful()) {
+                    Platform.runLater(() -> {
+                        loanProgressStatusLabel.setText(responseBody);
+                        loanProgressStatusLabel.setTextFill(Color.GREEN);
+                    });
+                }
+                else {
+                    Platform.runLater(() -> {
+                        loanProgressStatusLabel.setText(responseBody);
+                        loanProgressStatusLabel.setTextFill(Color.RED);
+                    });
+                }
+                response.close();
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    loanProgressStatusLabel.setText(e.getMessage());
+                    loanProgressStatusLabel.setTextFill(Color.RED);
+                });
+            }
+        }).start();
+    }
+
+    private boolean checkFields() {
+        String loanId = nameField.getText();
+        String category = categoryField.getText();
+        int amount = Integer.parseInt(requestAmountField.getText());
+        int time = Integer.parseInt(timeField.getText());
+        int paymentPer = Integer.parseInt(payEveryField.getText());
+        int interest = Integer.parseInt(interestField.getText());
+
+        if(loanId.isEmpty()) {
+            loanProgressStatusLabel.setText("Loan's name cannot be empty!");
+            loanProgressStatusLabel.setTextFill(Color.RED);
+            return false;
+        }
+
+        if(category.isEmpty()) {
+            loanProgressStatusLabel.setText("Loan's category cannot be empty!");
+            loanProgressStatusLabel.setTextFill(Color.RED);
+            return false;
+        }
+
+        if(amount <= 0) {
+            loanProgressStatusLabel.setText("Loan's amount must be positive!");
+            loanProgressStatusLabel.setTextFill(Color.RED);
+            return false;
+        }
+
+        if(time <= 0) {
+            loanProgressStatusLabel.setText("Loan's time must be positive!");
+            loanProgressStatusLabel.setTextFill(Color.RED);
+            return false;
+        }
+
+        if(paymentPer <= 0) {
+            loanProgressStatusLabel.setText("Loan's payment every X must be positive!");
+            loanProgressStatusLabel.setTextFill(Color.RED);
+            return false;
+        }
+
+        if(interest <= 0) {
+            loanProgressStatusLabel.setText("Loan's interest must be positive!");
+            loanProgressStatusLabel.setTextFill(Color.RED);
+            return false;
+        }
+
+        return true;
     }
 
     @FXML
@@ -855,7 +941,15 @@ public class CustomerController {
         setWalkAnimation();
 
         setReadOnlyDisables();
+        setRequestFields();
 
+    }
+
+    private void setRequestFields() {
+        setFieldLimits(requestAmountField);
+        setFieldLimits(interestField);
+        setFieldLimits(payEveryField);
+        setFieldLimits(timeField);
     }
 
     private void setReadOnlyDisables() {
@@ -867,6 +961,7 @@ public class CustomerController {
                 withdrawButton.setDisable(newValue);
                 chargeButton.setDisable(newValue);
                 searchLoansButton.setDisable(newValue);
+                requestLoanButton.setDisable(newValue);
                 investButton.setDisable(newValue);
                 payCycleButton.setDisable(newValue);
                 closeLoanButton.setDisable(newValue);

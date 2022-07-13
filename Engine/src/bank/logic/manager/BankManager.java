@@ -10,6 +10,7 @@ import manager.customers.CustomersData;
 import manager.customers.CustomersNames;
 import manager.info.ClientInfoData;
 import manager.investments.*;
+import manager.loans.LoanData;
 import manager.loans.LoansData;
 import manager.messages.NotificationsData;
 import manager.time.TimeData;
@@ -135,5 +136,9 @@ public class BankManager {
 
     public TimeData getTimeData() {
         return bankInstance.getTimeData();
+    }
+
+    public void createLoan(String usernameFromSession, LoanData data) throws Exception {
+        bankInstance.createLoan(usernameFromSession, data);
     }
 }

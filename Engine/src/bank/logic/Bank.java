@@ -158,4 +158,5 @@ public interface Bank {
 
     TimeData getTimeData();
 
+    void createLoan(String usernameFromSession, LoanData data) throws DataNotFoundException, DataAlreadyExistsException, Exception;
 }
