@@ -22,7 +22,10 @@ public interface CustomerAccount extends Account {
 
     void updateNotificationsVersion();
     int getNotificationsVersion();
+    int getInvestmentsVersion();
 
+
+    void updateInvestmentsVersion();
 
     int getNumOfRequestedLoansByStatus(LoanStatus status);
 }

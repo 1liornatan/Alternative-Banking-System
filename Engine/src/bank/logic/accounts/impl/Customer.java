@@ -13,6 +13,7 @@ public class Customer extends LoanAccount implements CustomerAccount {
     private final Collection<Loan> loansInvested;
     private final List<Notification> notificationList;
     private int notificationsVersion;
+    private int investmentsVersion;
 
     @Override
     public boolean equals(Object o) {
@@ -35,6 +36,7 @@ public class Customer extends LoanAccount implements CustomerAccount {
         loansInvested = new HashSet<>();
         notificationList = new ArrayList<>();
         notificationsVersion = 1;
+        investmentsVersion = 1;
     }
 
     @Override
@@ -55,6 +57,7 @@ public class Customer extends LoanAccount implements CustomerAccount {
     @Override
     public void addInvestedLoan(Loan loan) {
         loansInvested.add(loan);
+        updateInvestmentsVersion();
     }
 
     @Override
@@ -72,11 +75,18 @@ public class Customer extends LoanAccount implements CustomerAccount {
         return name;
     }
 
+    @Override
     public int getNotificationsVersion() {
         return notificationsVersion;
     }
-
+    @Override
     public void updateNotificationsVersion() {notificationsVersion++;}
+    @Override
+    public int getInvestmentsVersion() {
+        return investmentsVersion;
+    }
+    @Override
+    public void updateInvestmentsVersion() {investmentsVersion++;}
 
     @Override
     public String toString() {

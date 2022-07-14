@@ -138,11 +138,11 @@ public class BankImpl implements Bank {
         List<Investment> investments = new ArrayList<>();
 
         account.getLoansInvested().stream().filter(loan -> loans.isDataExists(loan.getId())).filter(loan -> loan.getStatus() == LoanStatus.ACTIVE).forEach(loan -> loan.getInvestments().stream().filter(investment -> investment.getInvestorId().equals(customerId)).forEach(investments::add));
-
-        return investmentsListToData(investments);
+        return investmentsListToData(investments, account.getInvestmentsVersion());
     }
 
-    private InvestmentsSellData investmentsListToData(List<Investment> investments) {
+    @Override
+    public InvestmentsSellData investmentsListToData(List<Investment> investments, int investmentsVersion) {
         List<String> ownerId = new ArrayList<>();
         List<String> loanId = new ArrayList<>();
         List<Integer> amount = new ArrayList<>();
@@ -158,7 +158,6 @@ public class BankImpl implements Bank {
             invIds.add(investment.getId());
             forSale.add(sellInvestmentsDataStorage.isDataExists(investment.getId()));
         }
-
         return new InvestmentsSellData.SellBuilder()
                 .name(ownerId)
                 .loans(loanId)
@@ -166,6 +165,7 @@ public class BankImpl implements Bank {
                 .time(yazPlaced)
                 .id(invIds)
                 .forSale(forSale)
+                .version(investmentsVersion)
                 .Build();
     }
 
