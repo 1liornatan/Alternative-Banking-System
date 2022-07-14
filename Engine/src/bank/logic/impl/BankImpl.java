@@ -123,8 +123,10 @@ public class BankImpl implements Bank {
 
         buyerAccount.getLoansInvested().add(loan);
         sellerAccount.getLoansInvested().remove(loan);
+        sellerAccount.updateInvestmentsVersion();
         buyerAccount.addNotification(new BankNotification("Bought " + investPrinting, getCurrentYaz()));
         buyerAccount.updateNotificationsVersion();
+        buyerAccount.updateInvestmentsVersion();
         sellerAccount.addNotification(new BankNotification("Sold " + investPrinting, getCurrentYaz()));
         sellerAccount.updateNotificationsVersion();
         investment.setInvestorId(buyerId);

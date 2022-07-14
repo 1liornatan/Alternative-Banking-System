@@ -145,6 +145,9 @@ public class CustomerController {
     private Label uploadErrorLabel;
 
     @FXML
+    private Label controlsLabel;
+
+    @FXML
     private TextField balanceField;
 
     @FXML
@@ -781,6 +784,9 @@ public class CustomerController {
         if (selectedLoan == null) {
             paymentErrorLabel.setText("You must select a loan first!");
             paymentErrorLabel.setTextFill(Color.RED);
+        } else if(balanceProperty.get() < selectedLoan.getAmountLeftToPay()) {
+            controlsLabel.setTextFill(Color.RED);
+            controlsLabel.setText("Not enough money to close loan!");
         }
         else {
             Thread closeLoanThread = new Thread(() -> {
@@ -823,6 +829,9 @@ public class CustomerController {
         if (selectedLoan == null) {
             paymentErrorLabel.setText("You must select a loan first!");
             paymentErrorLabel.setTextFill(Color.RED);
+        } else if(balanceProperty.get() < selectedLoan.getPaymentAmount()) {
+            controlsLabel.setTextFill(Color.RED);
+            controlsLabel.setText("Not enough money to pay cycle!");
         }
         else {
             Thread payCycleThread = new Thread(() -> {
@@ -873,8 +882,8 @@ public class CustomerController {
         selectedDebtLoan = loanerLoansPTable.getSelectionModel().getSelectedItem();
 
         if (selectedDebtLoan == null || !selectedDebtLoan.getStatus().equals(LoanStatus.RISKED.toString())) {
-            paymentErrorLabel.setText("You must select a loan with debt first!");
-            paymentErrorLabel.setTextFill(Color.RED);
+            controlsLabel.setText("You must select a loan with debt first!");
+            controlsLabel.setTextFill(Color.RED);
             debtPaymentHBox.setDisable(true);
         }
         else {
@@ -885,6 +894,10 @@ public class CustomerController {
     @FXML
     void submitDebtButtonAction(ActionEvent ignoredEvent) {
         debtAmountProperty.set(Integer.parseInt(debtAmountField.getText()));
+        if(debtAmountProperty.get() > balanceProperty.get()) {
+            paymentErrorLabel.setText("Not enough money to pay for debt!");
+            paymentErrorLabel.setTextFill(Color.RED);
+        }
         Thread debtThread = new Thread(() -> {
             try {
                 Props prop = new Props();
