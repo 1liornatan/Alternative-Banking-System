@@ -82,6 +82,7 @@ public class CustomerController {
     private int loansVer;
     private int pLoansVer;
     private int notificationsVer;
+    private int investmentsVer;
 
 
     final static Image WALK_1 = new Image(Objects.requireNonNull(CustomerController.class.getResource("/screens/resources/animation/1.png")).toString());
@@ -464,7 +465,7 @@ public class CustomerController {
 
                     Platform.runLater(() -> {
                         updateData();
-                        buyInvestmentTable.getItems().remove(selectedItem);
+                        buyInvestmentTable.getItems().remove(selectedItem);//TODO: update owned investments
                         buyErrorLabel.setText("Investment bought successfully!");
                         buyErrorLabel.setTextFill(Color.GREEN);
                     });
@@ -521,6 +522,7 @@ public class CustomerController {
 
                     Platform.runLater(() -> {
                         updateOwnedInvestments();
+                        investmentsVer++;
                         sellErrorLabel.setText("Listed investment successfully!");
                         sellErrorLabel.setTextFill(Color.GREEN);
                     });
@@ -613,6 +615,7 @@ public class CustomerController {
                     response.close();
                     Platform.runLater(() -> {
                         updateOwnedInvestments();
+                        investmentsVer++;
                         sellErrorLabel.setText("Unlisted investment successfully!");
                         sellErrorLabel.setTextFill(Color.GREEN);
                     });
@@ -1118,6 +1121,7 @@ public class CustomerController {
         loansVer = 0;
         pLoansVer = 0;
         notificationsVer = 0;
+        investmentsVer = 0;
         categoriesVer = 0;
         forecastVer = 0;
         setupUpdateThread();
@@ -1642,6 +1646,10 @@ public class CustomerController {
                 if(response.isSuccessful()) {
                     try (ResponseBody body = response.body()) {
                         InvestmentsSellData customerInvestments = Constants.GSON_INSTANCE.fromJson(body.string(), InvestmentsSellData.class);
+                        if(customerInvestments.getVersion() == investmentsVer)
+                            return;
+
+                        investmentsVer = customerInvestments.getVersion();
                         sellInvestmentModels = getInvModels(customerInvestments);
 
 

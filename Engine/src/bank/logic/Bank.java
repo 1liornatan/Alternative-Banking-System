@@ -9,6 +9,7 @@ import bank.logic.impl.exceptions.DataAlreadyExistsException;
 import bank.logic.impl.exceptions.DataNotFoundException;
 import bank.logic.loans.Loan;
 import bank.logic.loans.interest.exceptions.InvalidPercentException;
+import bank.logic.loans.investments.Investment;
 import bank.logic.time.TimeHandler;
 import bank.logic.transactions.Transaction;
 import files.xmls.exceptions.*;
@@ -43,6 +44,8 @@ public interface Bank {
     void investmentTrade(InvestmentData data) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
 
     InvestmentsSellData getCustomerInvestments(String customerId) throws DataNotFoundException;
+
+    InvestmentsSellData investmentsListToData(List<Investment> investments, int investmentsVersion);
 
     DataStorage<CustomerAccount> getCustomersAccounts();
 

@@ -11,6 +11,7 @@ public class InvestmentsSellData {
         List<Integer> yazPlaced;
         List<String> invIds;
         List<Boolean> forSale;
+        int version;
 
         public SellBuilder forSale(List<Boolean> forSale) {
             this.forSale = forSale;
@@ -18,6 +19,10 @@ public class InvestmentsSellData {
         }
         public SellBuilder id(List<String> investmentIds) {
             this.invIds = investmentIds;
+            return this;
+        }
+        public SellBuilder version(int version) {
+            this.version = version;
             return this;
         }
 
@@ -48,6 +53,7 @@ public class InvestmentsSellData {
             invIds = new ArrayList<>();
             forSale = new ArrayList<>();
             yazPlaced = new ArrayList<>();
+            version = 0;
         }
 
         public InvestmentsSellData Build() {
@@ -61,6 +67,7 @@ public class InvestmentsSellData {
     final List<Integer> yazPlaced;
     final List<String> invIds;
     final List<Boolean> forSale;
+    final int version;
 
     private InvestmentsSellData(SellBuilder investmentsBuilder) {
         this.amounts = investmentsBuilder.amounts;
@@ -69,6 +76,7 @@ public class InvestmentsSellData {
         this.yazPlaced = investmentsBuilder.yazPlaced;
         this.invIds = investmentsBuilder.invIds;
         this.forSale = investmentsBuilder.forSale;
+        this.version = investmentsBuilder.version;
     }
 
     public List<Integer> getYazPlaced() {
@@ -94,4 +102,7 @@ public class InvestmentsSellData {
     public List<Boolean> getForSale() {
         return forSale;
     }
+
+    public int getVersion() {return version;}
+
 }
