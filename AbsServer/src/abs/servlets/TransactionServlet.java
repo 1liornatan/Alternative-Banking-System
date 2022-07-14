@@ -36,12 +36,9 @@ public class TransactionServlet extends HttpServlet {
                 TransactionsData transactions = bankManager.getTransactionsData(usernameFromSession);
                 String jsonResponse = Constants.GSON_INSTANCE.toJson(transactions);
 
-                try (PrintWriter out = response.getWriter()) {
-                    out.print(jsonResponse);
-                    out.flush();
-                    response.setStatus(HttpServletResponse.SC_OK);
-                }
-                logServerMessage("Transaction Response (" + usernameFromSession + "): " + jsonResponse);
+                outputStream.print(jsonResponse);
+                outputStream.flush();
+                response.setStatus(HttpServletResponse.SC_OK);
         }
     }
 
@@ -58,7 +55,6 @@ public class TransactionServlet extends HttpServlet {
 
         if (usernameFromSession == null) { //user is not logged in yet
             outputStream.print("Not logged in yet.");
-
         } else {
             //user is already logged in
             Properties prop = new Properties();

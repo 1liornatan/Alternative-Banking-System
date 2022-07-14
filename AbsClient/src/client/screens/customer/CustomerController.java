@@ -1481,7 +1481,9 @@ public class CustomerController {
         balanceColumn.prefWidthProperty().bind(transactionsTable.widthProperty().multiply(0.2));
         previousBalanceColumn.prefWidthProperty().bind(transactionsTable.widthProperty().multiply(0.2));
         yazMadeColumn.prefWidthProperty().bind(transactionsTable.widthProperty().multiply(0.1));
-
+        yazMadeColumn.setStyle("-fx-alignment: CENTER;");
+        previousBalanceColumn.setStyle("-fx-alignment: CENTER;");
+        balanceColumn.setStyle("-fx-alignment: CENTER;");
         transactionsTable.getColumns().addAll(descriptionColumn, balanceColumn, previousBalanceColumn, yazMadeColumn);
 
         updateTransactions();
