@@ -10,6 +10,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -35,6 +37,7 @@ public class LoginController {
     private final BooleanProperty isConnected;
     private Parent mainScreen;
     private Stage primaryStage;
+    private BooleanProperty shakeProperty;
     private int x, y;
 
     private static final String STYLE_DEFAULT = Objects.requireNonNull(LoginController.class.getResource("/screens/resources/mainStyle.css")).toString();
@@ -273,10 +276,24 @@ public class LoginController {
 
 
         customerController = loader.getController();
+        shakeProperty = customerController.shakePropertyProperty();
+        setShake();
         customerController.customerIdProperty().set(currCustomer.get());
         customerController.startUpdateThread();
 
         Platform.runLater(() -> borderPane.setCenter(root));
+    }
+
+    private void setShake() {
+        shakeProperty.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if(newValue) {
+                    shakeStage();
+                    shakeProperty.set(false);
+                }
+            }
+        });
     }
 
     private Response makeLoginRequest(String username) throws IOException {

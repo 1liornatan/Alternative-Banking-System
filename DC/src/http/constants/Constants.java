@@ -57,4 +57,6 @@ public class Constants {
     public static final String NO_TYPE_MESSAGE = "Body type parameter not found.";
     public static final String INVALID_TIME_MESSAGE = "Body time parameter is invalid";
     public static final String URL_REWIND = URL_TIME + "/rewind";
+    public static final String URL_CHAT = URL_BASE + "/chat";
+    public static final String URL_USERS = URL_BASE + "/users";
 }
