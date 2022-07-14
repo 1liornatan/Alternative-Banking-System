@@ -880,9 +880,12 @@ public class BankImpl implements Bank {
     @Override
     public NotificationsData getNotificationsData(String customerId) throws DataNotFoundException {
         NotificationsData notificationsData = new NotificationsData();
+        int currYaz = timeHandler.getCurrentTime();
         List<NotificationData> notificationDataList = new ArrayList<>();
         CustomerAccount customer = customersAccounts.getDataById(customerId);
         customer.getNotificationList()
+                .stream()
+                .filter(notification -> notification.getYazMade() <= currYaz)
                 .forEach(notification -> notificationDataList.add(new NotificationData.NotificationDataBuilder()
                         .message(notification.getMessage())
                         .yazMade(notification.getYazMade())
@@ -1112,6 +1115,9 @@ public class BankImpl implements Bank {
             timeHandler.resetRewind();
 
         loanHandler.calculateLoansStatus();
+        customersVer++;
+        loansVer++;
+        forecastVer++;
     }
 
     @Override

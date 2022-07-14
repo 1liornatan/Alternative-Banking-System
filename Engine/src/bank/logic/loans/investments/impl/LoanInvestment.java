@@ -95,7 +95,7 @@ public class LoanInvestment implements Investment {
         int currYaz = timeHandler.getCurrentTime();
         int size = Math.toIntExact(cyclesPaid.stream().filter(time -> time <= currYaz).count());
 
-        return payments.subList(0, size - 1).stream().mapToInt(Integer::intValue).sum();
+        return payments.subList(0, size).stream().mapToInt(Integer::intValue).sum();
     }
 
     @Override

@@ -526,6 +526,7 @@ public class AdminController {
         increaseYazButton.setStyle("-fx-text-alignment: CENTER;");
         currYazTextField.textProperty().bind(currYazProperty.asString());
         stopRewindButton.disableProperty().bind(startRewindButton.disableProperty().not());
+        rewindTextField.setText("1");
         rewindTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             int currYaz = currYazProperty.get();
             if (!newValue.matches("\\d*")) {

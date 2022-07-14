@@ -68,7 +68,6 @@ public class BankLoanHandler implements LoanHandler {
 
         transactions.addData(srcAcc.withdraw(amount, "Loan '" + loan.getId() + "' Debt Payment"));
         customers.getDataById(srcAcc.getId()).addNotification(new BankNotification("Payment of " + amount + " for loan '" + loan.getId() + "'",timeHandler.getCurrentTime()));
-        customers.getDataById(srcAcc.getId()).updateNotificationsVersion();
         //int missingCycles = (loan.getCurrentPayment() - loan.getFullPaidCycles());
         int cyclesToPay = amount / loan.getPayment();
         for(int i = 0; i < cyclesToPay; i++)
@@ -86,8 +85,9 @@ public class BankLoanHandler implements LoanHandler {
         if(loan.getAmountToCloseLoan() == 0) {
             loan.setStatus(LoanStatus.FINISHED);
             srcAcc.addNotification(new BankNotification("Loan '" + loan.getId() + "' is now finished", timeHandler.getCurrentTime()));
-            srcAcc.updateNotificationsVersion();
             loan.setFinishedYaz(timeHandler.getCurrentTime());
+        } else {
+            checkCurrentLoanStatus(loan);
         }
     }
 
@@ -109,10 +109,9 @@ public class BankLoanHandler implements LoanHandler {
             CustomerAccount investor = customers.getDataById(investment.getInvestorId());
             transactions.addData(investor.deposit(payment, description));
             investor.addNotification(new BankNotification("Received " + payment + " from closing of '" + loanId + "'", currentTime));
-            investor.updateNotificationsVersion();
         }
         customer.addNotification(new BankNotification("Closed '" + loanId + "' for " + amountToCloseLoan, currentTime));
-        customer.updateNotificationsVersion();
+
         loan.closeLoan();
     }
 
@@ -158,9 +157,9 @@ public class BankLoanHandler implements LoanHandler {
         int payment = loan.getPayment();
         try {
             int currYaz = timeHandler.getCurrentTime();
+            int duration = loan.getDuration() / loan.getCyclesPerPayment();
             transactions.addData(srcAcc.withdraw(payment, "Loan '" + loan.getId() + "' Payment of " + payment));
             srcAcc.addNotification(new BankNotification("Loan '" + loan.getId() + "' Payment of " + payment, currYaz));
-            srcAcc.updateNotificationsVersion();
             loan.fullPaymentCycle();
             Collection<Investment> investments = loan.getInvestments();
             boolean isFinished = true;
@@ -178,7 +177,8 @@ public class BankLoanHandler implements LoanHandler {
                 loan.setStatus(LoanStatus.FINISHED);
                 loan.setFinishedYaz(currYaz);
                 srcAcc.addNotification(new BankNotification("Loan '" + loan.getId() + "' is now finished!", currYaz));
-                srcAcc.updateNotificationsVersion();
+            } else {
+                checkCurrentLoanStatus(loan);
             }
 
         } catch (NonPositiveAmountException | NoMoneyException e) {
@@ -190,7 +190,6 @@ public class BankLoanHandler implements LoanHandler {
         for(Investment investment : loan.getInvestments()) {
             customers.getDataById(investment.getInvestorId()).addNotification(new BankNotification("Loan '" +
                     loan.getId() + "' is in Risk", timeHandler.getCurrentTime()));;
-            customers.getDataById(investment.getInvestorId()).updateNotificationsVersion();
         }
     }
 
@@ -248,21 +247,26 @@ public class BankLoanHandler implements LoanHandler {
 
         for(Pair<Loan, Integer> pair : allPairs) {
             Loan loan = pair.getKey();
-            int missingCycles = loan.getMissingCycles();
-            if(loan.getStartedYaz() == 0) {
-                if(loan.getInvestments().size() == 0)
-                    loan.setStatus(LoanStatus.NEW);
-                else
-                    loan.setStatus(LoanStatus.PENDING);
-            }
-            else if(loan.getAmountToCloseLoan() == 0) {
-                loan.setStatus(LoanStatus.FINISHED);
-            }
-            else if(loan.getMissingCycles() <= 1)
-                loan.setStatus(LoanStatus.ACTIVE);
-            else
-                loan.setStatus(LoanStatus.RISKED);
+            checkCurrentLoanStatus(loan);
         }
+    }
+
+    @Override
+    public void checkCurrentLoanStatus(Loan loan) {
+        int missingCycles = loan.getMissingCycles();
+        if(loan.getStartedYaz() == 0) {
+            if(loan.getInvestments().size() == 0)
+                loan.setStatus(LoanStatus.NEW);
+            else
+                loan.setStatus(LoanStatus.PENDING);
+        }
+        else if(loan.getAmountToCloseLoan() == 0) {
+            loan.setStatus(LoanStatus.FINISHED);
+        }
+        else if(loan.getMissingCycles() <= 1)
+            loan.setStatus(LoanStatus.ACTIVE);
+        else
+            loan.setStatus(LoanStatus.RISKED);
     }
 
 }
