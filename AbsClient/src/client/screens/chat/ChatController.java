@@ -96,7 +96,7 @@ public class ChatController {
                 response.close();
 
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Error Updating Chat: " + e.getMessage());
             }
         }).start();
     }
