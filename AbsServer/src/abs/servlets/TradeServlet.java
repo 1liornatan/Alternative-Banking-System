@@ -135,7 +135,4 @@ public class TradeServlet extends HttpServlet {
             }
         }
     }
-    private void logServerMessage(String message) {
-        System.out.println(message);
-    }
 }
