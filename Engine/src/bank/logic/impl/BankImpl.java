@@ -381,7 +381,8 @@ public class BankImpl implements Bank {
 
 
     @Override
-    public InvestmentsSellData getInvestmentsForSell(String requesterId) {
+    public InvestmentsSellData getInvestmentsForSell(String requesterId) throws DataNotFoundException {
+
         List<String> investors = new ArrayList<>();
         List<String> loans = new ArrayList<>();
         List<Integer> sellAmounts = new ArrayList<>();
@@ -394,12 +395,15 @@ public class BankImpl implements Bank {
         for(Pair<Investment, Integer> invPair : allPairs) {
             Investment investment = invPair.getKey();
             String investorId = investment.getInvestorId();
+            String loanId = investment.getLoanId();
 
-            if(investorId.equals(requesterId) || investment.isFullyPaid()) // filter all owned investments or finished
+            Loan loan = this.loans.getDataById(loanId);
+
+            if(investorId.equals(requesterId) || investment.isFullyPaid() || loan.getOwnerId().equals(requesterId)) // filter all owned investments or finished
                 continue;
 
             investors.add(investorId);
-            loans.add(investment.getLoanId());
+            loans.add(loanId);
             sellAmounts.add((int)investment.getSellPrice());
             yazPlaced.add(invPair.getValue());
             invIds.add(investment.getId());

@@ -75,7 +75,7 @@ public interface Bank {
 
     int getDeriskAmount(Loan loan);
 
-    InvestmentsSellData getInvestmentsForSell(String requesterId);
+    InvestmentsSellData getInvestmentsForSell(String requesterId) throws DataNotFoundException;
 
     void setInvestmentsData(InvestmentsData investmentsData) throws DataNotFoundException, NoMoneyException, NonPositiveAmountException;
 

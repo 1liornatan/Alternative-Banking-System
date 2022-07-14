@@ -51,26 +51,31 @@ public class TradeServlet extends HttpServlet {
 
             String jsonResponse = null;
 
-            switch (type) {
-                case (Constants.INVESTMENTS_FOR_SELL): {
-                    InvestmentsSellData investmentsForSell = bankManager.getInvestmentsForSell(usernameFromSession);
-                    jsonResponse = Constants.GSON_INSTANCE.toJson(investmentsForSell);
-                    break;
-                }
-                case (Constants.LISTED_INVESTMENTS): {
-                    try {
-                        InvestmentsSellData listedInvestments = bankManager.getCustomerInvestments(usernameFromSession);
-                        jsonResponse = Constants.GSON_INSTANCE.toJson(listedInvestments);
-                    } catch (Exception e) {
-                        response.setStatus(HttpServletResponse.SC_CONFLICT);
-                        outputStream.print("Invalid parameters found!");
+            try {
+                switch (type) {
+                    case (Constants.INVESTMENTS_FOR_SELL): {
+                        InvestmentsSellData investmentsForSell = bankManager.getInvestmentsForSell(usernameFromSession);
+                        jsonResponse = Constants.GSON_INSTANCE.toJson(investmentsForSell);
+                        break;
                     }
-                    break;
+                    case (Constants.LISTED_INVESTMENTS): {
+                        try {
+                            InvestmentsSellData listedInvestments = bankManager.getCustomerInvestments(usernameFromSession);
+                            jsonResponse = Constants.GSON_INSTANCE.toJson(listedInvestments);
+                        } catch (Exception e) {
+                            response.setStatus(HttpServletResponse.SC_CONFLICT);
+                            outputStream.print("Invalid parameters found!");
+                        }
+                        break;
+                    }
                 }
+                outputStream.print(jsonResponse);
+                outputStream.flush();
+                response.setStatus(HttpServletResponse.SC_OK);
+            } catch (DataNotFoundException e) {
+                outputStream.print(e.getMessage());
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
             }
-            outputStream.print(jsonResponse);
-            outputStream.flush();
-            response.setStatus(HttpServletResponse.SC_OK);
         }
     }
 

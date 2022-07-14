@@ -98,7 +98,7 @@ public class BankManager {
         bankInstance.unlistInvestment(data);
     }
 
-    public InvestmentsSellData getInvestmentsForSell(String requesterId) {
+    public InvestmentsSellData getInvestmentsForSell(String requesterId) throws DataNotFoundException {
         return bankInstance.getInvestmentsForSell(requesterId);
     }
 

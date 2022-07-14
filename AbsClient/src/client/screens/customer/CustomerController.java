@@ -1,7 +1,6 @@
 package client.screens.customer;
 
-import client.screens.CustomerMain;
-import com.sun.deploy.util.BlackList;
+import client.screens.chat.ChatController;
 import http.constants.Constants;
 import http.utils.HttpClientUtil;
 import http.utils.Props;
@@ -18,12 +17,16 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
@@ -48,10 +51,12 @@ import models.utils.TradeTable;
 import okhttp3.*;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.control.table.TableRowExpanderColumn;
+import screens.resources.BankScreenConsts;
 import utils.ModelUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 
 public class CustomerController {
@@ -76,6 +81,8 @@ public class CustomerController {
     private LoanModel selectedDebtLoan;
     private final BooleanProperty animationProperty;
     private final BooleanProperty readOnlyProperty;
+    private ChatController chatController;
+    private BooleanProperty shakeProperty;
 
     private int stopSignal;
 
@@ -261,9 +268,12 @@ public class CustomerController {
     private LineChart<String, Number> timeLineChart;
     private Timeline walkTimeline;
     private Thread updateThread;
-    private IntegerProperty currYazProperty;
+    private final IntegerProperty currYazProperty;
     private int categoriesVer;
     private int forecastVer;
+
+    @FXML
+    private BorderPane chatPane;
 
     @FXML
     void loadFileButtonAction(ActionEvent ignoredEvent) {
@@ -969,6 +979,8 @@ public class CustomerController {
         setReadOnlyDisables();
         setRequestFields();
 
+        setChat();
+
     }
 
     private void setRequestFields() {
@@ -1231,10 +1243,12 @@ public class CustomerController {
 
     public void startUpdateThread() {
         updateThread.start();
+        chatController.startUpdateThread();
     }
 
     public void stopUpdateThread() {
         stopSignal = 1;
+        chatController.stopUpdateThread();
     }
 
 
@@ -1750,6 +1764,32 @@ public class CustomerController {
                 System.out.println(e.getMessage());
             }
         }).start();
+    }
+
+    private void setChat() {
+        FXMLLoader loader = new FXMLLoader();
+
+        // load admin fxml
+        URL chatFXML = getClass().getResource(BankScreenConsts.CHAT_FXML_RESOURCE_IDENTIFIER);
+        loader.setLocation(chatFXML);
+        try {
+            Parent root = loader.load();
+
+            chatController = loader.getController();
+            shakeProperty = chatController.shakePropertyProperty();
+
+            Platform.runLater(() -> chatPane.setCenter(root));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public boolean isShakeProperty() {
+        return shakeProperty.get();
+    }
+
+    public BooleanProperty shakePropertyProperty() {
+        return shakeProperty;
     }
 }
 
