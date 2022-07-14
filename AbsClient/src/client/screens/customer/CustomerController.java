@@ -465,7 +465,7 @@ public class CustomerController {
 
                     Platform.runLater(() -> {
                         updateData();
-                        buyInvestmentTable.getItems().remove(selectedItem);//TODO: update owned investments
+                        buyInvestmentTable.getItems().remove(selectedItem);
                         buyErrorLabel.setText("Investment bought successfully!");
                         buyErrorLabel.setTextFill(Color.GREEN);
                     });
