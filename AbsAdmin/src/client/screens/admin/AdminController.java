@@ -86,6 +86,7 @@ public class AdminController {
     private StringProperty loginErrorMessageProperty;
     private BooleanProperty isLoggedIn;
     private Thread updateThread;
+    private int stopSignal;
 
 
 
@@ -145,6 +146,7 @@ public class AdminController {
                         });
                     }
                 }
+                response.close();
 
             } catch (IOException e) {
                 System.out.println(e.getMessage());
@@ -510,6 +512,7 @@ public class AdminController {
         setUpdateThread();
         customersVer = 0;
         loansVer = 0;
+        stopSignal = 0;
     }
 
     public void startUpdateThread() {
@@ -517,7 +520,7 @@ public class AdminController {
     }
 
     public void stopUpdateThread() {
-        updateThread.interrupt();
+        stopSignal = 1;
     }
     @FXML
     void initialize() {
@@ -552,14 +555,15 @@ public class AdminController {
 
     private void setUpdateThread() {
         updateThread = new Thread(() -> {
-            while(true) {
+            while(stopSignal != 1) {
                 try {
                     updateBankData();
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    System.out.println("check update: " + e.getMessage());
+                    System.out.println("Update Thread: " + e.getMessage());
                 }
             }
+            stopSignal = 0;
         });
     }
 

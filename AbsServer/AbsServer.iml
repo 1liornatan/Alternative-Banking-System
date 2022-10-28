@@ -24,6 +24,6 @@
     <orderEntry type="module" module-name="DTOs" />
     <orderEntry type="module" module-name="Engine" />
     <orderEntry type="library" name="gson-2.1" level="project" />
-    <orderEntry type="library" name="lib" level="project" />
+    <orderEntry type="library" name="tomcat" level="project" />
   </component>
 </module>

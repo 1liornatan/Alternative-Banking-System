@@ -306,6 +306,7 @@ public class CustomerController {
                         .build();
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
 
+                String responseBody = response.body().string();
                 if(response.isSuccessful()) {
                     Platform.runLater(() -> {
                         uploadErrorLabel.setText("Uploaded File Successfully!");
@@ -313,13 +314,8 @@ public class CustomerController {
                     });
                 } else {
                     Platform.runLater(() -> {
-                        try {
-                            uploadErrorLabel.setText(response.body().string());
-                            uploadErrorLabel.setTextFill(Color.RED);
-                        } catch (IOException e) {
-                            uploadErrorLabel.setText(e.getMessage());
-                            uploadErrorLabel.setTextFill(Color.RED);
-                        }
+                        uploadErrorLabel.setText(responseBody);
+                        uploadErrorLabel.setTextFill(Color.RED);
                     });
                 }
                 response.close();
@@ -335,15 +331,15 @@ public class CustomerController {
     }
 
     private void requestLoan() {
+        if(!checkFields())
+            return;
+
         String loanId = nameField.getText();
         String category = categoryField.getText();
         int amount = Integer.parseInt(requestAmountField.getText());
         int time = Integer.parseInt(timeField.getText());
         int paymentPer = Integer.parseInt(payEveryField.getText());
         int interest = Integer.parseInt(interestField.getText());
-
-        if(!checkFields())
-            return;
 
         LoanData data = new LoanData();
 
@@ -356,6 +352,12 @@ public class CustomerController {
 
         new Thread(() -> {
             try {
+                Platform.runLater(() -> {
+                    requestLoanProgress.setProgress(0);
+                    requestLoanButton.setDisable(true);
+                });
+                Thread.sleep(1000);
+                Platform.runLater(() -> requestLoanProgress.setProgress(0.2));
                 Props prop = new Props();
                 String jsonRequest = Constants.GSON_INSTANCE.toJson(data);
 
@@ -370,7 +372,12 @@ public class CustomerController {
                         .build();
 
                 Response response = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                Thread.sleep(1000);
+                Platform.runLater(() -> requestLoanProgress.setProgress(0.4));
                 String responseBody = response.body().string();
+                Thread.sleep(1000);
+                Platform.runLater(() -> requestLoanProgress.setProgress(0.8));
+                Thread.sleep(1000);
                 if(response.isSuccessful()) {
                     Platform.runLater(() -> {
                         loanProgressStatusLabel.setText(responseBody);
@@ -383,11 +390,16 @@ public class CustomerController {
                         loanProgressStatusLabel.setTextFill(Color.RED);
                     });
                 }
+                Platform.runLater(() -> {
+                    requestLoanProgress.setProgress(1);
+                    requestLoanButton.setDisable(false);
+                });
                 response.close();
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     loanProgressStatusLabel.setText(e.getMessage());
                     loanProgressStatusLabel.setTextFill(Color.RED);
+                    requestLoanButton.setDisable(false);
                 });
             }
         }).start();
@@ -1004,6 +1016,12 @@ public class CustomerController {
         setFieldLimitsZero(interestField);
         setFieldLimitsZero(payEveryField);
         setFieldLimitsZero(timeField);
+
+        requestAmountField.setText("0");
+        timeField.setText("1");
+        payEveryField.setText("1");
+        interestField.setText("1");
+
     }
 
     private void setReadOnlyDisables() {
@@ -1160,7 +1178,7 @@ public class CustomerController {
                     updateData();
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    System.out.println("check update: " + e.getMessage());
+                    System.out.println("Update Thread: " + e.getMessage());
                 }
             }
             stopSignal = 0;

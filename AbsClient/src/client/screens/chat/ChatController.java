@@ -102,7 +102,7 @@ public class ChatController {
     }
 
     private void checkShake(String chat) {
-        if(chat.contains("Aviad"))
+        if(chat.toUpperCase().contains("AVIAD"))
             shakeProperty.set(true);
     }
 

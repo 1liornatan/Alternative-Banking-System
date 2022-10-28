@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="AbsAdmin:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/AbsAdmin_jar</output-path>
-    <root id="archive" name="AbsAdmin.jar">
-      <element id="module-output" name="AbsAdmin" />
+  <artifact type="jar" name="AbsClient:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/AbsClient_jar</output-path>
+    <root id="archive" name="AbsClient.jar">
+      <element id="module-output" name="AbsClient" />
       <element id="module-output" name="DC" />
       <element id="module-output" name="DTOs" />
       <element id="module-output" name="GUI" />

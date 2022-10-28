@@ -147,7 +147,7 @@ public interface Bank {
 
     boolean isCustomerExists(String username);
 
-    void addLoansFromFile(String customer, String filePath) throws XmlPaymentsException, NonPositiveAmountException, DataNotFoundException, DataAlreadyExistsException;
+    void addLoansFromFile(String customer, String filePath) throws Exception;
 
     ClientInfoData getClientInfo(String customer) throws DataNotFoundException;
 

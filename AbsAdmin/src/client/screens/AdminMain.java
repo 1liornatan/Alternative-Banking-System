@@ -1,6 +1,7 @@
 package client.screens;
 
 
+import client.screens.login.LoginController;
 import http.constants.Constants;
 import http.utils.HttpClientUtil;
 import javafx.application.Application;
@@ -10,13 +11,16 @@ import javafx.scene.Scene;
 
 import javafx.stage.Stage;
 import okhttp3.Request;
+import okhttp3.Response;
 import screens.resources.BankScreenConsts;
 
 import java.io.IOException;
 import java.net.URL;
 
+
 public class AdminMain extends Application {
 
+    private LoginController loginController;
     @SuppressWarnings("unchecked")
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -29,7 +33,7 @@ public class AdminMain extends Application {
         loader.setLocation(adminFXML);
         Parent root = loader.load();
 
-
+        loginController = loader.getController();
         // set stage
         primaryStage.setTitle("Alternative Banking System - Admin Client");
         Scene scene = new Scene(root, 1050, 600);
@@ -38,8 +42,9 @@ public class AdminMain extends Application {
         primaryStage.show();
     }
 
-/*    @Override
+    @Override
     public void stop() {
+        loginController.getAdminController().stopUpdateThread();
 
         new Thread(() -> {
             try {
@@ -47,12 +52,14 @@ public class AdminMain extends Application {
                         .url(Constants.URL_LOGOUT)
                         .build();
 
-                HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                Response execute = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                execute.close();
+
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
         }).start();
-    }*/
+    }
 
     public static void main(String[] args) {
         launch(args);

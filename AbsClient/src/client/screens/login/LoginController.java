@@ -215,15 +215,7 @@ public class LoginController {
                         });
                     }
                     else {
-                        String errorMessage = "";
-                        try (ResponseBody body = response.body()) {
-                            if (body != null) {
-                                errorMessage = body.string();
-                            }
-
-                            String finalErrorMessage = errorMessage;
-                            Platform.runLater(() -> setErrorMessage(finalErrorMessage));
-                        }
+                        Platform.runLater(() -> setErrorMessage("Cannot connect to the server"));
                     }
                     response.close();
                 } catch (IOException e) {
@@ -334,5 +326,9 @@ public class LoginController {
 
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
+    }
+
+    public CustomerController getCustomerController() {
+        return customerController;
     }
 }

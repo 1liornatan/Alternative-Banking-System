@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="Abs">
+    <output-path>$PROJECT_DIR$/out/artifacts/Abs</output-path>
+    <root id="archive" name="Abs.war">
+      <element id="artifact" artifact-name="AbsServer:Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="tomcat" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
