@@ -9,7 +9,6 @@
       <module fileurl="file://$PROJECT_DIR$/DTOs/DTOs.iml" filepath="$PROJECT_DIR$/DTOs/DTOs.iml" />
       <module fileurl="file://$PROJECT_DIR$/Engine.iml" filepath="$PROJECT_DIR$/Engine.iml" />
       <module fileurl="file://$PROJECT_DIR$/GUI/GUI.iml" filepath="$PROJECT_DIR$/GUI/GUI.iml" />
-      <module fileurl="file://$PROJECT_DIR$/UI/UI.iml" filepath="$PROJECT_DIR$/UI/UI.iml" />
     </modules>
   </component>
 </project>
