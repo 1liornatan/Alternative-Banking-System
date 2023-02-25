@@ -29,6 +29,11 @@
 }
 
 #loansChosenLabel,
+#investedLoansLabel,
+#requestedLoansLabel,
+#paymentsLabel,
+#notificationsLabel,
+#transactionsLabel,
 #loansFoundLabel {
     -fx-font-size: 16;
     -fx-text-fill: #50a0c0;

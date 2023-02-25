@@ -96,13 +96,13 @@ public class ChatController {
                 response.close();
 
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Error Updating Chat: " + e.getMessage());
             }
         }).start();
     }
 
     private void checkShake(String chat) {
-        if(chat.contains("Aviad"))
+        if(chat.toUpperCase().contains("AVIAD"))
             shakeProperty.set(true);
     }
 

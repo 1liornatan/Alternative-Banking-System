@@ -1052,7 +1052,7 @@ public class BankImpl implements Bank {
     }
 
     @Override
-    public void addLoansFromFile(String customer, String filePath) throws XmlPaymentsException, NonPositiveAmountException, DataNotFoundException, DataAlreadyExistsException {
+    public void addLoansFromFile(String customer, String filePath) throws Exception {
         List<LoanData> loansFromXML = XmlLoanReader.getLoansFromXML(filePath);
         String categoryName, loanName;
         int interestPercent, amount, payPerTime, totalTime;

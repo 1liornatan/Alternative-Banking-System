@@ -19,23 +19,6 @@ import java.util.Properties;
 @WebServlet(name = "Time Servlet", urlPatterns = "/bank/time/rewind")
 public class RewindServlet extends HttpServlet {
 
-/*    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/plain;charset=UTF-8");
-
-        String usernameFromSession = SessionUtils.getUsername(request);
-        ServletOutputStream outputStream = response.getOutputStream();
-        BankManager bankManager = ServletUtils.getBankManager(getServletContext());
-
-        if (usernameFromSession == null) { //user is not logged in yet
-            outputStream.print("Not logged in yet.");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        } else if (!SessionUtils.isAdmin(request)) {
-            outputStream.print("You are not an admin!");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        } else {
-
-        }
-    }*/
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/plain;charset=UTF-8");
 

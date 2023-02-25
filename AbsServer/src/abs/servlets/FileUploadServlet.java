@@ -52,9 +52,11 @@ public class FileUploadServlet extends HttpServlet {
                 bankManager.addLoansFromFile(usernameFromSession, tempFile.toString());
 
                 outputStream.print("Successfully Uploaded File.");
+                response.setStatus(HttpServletResponse.SC_OK);
             }
         } catch (Exception e) {
             outputStream.print(e.getMessage());
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
         }
     }
 

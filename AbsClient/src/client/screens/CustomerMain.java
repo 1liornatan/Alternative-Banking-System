@@ -10,6 +10,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import okhttp3.Request;
+import okhttp3.Response;
 import screens.resources.BankScreenConsts;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.net.URL;
 
 public class CustomerMain extends Application {
 
+    private LoginController loginController;
     @SuppressWarnings("unchecked")
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -28,9 +30,9 @@ public class CustomerMain extends Application {
         URL adminFXML = getClass().getResource(BankScreenConsts.LOGIN_FXML_RESOURCE_IDENTIFIER);
         loader.setLocation(adminFXML);
         Parent root = loader.load();
-        LoginController controller = loader.getController();
-        controller.setMainScreen(root);
-        controller.setPrimaryStage(primaryStage);
+        loginController = loader.getController();
+        loginController.setMainScreen(root);
+        loginController.setPrimaryStage(primaryStage);
 
 
         // set stage
@@ -39,6 +41,25 @@ public class CustomerMain extends Application {
         scene.getStylesheets().add(getClass().getResource("/screens/resources/mainStyle.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    @Override
+    public void stop() {
+        loginController.getCustomerController().stopUpdateThread();
+
+        new Thread(() -> {
+            try {
+                Request request = new Request.Builder()
+                        .url(Constants.URL_LOGOUT)
+                        .build();
+
+                Response execute = HttpClientUtil.HTTP_CLIENT.newCall(request).execute();
+                execute.close();
+
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }).start();
     }
 
 

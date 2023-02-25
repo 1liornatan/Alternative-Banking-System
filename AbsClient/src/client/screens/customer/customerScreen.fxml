@@ -89,16 +89,31 @@
                                  <items>
                                     <VBox alignment="CENTER" spacing="10.0">
                                        <children>
-                                          <TableView fx:id="loanerLoansTable" />
-                                          <TableView fx:id="lenderLoansTable" />
+                                          <VBox alignment="CENTER" spacing="5.0">
+                                             <children>
+                                                <Label fx:id="requestedLoansLabel" text="Requested Loans" />
+                                                <TableView fx:id="loanerLoansTable" />
+                                             </children>
+                                          </VBox>
+                                          <VBox alignment="CENTER" spacing="5.0">
+                                             <children>
+                                                <Label fx:id="investedLoansLabel" text="Invested Loans" />
+                                                <TableView fx:id="lenderLoansTable" />
+                                             </children>
+                                          </VBox>
                                        </children>
                                        <padding>
                                           <Insets bottom="10.0" top="10.0" />
                                        </padding>
                                     </VBox>
-                                    <VBox alignment="CENTER" spacing="10.0">
+                                    <VBox alignment="TOP_CENTER" spacing="10.0">
                                        <children>
-                                          <TableView fx:id="transactionsTable" />
+                                          <VBox alignment="CENTER" spacing="5.0">
+                                             <children>
+                                                <Label fx:id="transactionsLabel" text="Transactions" />
+                                                <TableView fx:id="transactionsTable" />
+                                             </children>
+                                          </VBox>
                                           <VBox alignment="CENTER">
                                              <children>
                                                 <Label text="Amount" />
@@ -113,6 +128,9 @@
                                           </HBox>
                                           <Label fx:id="infErrorLabel" />
                                        </children>
+                                       <padding>
+                                          <Insets top="10.0" />
+                                       </padding>
                                     </VBox>
                                  </items>
                               </SplitPane>
@@ -369,9 +387,14 @@
                            <children>
                               <BorderPane prefHeight="371.0" prefWidth="600.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="15.0">
                                  <left>
-                                    <VBox alignment="CENTER" prefHeight="341.0" prefWidth="359.0" spacing="20.0" BorderPane.alignment="CENTER">
+                                    <VBox alignment="TOP_CENTER" prefHeight="341.0" prefWidth="359.0" spacing="20.0" BorderPane.alignment="CENTER">
                                        <children>
-                                          <TableView fx:id="loanerLoansPTable" prefWidth="359.0" />
+                                          <VBox alignment="TOP_CENTER" spacing="5.0">
+                                             <children>
+                                                <Label fx:id="paymentsLabel" text="Payments" />
+                                                <TableView fx:id="loanerLoansPTable" prefWidth="359.0" />
+                                             </children>
+                                          </VBox>
                                           <HBox alignment="CENTER" spacing="30.0">
                                              <children>
                                                 <Button fx:id="payCycleButton" mnemonicParsing="false" onAction="#payCycleButtonAction" prefWidth="80.0" text="Pay Cycle" />
@@ -393,19 +416,21 @@
                                           </HBox>
                                           <Label fx:id="paymentErrorLabel" />
                                        </children>
-                                       <BorderPane.margin>
-                                          <Insets />
-                                       </BorderPane.margin>
                                     </VBox>
                                  </left>
                                  <center>
                                     <AnchorPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                                        <children>
-                                          <TableView fx:id="notificationsTable" prefHeight="341.0" prefWidth="226.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="0.0">
-                                             <columnResizePolicy>
-                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                             </columnResizePolicy>
-                                          </TableView>
+                                          <VBox alignment="TOP_CENTER" layoutX="15.0" prefHeight="607.0" prefWidth="263.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <Label fx:id="notificationsLabel" text="Notifications" />
+                                                <TableView fx:id="notificationsTable">
+                                                   <columnResizePolicy>
+                                                      <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                   </columnResizePolicy>
+                                                </TableView>
+                                             </children>
+                                          </VBox>
                                        </children>
                                     </AnchorPane>
                                  </center>

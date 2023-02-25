@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="exploded-war" name="AbsServer:Web exploded">
-    <output-path>$PROJECT_DIR$/out/artifacts/AbsServer_Web_exploded</output-path>
+  <artifact type="exploded-war" name="AbsServer:Web">
+    <output-path>$PROJECT_DIR$/out/artifacts/AbsServer_Web</output-path>
     <root id="root">
       <element id="javaee-facet-resources" facet="AbsServer/web/Web" />
       <element id="directory" name="WEB-INF">
@@ -12,6 +12,8 @@
         </element>
         <element id="directory" name="lib">
           <element id="library" level="project" name="gson-2.1" />
+          <element id="library" level="project" name="okhttp-4.9.1" />
+          <element id="library" level="project" name="tomcat" />
         </element>
       </element>
     </root>

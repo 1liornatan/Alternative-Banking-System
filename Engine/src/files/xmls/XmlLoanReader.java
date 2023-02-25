@@ -28,45 +28,49 @@ public class XmlLoanReader {
         return (AbsDescriptor) u.unmarshal(in);
     }
 
-    public static List<LoanData> getLoansFromXML(String filePath) throws XmlPaymentsException, NonPositiveAmountException {
+    public static List<LoanData> getLoansFromXML(String filePath) throws Exception {
         List<LoanData> loanList = new ArrayList<>();
-        try {
-            InputStream inputStream = new FileInputStream(filePath);
+        InputStream inputStream = new FileInputStream(filePath);
 
-            AbsDescriptor descriptor = deserializeLoanFrom(inputStream);
-            AbsCategories categories = descriptor.getAbsCategories();
-            AbsLoans loans = descriptor.getAbsLoans();
-            List<AbsLoan> absLoan = loans.getAbsLoan();
+        AbsDescriptor descriptor = deserializeLoanFrom(inputStream);
+        AbsCategories categories = descriptor.getAbsCategories();
+        AbsLoans loans = descriptor.getAbsLoans();
+        List<AbsLoan> absLoan = loans.getAbsLoan();
 
-            List<String> categoryList = categories.getAbsCategory();
+        List<String> categoryList = categories.getAbsCategory();
 
-            for (AbsLoan currLoan : absLoan) {
-                String loanName = currLoan.getId();
-                String categoryName = currLoan.getAbsCategory();
-                int amount = currLoan.getAbsCapital();
-                int totalTime = currLoan.getAbsTotalYazTime();
-                int payPerTime = currLoan.getAbsPaysEveryYaz();
-                int interestPercent = currLoan.getAbsIntristPerPayment();
+        for (AbsLoan currLoan : absLoan) {
+            String loanName = currLoan.getId();
+            String categoryName = currLoan.getAbsCategory();
+            int amount = currLoan.getAbsCapital();
+            int totalTime = currLoan.getAbsTotalYazTime();
+            int payPerTime = currLoan.getAbsPaysEveryYaz();
+            int interestPercent = currLoan.getAbsIntristPerPayment();
 
-                if (totalTime <= 0 || payPerTime <= 0 || totalTime % payPerTime != 0)
-                    throw new XmlPaymentsException();
+            if (totalTime <= 0 || payPerTime <= 0 || totalTime % payPerTime != 0)
+                throw new XmlPaymentsException();
 
-                if(amount <= 0)
-                    throw new NonPositiveAmountException();
-
-                LoanData currLoanData = new LoanData();
-
-                currLoanData.setName(loanName);
-                currLoanData.setCategory(categoryName);
-                currLoanData.setBaseAmount(amount);
-                currLoanData.setCyclesPerPayment(payPerTime);
-                currLoanData.setFinishedYaz(totalTime);
-                currLoanData.setInterest(interestPercent);
-
-                loanList.add(currLoanData);
+            if (loanName.isEmpty()) {
+                throw new Exception("Loan name cannot be empty!");
             }
-        } catch (FileNotFoundException | JAXBException e) {
-            System.out.println(e.getMessage());
+
+            if (categoryName.isEmpty()) {
+                throw new Exception("Category cannot be empty!");
+            }
+
+            if (amount <= 0)
+                throw new NonPositiveAmountException();
+
+            LoanData currLoanData = new LoanData();
+
+            currLoanData.setName(loanName);
+            currLoanData.setCategory(categoryName);
+            currLoanData.setBaseAmount(amount);
+            currLoanData.setCyclesPerPayment(payPerTime);
+            currLoanData.setFinishedYaz(totalTime);
+            currLoanData.setInterest(interestPercent);
+
+            loanList.add(currLoanData);
         }
         return loanList;
     }

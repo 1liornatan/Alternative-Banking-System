@@ -103,13 +103,13 @@ public class LoginController {
                 if(response.isSuccessful()) {
                     HttpClientUtil.shutdown();
                     HttpClientUtil.removeCookiesOf(Constants.ADDRESS);
-                    Platform.runLater(() -> {
-                                setDisconnected();
-                                borderPane.setCenter(null);
-                            });
-
                     adminController.isLoggedInProperty().set(false);
                     adminController.stopUpdateThread();
+                    Platform.runLater(() -> {
+                        setDisconnected();
+                        borderPane.setCenter(null);
+                    });
+
 
                 }
                 else {
@@ -160,14 +160,8 @@ public class LoginController {
                         });
                     }
                     else {
-                        String errorMessage = "";
-                        try (ResponseBody body = response.body()) {
-                            if (body != null) {
-                                errorMessage = body.string();
-                            }
-                        }
-                        String finalErrorMessage = errorMessage;
-                        Platform.runLater(() -> setErrorMessage(finalErrorMessage));
+
+                        Platform.runLater(() -> setErrorMessage("Cannot connect to the server."));
                     }
                     response.close();
                 } catch (IOException e) {
@@ -224,6 +218,10 @@ public class LoginController {
         adminController.startUpdateThread();
 
         Platform.runLater(() -> borderPane.setCenter(root));
+    }
+
+    public AdminController getAdminController() {
+        return adminController;
     }
 
     private Response makeAdminLoginRequest(String username) throws IOException {
